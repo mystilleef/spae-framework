@@ -19,11 +19,10 @@ Input: $ARGUMENTS
    caller provides no instructions, use an empty prompt.
 3. **Execute:** Call the `Agent` tool with `subagent_type` set to
    `agent_name` and the optimized `instructions` as the prompt.
-4. **Present:** Always present the raw result from the agent, then halt.
+4. **Present:** Always present the raw result from the agent.
 5. **Critical:** `STOP!`. Perform no further operations.
 
 **Rules:**
 
 - Present subagent results **as-is**.
 - Never change the `subagent`'s results unless requested.
-- Always present the raw result from the agent, then halt.
