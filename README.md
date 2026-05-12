@@ -60,7 +60,7 @@ If `/verify` finds gaps, it creates `VERIFY.md` and resets the cycle to
 
 The full protocol specifies extra phases—`coverage`, `purity`,
 `refactor`, `review`, and `commit`—for post-verification refinement. See
-[`spae-framework.md`](spae-framework.md) for the complete specification.
+[`spae-framework.md`](./spae-framework.md) for the complete specification.
 
 ---
 
@@ -82,7 +82,7 @@ directory—add `.spae/` to `.gitignore`.
 ## Prerequisites
 
 - Harness must support the
-  [Agent Skill specification](https://github.com/agentverse/agent-skill-specification)
+  [Agent Skills specification](https://agentskills.io/home)
 - Subagent support recommended
 - Custom commands or prompts recommended
 
