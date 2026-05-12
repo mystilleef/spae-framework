@@ -33,34 +33,73 @@ predictable `LLM` outputs, even when using lower-tier agents.
 
 ---
 
+## Usage
+
+Invoke any agent with `/run <agent> [argument]`. Agents encapsulate
+skills and carry out each phase. For SPAE agents, only `spec` takes an
+argument—a description of the task.
+
+| Agent     | Invocation                |
+| --------- | ------------------------- |
+| `spec`    | `/run spec <requirement>` |
+| `plan`    | `/run plan`               |
+| `inspect` | `/run inspect`            |
+| `build`   | `/run build`              |
+| `tdd`     | `/run tdd`                |
+| `execute` | `/run execute`            |
+| `verify`  | `/run verify`             |
+
+---
+
 ## Workflow
 
 Run phases in order. Each agent reads only its designated inputs and
 writes only its designated outputs.
 
-<!-- prettier-ignore -->
-| Phase | Skill | Purpose |
-| --- | --- | --- |
-| 1 | `/spec <task>` | Distill requirements into `SPEC.md` |
-| 2 | `/plan` | Decompose `SPEC.md` into an atomic task graph |
-| 3 | `/inspect` | Perform gap analysis and optimize `PLAN.md` |
-| 4 | `/build` · `/tdd` · `/execute` | Carry out tasks from `PLAN.md` |
-| 5 | `/verify` | Verify implementation against `SPEC.md` |
+| Phase | Agent                     | Purpose                                       |
+| ----- | ------------------------- | --------------------------------------------- |
+| 1     | `/run spec <requirement>` | Distill requirements into `SPEC.md`           |
+| 2     | `/run plan`               | Decompose `SPEC.md` into an atomic task graph |
+| 3     | `/run inspect`            | Perform gap analysis and optimize `PLAN.md`   |
+| 4     | `/run build`              | Carry out tasks from `PLAN.md`                |
+| 5     | `/run verify`             | Verify implementation against `SPEC.md`       |
 
-Choose one execution mode per `workstream` after `/inspect`:
+Choose one execution mode per `workstream` after `/run inspect`:
 
-- `/build` — one task per cycle; best for complex or high-risk plans
-- `/tdd` — failing-test-first cycle; best for behavioral changes
-- `/execute` — all tasks at once; best for small, low-risk plans
+- `/run build`—one task per cycle; best for complex or high-risk plans
+- `/run tdd`—failing-test-first cycle; best for behavioral changes
+- `/run execute`—all tasks at once; best for small, low-risk plans
 
-If `/verify` finds gaps, it creates `VERIFY.md` and resets the cycle to
-`/spec`. Repeat until `/verify` passes.
+If `/run verify` finds gaps, it creates `VERIFY.md` and resets the cycle
+to `/run spec`. Repeat until `/run verify` passes.
 
-### Extended phases
+---
 
-The full protocol specifies extra phases—`coverage`, `purity`,
-`refactor`, `review`, and `commit`—for post-verification refinement. See
-[`spae-framework.md`](./spae-framework.md) for the complete specification.
+## Post-verification
+
+After `/run verify` passes, run these agents to refine and ship the
+implementation. Follow the order below for best results.
+
+| Order | Agent           | Purpose                             |
+| ----- | --------------- | ----------------------------------- |
+| 1     | `/run coverage` | Fill test coverage gaps             |
+| 2     | `/run purity`   | Simplify and optimize code          |
+| 3     | `/run refactor` | Improve structure and clarity       |
+| 4     | `/run review`   | Review for correctness and style    |
+| 5     | `/run commit`   | Stage and commit the implementation |
+
+---
+
+## Utility agents
+
+These agents run independently of the `SPAE` workflow. Use them at any
+point to avoid polluting the main conversation context.
+
+| Agent               | Purpose                                           |
+| ------------------- | ------------------------------------------------- |
+| `/run work`         | Run ad-hoc tasks in an isolated session           |
+| `/run query`        | Answer questions or research without side effects |
+| `/run troubleshoot` | Diagnose and fix issues                           |
 
 ---
 
@@ -69,13 +108,12 @@ The full protocol specifies extra phases—`coverage`, `purity`,
 All artifacts live in `.spae/<workstream>/`. Never commit this
 directory—add `.spae/` to `.gitignore`.
 
-<!-- prettier-ignore -->
-| File | Purpose |
-| --- | --- |
-| `STATE.json` | Execution cursor—tracks phase and active task |
-| `SPEC.md` | Normalized requirements—immutable during execution |
-| `PLAN.md` | Atomic task graph—immutable during execution |
-| `VERIFY.md` | Ephemeral signal—created when verification fails |
+| File         | Purpose                                            |
+| ------------ | -------------------------------------------------- |
+| `STATE.json` | Execution cursor—tracks phase and active task      |
+| `SPEC.md`    | Normalized requirements—immutable during execution |
+| `PLAN.md`    | Atomic task graph—immutable during execution       |
+| `VERIFY.md`  | Ephemeral signal—created when verification fails   |
 
 ---
 
@@ -108,8 +146,8 @@ agent files.
 
 ### Run command
 
-The `/run` command orchestrates subagent invocation. Format varies by
-harness.
+The `/run` command orchestrates subagent invocation. Invoke agents as
+`/run <agent> [argument]`. Format varies by harness.
 
 <!-- prettier-ignore -->
 | Harness | Notes |
