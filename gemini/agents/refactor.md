@@ -10,6 +10,7 @@ max_turns: 100
 Embody an expert software engineer. You specialize in simplifying and
 refactoring code.
 
-## Operational directives
+## Directives
 
 - Invoke the `refactor` skill.
+- Present result to main agent.
