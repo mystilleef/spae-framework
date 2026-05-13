@@ -138,19 +138,19 @@ each phase and work with any compliant harness.
 Agents wrap skills in isolated sessions. Each harness requires its own
 agent files.
 
-<!-- prettier-ignore -->
-| Harness | Source | Destination |
-| --- | --- | --- |
-| Pi | `pi/` | `~/.pi/agent/agents/` |
-| Gemini | `gemini/` | `~/.gemini/agents/` |
+| Harness | Source           | Destination           |
+| ------- | ---------------- | --------------------- |
+| Claude  | `claude/agents/` | `~/.claude/agents/`   |
+| Gemini  | `gemini/agents/` | `~/.gemini/agents/`   |
+| Pi      | `pi/agents/`     | `~/.pi/agent/agents/` |
 
 ### Run command
 
 The `/run` command orchestrates subagent invocation. Invoke agents as
 `/run <agent> [argument]`. Format varies by harness.
 
-<!-- prettier-ignore -->
-| Harness | Notes |
-| --- | --- |
-| Pi | Install `mystilleef/pi-subagent`; includes a built-in `/run` command |
-| Gemini | Copy `gemini/commands/` to `~/.gemini/commands/` |
+| Harness | Notes                                                                |
+| ------- | -------------------------------------------------------------------- |
+| Claude  | Copy `claude/commands/` to `~/.claude/commands/`                     |
+| Gemini  | Copy `gemini/commands/` to `~/.gemini/commands/`                     |
+| Pi      | Install `mystilleef/pi-subagent`; includes a built-in `/run` command |
