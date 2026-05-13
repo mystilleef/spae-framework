@@ -4,6 +4,12 @@ Agent definitions for the [Pi](https://github.com/mystilleef/pi) harness.
 
 ## Installation
 
+Copy skills to `~/.agents/skills/`:
+
+```sh
+cp -r ../skills/* ~/.agents/skills/
+```
+
 Copy agents to `~/.pi/agent/agents/`:
 
 ```sh

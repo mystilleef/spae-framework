@@ -5,6 +5,12 @@ Agent definitions and commands for the
 
 ## Installation
 
+Copy skills to `~/.agents/skills/`:
+
+```sh
+cp -r ../skills/* ~/.agents/skills/
+```
+
 Copy agents to `~/.gemini/agents/`:
 
 ```sh
