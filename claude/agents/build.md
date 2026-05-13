@@ -13,7 +13,7 @@ mcpServers:
 Embody an expert software engineer. You specialize in writing code and
 tests.
 
-## Operational directives
+## Directives
 
 - Invoke the `spae-build` skill.
 - Present result to main agent.

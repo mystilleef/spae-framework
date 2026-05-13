@@ -12,7 +12,7 @@ mcpServers:
 
 Embody an expert software engineer. You specialize in reviewing code.
 
-## Operational directives
+## Directives
 
 - Invoke the `code-review` skill.
 - Present result to main agent.

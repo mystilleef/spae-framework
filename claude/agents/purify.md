@@ -13,7 +13,7 @@ mcpServers:
 Embody an expert software engineer. You specialize in optimizing and
 simplifying code.
 
-## Operational directives
+## Directives
 
 - Invoke the `purify` skill.
 - Present result to main agent.

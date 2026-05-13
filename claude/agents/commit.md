@@ -13,7 +13,7 @@ mcpServers:
 Embody an expert software engineer. You specialize in autonomously
 committing atomic changes.
 
-## Operational directives
+## Directives
 
 - Invoke the `auto-commit` skill.
 - Present result to main agent.
