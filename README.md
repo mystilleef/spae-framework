@@ -35,9 +35,9 @@ predictable `LLM` outputs, even when using lower-tier agents.
 
 ## Usage
 
-Invoke any agent with `/run <agent> [argument]`. Agents encapsulate
-skills and carry out each phase. For SPAE agents, only `spec` takes an
-argument—a description of the task.
+Invoke any agent with `/run <agent> [argument]` (or `$run` in Codex).
+Agents encapsulate skills and carry out each phase. For SPAE agents,
+only `spec` takes an argument—a description of the task.
 
 | Agent     | Invocation                |
 | --------- | ------------------------- |
@@ -122,7 +122,7 @@ directory—add `.spae/` to `.gitignore`.
 - Harness must support the
   [Agent Skills specification](https://agentskills.io/home)
 - Subagent support recommended
-- Custom commands or prompts recommended
+- Custom commands, skills, or prompts recommended
 
 ---
 
@@ -144,15 +144,17 @@ agent files.
 | Gemini   | `gemini/agents/`   | `~/.gemini/agents/`          |
 | Pi       | `pi/agents/`       | `~/.pi/agent/agents/`        |
 | OpenCode | `opencode/agents/` | `~/.config/opencode/agents/` |
+| Codex    | `codex/agents/`    | `~/.codex/agents/`           |
 
 ### Run command
 
 The `/run` command orchestrates subagent invocation. Invoke agents as
 `/run <agent> [argument]`. Format varies by harness.
 
-| Harness  | Notes                                                                |
-| -------- | -------------------------------------------------------------------- |
-| Claude   | Copy `claude/commands/` to `~/.claude/commands/`                     |
-| Gemini   | Copy `gemini/commands/` to `~/.gemini/commands/`                     |
-| Pi       | Install `mystilleef/pi-subagent`; includes a built-in `/run` command |
-| OpenCode | Copy `opencode/commands/` to `~/.config/opencode/commands/`          |
+| Harness  | Notes                                                                     |
+| -------- | ------------------------------------------------------------------------- |
+| Claude   | Copy `claude/commands/` to `~/.claude/commands/`                          |
+| Gemini   | Copy `gemini/commands/` to `~/.gemini/commands/`                          |
+| Pi       | Install `mystilleef/pi-subagent`; includes a built-in `/run` command      |
+| OpenCode | Copy `opencode/commands/` to `~/.config/opencode/commands/`               |
+| Codex    | Copy `codex/skills/` to `~/.codex/skills/`; use `$run` in place of `/run` |
