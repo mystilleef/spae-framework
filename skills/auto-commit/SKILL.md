@@ -14,8 +14,8 @@ atomic commits for the current project.
 
 ## When to use
 
-- When the agent needs to autonomously commit all changes in a
-  repository using atomic commits.
+- Always. Execute immediately upon invocation without waiting for user
+  input or confirmation.
 
 ## Process
 
@@ -78,6 +78,9 @@ atomic commits for the current project.
   operations.
 - **Atomic Grouping**: Group files that _must_ exist together (for
   example, implementation + test).
+- **Unconditional**: Execute immediately upon invocation. Never wait for
+  user input, confirmation, or additional context before running
+  `git status`.
 - **No User Input**: Autonomously perform commits without awaiting user
   approval for messages.
 - **Current Project**: Only commit changes in the current project.

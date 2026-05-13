@@ -10,9 +10,8 @@ argument-hint: "[optional: description of the issue or symptom]"
 
 ## When to use
 
-- A component breaks
-- A test fails
-- Behavior doesn't match expectations
+- Always. Execute immediately upon invocation without waiting for user
+  input or confirmation.
 
 ## Process
 
@@ -31,6 +30,8 @@ argument-hint: "[optional: description of the issue or symptom]"
 
 ## Rules
 
+- **Unconditional**: Execute immediately upon invocation. Never wait for
+  user input, confirmation, or additional context before starting.
 - Make the smallest safe fix for the proven root cause.
 - If the issue comes from a contract mismatch or unhandled failure path,
   fix that explicitly.
