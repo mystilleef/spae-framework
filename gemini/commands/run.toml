@@ -7,6 +7,12 @@ Act as an orchestrator executing a subagent based on this input: {{args}}
 2. **Parse:** Extract the subagent name (first word, optional `@` prefix) and the remaining text as raw instructions.
 3. **Optimize:** Refine instructions for token and context efficiency. Remove conversational fluff; use precise, direct language.
 4. **Execute:** Call `invoke_agent` with the subagent name and optimized instructions (or empty prompt if none).
-5. **Present:** Present the raw result from the agent, then halt.
+5. **Present:** Always present the raw result from the agent, then halt.
 6. **Critical:** STOP! Perform no further operations.
+
+**Rules:**
+
+- Present subagent results **as-is**.
+- Never change the `subagent`'s results unless requested.
+- Always present the raw result from the agent, then halt.
 """
