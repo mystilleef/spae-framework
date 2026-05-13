@@ -28,6 +28,7 @@ argument-hint: "[optional-workstream-name] [optional-task]"
    - Synthesize requirements from `STATE.json`, `VERIFY.md`, and
      relevant codebase patterns.
    - Draft a minimal, unambiguous specification.
+
 3. **Finalize**:
    - Write `SPEC.md`.
    - Update `STATE.json` (phase: `plan`, status: `active`).

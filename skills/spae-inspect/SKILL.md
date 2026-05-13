@@ -26,6 +26,7 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
      codebase.
    - Identify concrete bugs, regressions, or weak verification steps.
    - Refine `PLAN.md` with minimal, high-impact changes.
+
 3. **Finalize**:
    - Write the optimized `PLAN.md`.
    - Update `STATE.json` (phase: `build`, cursor: `T-001`, status:

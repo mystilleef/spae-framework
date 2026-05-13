@@ -28,6 +28,7 @@ atomic tasks in `PLAN.md`.
      in a working state.
    - Define clear acceptance criteria and verification steps for each
      task.
+
 3. **Finalize**:
    - Write `PLAN.md`.
    - Initialize the `tasks` registry and update `phase: inspect` in

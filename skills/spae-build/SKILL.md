@@ -26,8 +26,10 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
      acceptance criteria.
    - Restrict edits to relevant files; avoid incidental refactoring or
      cleanup.
+
    - Add required tests and run the verification steps defined in
      `PLAN.md`.
+
 3. **Finalize**:
    - Mark the task `done` and increment completion metrics in
      `STATE.json`.

@@ -25,6 +25,7 @@ the `workstream` if no gaps exist.
 2. **Execute**:
    - Compare the current changes against `SPEC.md`.
    - Inspect for gaps, regressions, bugs, or optimizations.
+
 3. **Finalize**:
    - **Pass**: Delete `VERIFY.md` and set `status: completed`,
      `phase: done` in `STATE.json`. Output the standardized **Execution
