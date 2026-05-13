@@ -4,8 +4,6 @@ description: Perform a code review.
 skills: code-review
 effort: high
 permissionMode: bypassPermissions
-mcpServers:
-  - vibe-check
 ---
 
 # Role

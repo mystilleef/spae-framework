@@ -4,8 +4,6 @@ description: Runs the SPAE planning phase for a task or workstream.
 skills: spae-plan
 effort: high
 permissionMode: bypassPermissions
-mcpServers:
-  - vibe-check
 ---
 
 # Role

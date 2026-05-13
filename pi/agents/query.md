@@ -3,7 +3,7 @@
 name: query
 description: Answer user query in read-only mode
 thinking: medium
-tools: read, bash, ctx_stats, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index, mcp, mcp:exa, mcp:vibe-check-mcp
+tools: read, bash, mcp
 ---
 
 # Role

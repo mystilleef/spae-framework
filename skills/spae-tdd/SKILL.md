@@ -26,7 +26,6 @@ Red-Green-Refactor `TDD`.
    - **Red Phase**: Write the minimal failing test for behavioral tasks.
      Confirm it fails for the expected reason.
    - **Green Phase**: Write the minimal code required to pass the test.
-     Use `vibe_check` for complex tasks.
    - **Refactor Phase**: Simplify and improve the code while keeping
      tests green.
    - Run the full relevant suite to ensure no regressions and meet

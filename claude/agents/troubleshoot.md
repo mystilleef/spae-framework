@@ -4,8 +4,6 @@ description: Fix issues using the troubleshoot skill.
 skills: troubleshoot
 effort: high
 permissionMode: bypassPermissions
-mcpServers:
-  - vibe-check
 ---
 
 # Role

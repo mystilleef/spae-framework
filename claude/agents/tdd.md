@@ -4,8 +4,6 @@ description: Runs one atomic SPAE tdd task for a task or workstream.
 skills: spae-tdd
 effort: medium
 permissionMode: bypassPermissions
-mcpServers:
-  - vibe-check
 ---
 
 # Role

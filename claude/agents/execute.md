@@ -4,8 +4,6 @@ description: Runs sequential SPAE execution for a task or workstream.
 skills: spae-execute
 effort: high
 permissionMode: bypassPermissions
-mcpServers:
-  - vibe-check
 ---
 
 # Role

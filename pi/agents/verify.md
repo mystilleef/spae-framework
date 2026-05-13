@@ -4,7 +4,7 @@ name: verify
 description: Find gaps between implementation and specs
 skills: spae-verify
 thinking: high
-tools: read, edit, write, bash, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index, mcp, mcp:exa, mcp:vibe-check-mcp
+tools: read, edit, write, bash, mcp
 ---
 
 # Role

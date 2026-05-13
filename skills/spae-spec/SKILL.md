@@ -28,9 +28,6 @@ argument-hint: "[optional-workstream-name] [optional-task]"
    - Synthesize requirements from `STATE.json`, `VERIFY.md`, and
      relevant codebase patterns.
    - Draft a minimal, unambiguous specification.
-   - Invoke `vibe_check` with `goal` (writing the spec) and `plan`
-     (steps taken so far) to remove feature creep and ensure codebase
-     alignment.
 3. **Finalize**:
    - Write `SPEC.md`.
    - Update `STATE.json` (phase: `plan`, status: `active`).

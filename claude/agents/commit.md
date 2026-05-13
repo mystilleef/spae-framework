@@ -4,8 +4,6 @@ description: Runs the auto-commit skill.
 skills: auto-commit
 effort: medium
 permissionMode: bypassPermissions
-mcpServers:
-  - vibe-check
 ---
 
 # Role

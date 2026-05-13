@@ -25,9 +25,6 @@ the `workstream` if no gaps exist.
 2. **Execute**:
    - Compare the current changes against `SPEC.md`.
    - Inspect for gaps, regressions, bugs, or optimizations.
-   - Invoke `vibe_check` with `goal` (verifying implementation against
-     SPEC.md) and `plan` (verification steps taken so far) to ensure
-     rigor and alignment.
 3. **Finalize**:
    - **Pass**: Delete `VERIFY.md` and set `status: completed`,
      `phase: done` in `STATE.json`. Output the standardized **Execution

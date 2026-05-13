@@ -4,8 +4,6 @@ description: Perform coverage analysis on the current project.
 skills: coverage
 effort: high
 permissionMode: bypassPermissions
-mcpServers:
-  - vibe-check
 ---
 
 # Role

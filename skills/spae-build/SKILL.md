@@ -26,9 +26,6 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
      acceptance criteria.
    - Restrict edits to relevant files; avoid incidental refactoring or
      cleanup.
-   - Invoke `vibe_check` with `goal` (current task name) and `plan`
-     (numbered implementation steps) for high-complexity or
-     system-altering tasks.
    - Add required tests and run the verification steps defined in
      `PLAN.md`.
 3. **Finalize**:

@@ -4,8 +4,6 @@ description: Refactor changes to the project.
 skills: refactor
 effort: high
 permissionMode: bypassPermissions
-mcpServers:
-  - vibe-check
 ---
 
 # Role

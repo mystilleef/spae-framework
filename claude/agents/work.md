@@ -3,8 +3,6 @@ name: work
 description: Gather context to run adhoc tasks.
 effort: medium
 permissionMode: bypassPermissions
-mcpServers:
-  - vibe-check
 ---
 
 # Role

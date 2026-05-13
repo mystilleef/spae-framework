@@ -4,8 +4,6 @@ description: Aggressively optimize code.
 skills: purify
 effort: high
 permissionMode: bypassPermissions
-mcpServers:
-  - vibe-check
 ---
 
 # Role

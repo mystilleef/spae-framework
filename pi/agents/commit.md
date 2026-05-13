@@ -4,7 +4,7 @@ name: commit
 description: Runs the auto-commit skill
 skills: auto-commit
 thinking: medium
-tools: read, write, edit, bash, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index, mcp, mcp:exa, mcp:vibe-check-mcp
+tools: read, write, edit, bash, mcp
 ---
 
 # Role

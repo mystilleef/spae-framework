@@ -4,8 +4,6 @@ description: Document code.
 skills: document
 effort: medium
 permissionMode: bypassPermissions
-mcpServers:
-  - vibe-check
 ---
 
 # Role

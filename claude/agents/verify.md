@@ -4,8 +4,6 @@ description: Find gaps between implementation and specs.
 skills: spae-verify
 effort: high
 permissionMode: bypassPermissions
-mcpServers:
-  - vibe-check
 ---
 
 # Role

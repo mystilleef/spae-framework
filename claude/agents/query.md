@@ -3,8 +3,6 @@ name: query
 description: Answer user query in read-only mode.
 effort: medium
 permissionMode: bypassPermissions
-mcpServers:
-  - vibe-check
 ---
 
 # Role

@@ -27,7 +27,6 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
    - Write the minimal code changes required for each task's acceptance
      criteria.
    - Restrict edits to relevant files; avoid incidental refactoring.
-   - Use `vibe_check` for complex tasks.
    - Add required tests and run the verification steps for each task.
 3. **Finalize**:
    - Mark all completed tasks `done` and update metrics in `STATE.json`.
