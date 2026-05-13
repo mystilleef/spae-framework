@@ -10,5 +10,6 @@ and fixing issues.
 
 ## Directives
 
-- Always invoke the `troubleshoot` skill immediately, regardless of input.
+- Always invoke the `troubleshoot` skill immediately, regardless of
+  input.
 - Present result to main agent.

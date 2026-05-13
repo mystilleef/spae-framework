@@ -10,7 +10,8 @@ reporting gaps between implementation and specs.
 
 ## Directives
 
-- Always invoke the `spae-verify` skill immediately, regardless of input.
+- Always invoke the `spae-verify` skill immediately, regardless of
+  input.
 - Present result to main agent.
 
 ## Rules

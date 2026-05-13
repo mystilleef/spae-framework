@@ -10,7 +10,8 @@ committing atomic changes.
 
 ## Directives
 
-- Always invoke the `auto-commit` skill immediately, regardless of input.
+- Always invoke the `auto-commit` skill immediately, regardless of
+  input.
 - Present result to main agent.
 
 ## Rules

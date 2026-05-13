@@ -13,7 +13,8 @@ tests.
 
 ## Directives
 
-- Always invoke the `spae-execute` skill immediately, regardless of input.
+- Always invoke the `spae-execute` skill immediately, regardless of
+  input.
 - Present result to main agent.
 
 ## Rules

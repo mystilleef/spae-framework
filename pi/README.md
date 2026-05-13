@@ -1,6 +1,7 @@
 # SPAE — Pi
 
-Agent definitions for the [Pi](https://github.com/mystilleef/pi) harness.
+Agent definitions for the [Pi](https://github.com/mystilleef/pi)
+harness.
 
 ## Installation
 
@@ -16,7 +17,8 @@ Copy agents to `~/.pi/agent/agents/`:
 cp -r agents/* ~/.pi/agent/agents/
 ```
 
-Install [`mystilleef/pi-subagent`](https://github.com/mystilleef/pi-subagent)
+Install
+[`mystilleef/pi-subagent`](https://github.com/mystilleef/pi-subagent)
 for the built-in `/run` command.
 
 ## Agents

@@ -138,8 +138,8 @@ each phase and work with any compliant harness.
 Agents wrap skills in isolated sessions. Each harness requires its own
 agent files.
 
-| Harness | Source           | Destination           |
-| ------- | ---------------- | --------------------- |
+| Harness  | Source             | Destination                  |
+| -------- | ------------------ | ---------------------------- |
 | Claude   | `claude/agents/`   | `~/.claude/agents/`          |
 | Gemini   | `gemini/agents/`   | `~/.gemini/agents/`          |
 | Pi       | `pi/agents/`       | `~/.pi/agent/agents/`        |
@@ -150,9 +150,9 @@ agent files.
 The `/run` command orchestrates subagent invocation. Invoke agents as
 `/run <agent> [argument]`. Format varies by harness.
 
-| Harness | Notes                                                                |
-| ------- | -------------------------------------------------------------------- |
-| Claude   | Copy `claude/commands/` to `~/.claude/commands/`                          |
-| Gemini   | Copy `gemini/commands/` to `~/.gemini/commands/`                          |
-| Pi       | Install `mystilleef/pi-subagent`; includes a built-in `/run` command      |
-| OpenCode | Copy `opencode/commands/` to `~/.config/opencode/commands/`               |
+| Harness  | Notes                                                                |
+| -------- | -------------------------------------------------------------------- |
+| Claude   | Copy `claude/commands/` to `~/.claude/commands/`                     |
+| Gemini   | Copy `gemini/commands/` to `~/.gemini/commands/`                     |
+| Pi       | Install `mystilleef/pi-subagent`; includes a built-in `/run` command |
+| OpenCode | Copy `opencode/commands/` to `~/.config/opencode/commands/`          |

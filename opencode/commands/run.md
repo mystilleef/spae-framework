@@ -10,14 +10,14 @@ Input: $ARGUMENTS
 
 **Directives:**
 
-1. **Parse:** The first word of `$ARGUMENTS`, after stripping any leading
-   `@`, becomes the subagent name. Everything after the first word,
-   verbatim, becomes the instructions.
-2. **Optimize:** Refine the instructions for token and context efficiency.
-   Strip conversational fluff. Use precise, direct language. If the caller
-   provides no instructions, use an empty prompt.
-3. **Execute:** Call the OpenCode Task tool with the parsed subagent name
-   and the optimized instructions.
+1. **Parse:** The first word of `$ARGUMENTS`, after stripping any
+   leading `@`, becomes the subagent name. Everything after the first
+   word, verbatim, becomes the instructions.
+2. **Optimize:** Refine the instructions for token and context
+   efficiency. Strip conversational fluff. Use precise, direct language.
+   If the caller provides no instructions, use an empty prompt.
+3. **Execute:** Call the OpenCode Task tool with the parsed subagent
+   name and the optimized instructions.
 4. **Present:** Present the Task result exactly as returned.
 5. **Stop:** Stop immediately. Perform no further operations.
 
