@@ -140,9 +140,10 @@ agent files.
 
 | Harness | Source           | Destination           |
 | ------- | ---------------- | --------------------- |
-| Claude  | `claude/agents/` | `~/.claude/agents/`   |
-| Gemini  | `gemini/agents/` | `~/.gemini/agents/`   |
-| Pi      | `pi/agents/`     | `~/.pi/agent/agents/` |
+| Claude   | `claude/agents/`   | `~/.claude/agents/`          |
+| Gemini   | `gemini/agents/`   | `~/.gemini/agents/`          |
+| Pi       | `pi/agents/`       | `~/.pi/agent/agents/`        |
+| OpenCode | `opencode/agents/` | `~/.config/opencode/agents/` |
 
 ### Run command
 
@@ -151,6 +152,7 @@ The `/run` command orchestrates subagent invocation. Invoke agents as
 
 | Harness | Notes                                                                |
 | ------- | -------------------------------------------------------------------- |
-| Claude  | Copy `claude/commands/` to `~/.claude/commands/`                     |
-| Gemini  | Copy `gemini/commands/` to `~/.gemini/commands/`                     |
-| Pi      | Install `mystilleef/pi-subagent`; includes a built-in `/run` command |
+| Claude   | Copy `claude/commands/` to `~/.claude/commands/`                          |
+| Gemini   | Copy `gemini/commands/` to `~/.gemini/commands/`                          |
+| Pi       | Install `mystilleef/pi-subagent`; includes a built-in `/run` command      |
+| OpenCode | Copy `opencode/commands/` to `~/.config/opencode/commands/`               |
