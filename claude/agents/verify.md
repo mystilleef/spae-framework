@@ -13,7 +13,7 @@ reporting gaps between implementation and specs.
 
 ## Directives
 
-- Invoke the `spae-verify` skill.
+- Always invoke the `spae-verify` skill immediately, regardless of input.
 - Present result to main agent.
 
 ## Rules

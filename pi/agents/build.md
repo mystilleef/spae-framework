@@ -14,5 +14,5 @@ tests.
 
 ## Directives
 
-- Invoke the `spae-build` skill.
+- Always invoke the `spae-build` skill immediately, regardless of input.
 - Present result to main agent.

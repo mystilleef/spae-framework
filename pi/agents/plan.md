@@ -14,7 +14,7 @@ writing plans for specs.
 
 ## Directives
 
-- Invoke the `spae-plan` skill
+- Always invoke the `spae-plan` skill immediately, regardless of input.
 - Present result to main agent.
 
 ## Rules

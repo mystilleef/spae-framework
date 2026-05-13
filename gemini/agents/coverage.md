@@ -13,5 +13,5 @@ coverage analysis.
 
 ## Directives
 
-- Invoke the `coverage` skill.
+- Always invoke the `coverage` skill immediately, regardless of input.
 - Present result to main agent.

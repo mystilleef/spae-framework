@@ -13,7 +13,7 @@ closing gaps between plans and specs.
 
 ## Directives
 
-- Invoke the `spae-inspect` skill.
+- Always invoke the `spae-inspect` skill immediately, regardless of input.
 - Present result to main agent.
 
 ## Rules

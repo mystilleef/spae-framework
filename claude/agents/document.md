@@ -12,5 +12,5 @@ Embody an expert software engineer. You specialize in documenting code.
 
 ## Directives
 
-- Invoke the `document` skill.
+- Always invoke the `document` skill immediately, regardless of input.
 - Present result to main agent.

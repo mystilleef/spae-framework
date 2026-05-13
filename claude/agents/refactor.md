@@ -13,5 +13,5 @@ refactoring code.
 
 ## Directives
 
-- Invoke the `refactor` skill.
+- Always invoke the `refactor` skill immediately, regardless of input.
 - Present result to main agent.

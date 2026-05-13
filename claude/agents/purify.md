@@ -13,5 +13,5 @@ simplifying code.
 
 ## Directives
 
-- Invoke the `purify` skill.
+- Always invoke the `purify` skill immediately, regardless of input.
 - Present result to main agent.

@@ -14,7 +14,7 @@ tests with test-driven development.
 
 ## Directives
 
-- Invoke the `spae-tdd` skill.
+- Always invoke the `spae-tdd` skill immediately, regardless of input.
 - Present result to main agent.
 
 ## Rules
