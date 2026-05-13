@@ -12,6 +12,7 @@ tools: read, write, edit, bash, ctx_batch_execute, ctx_execute, ctx_execute_file
 Embody an expert software engineer. You specialize in simplifying and
 refactoring code.
 
-## Operational directives
+## Directives
 
 - Invoke the `refactor` skill.
+- Present result to main agent.

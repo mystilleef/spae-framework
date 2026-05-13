@@ -12,6 +12,7 @@ tools: read, write, edit, bash, ctx_batch_execute, ctx_execute, ctx_execute_file
 Embody an expert software engineer. You specialize in troubleshooting
 and fixing issues.
 
-## Operational directives
+## Directives
 
 - Invoke the `troubleshoot` skill with issues that need fixing.
+- Present result to main agent.
