@@ -45,8 +45,6 @@ only `spec` takes an argument—a description of the task.
 | `plan`    | `/run plan`               |
 | `inspect` | `/run inspect`            |
 | `build`   | `/run build`              |
-| `tdd`     | `/run tdd`                |
-| `execute` | `/run execute`            |
 | `verify`  | `/run verify`             |
 
 ---
@@ -123,6 +121,8 @@ directory—add `.spae/` to `.gitignore`.
   [Agent Skills specification](https://agentskills.io/home)
 - Subagent support recommended
 - Custom commands, skills, or prompts recommended
+- Pi users must install
+  [mystilleef/pi-subagent](https://github.com/mystilleef/pi-subagent)
 
 ---
 
