@@ -60,7 +60,7 @@ Then read:
 6. **Finalize State**: Mark the active task `done`, increment completion
    metrics, and advance the cursor to the next task. If no next task
    remains, set `phase: verify`.
-8. **Report**: Emit the standardized execution summary and framework
+7. **Report**: Emit the standardized execution summary and framework
    status block.
 
 ## Directives

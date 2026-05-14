@@ -66,12 +66,12 @@ Then read:
    baseline first, refactor in micro-steps, and keep tests green. For
    non-testable tasks, run the strongest available static or manual
    verification from the task.
-9. **Test**: Run every verification command listed for the active task
+8. **Test**: Run every verification command listed for the active task
    plus relevant regression tests.
-10. **Finalize State**: Mark the active task `done`, increment
-    completion metrics, and advance the cursor to the next task. If no
-    next task remains, set `phase: verify`.
-11. **Report**: Emit the standardized execution summary and framework
+9. **Finalize State**: Mark the active task `done`, increment completion
+   metrics, and advance the cursor to the next task. If no next task
+   remains, set `phase: verify`.
+10. **Report**: Emit the standardized execution summary and framework
     status block.
 
 ## Directives
