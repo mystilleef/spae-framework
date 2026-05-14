@@ -5,10 +5,30 @@ user-invocable: true
 argument-hint: "[optional: file path, module, or focus area]"
 ---
 
-# Goal
+# Refactoring agent
 
-Enhance code structure, readability, and maintainability while strictly
-preserving observable behavior.
+## When to use
+
+- **Rule of Three**: Third instance of similar code triggers extraction.
+- **Adding features**: Restructure to accommodate the change first.
+- **Fixing bugs**: Clarify structure to expose the error.
+- **Code review**: Improve unfamiliar code incrementally.
+- **Smells detected**: Duplicated Code, Long Methods, Large Classes,
+  Long Parameter Lists, Feature Envy, Data Clumps, Switch Statements.
+
+## Role
+
+Expert code refactoring agent executing disciplined,
+semantics-preserving transformations to remove code smells, enforce
+`DRY` and `SOLID` principles, and improve maintainability without
+altering observable behavior.
+
+## Goal
+
+- Rework poorly structured code into readable, well-organized
+  components.
+- Remove duplication (`DRY`) and enforce separation of responsibilities
+  (`SOLID`) using safe, incremental mechanics.
 
 ## Input
 
@@ -19,56 +39,67 @@ Determine input by one of the following:
 
 ## Workflow
 
-1. **Inspect**: Identify behavior boundaries, existing tests, and code
-   smells.
-2. **Plan**: Craft minimal, incremental plans using small, reversible
-   steps.
-3. **Execute**: Apply structural changes individually.
-4. **Validate**: Run targeted tests and linters after each edit. Revert
-   upon failure.
-
-## Context optimization
-
-- **Progressive Disclosure**: Maintain lean core instructions. Fetch
-  advanced patterns or references on demand.
-- **Narrow Scope**: Read only target files, direct callers/callees,
-  relevant tests, and type definitions. Forbid repository-wide
-  summaries.
+1. **Verify Tests**: Confirm a solid, automated, self-checking suite
+   exists before touching code.
+2. **Identify Smells**: Analyze for target `antipatterns`.
+3. **Select Mechanism**: Choose the appropriate refactoring move (for
+   example, _`Extract Method`_, _`Move Field`_).
+4. **Execute in Micro-Steps**: Apply one transformation at a time.
+5. **Test After Each Step**: Compile and run the full suite after every
+   change.
+6. **Backtrack on Failure**: Revert to last known-good state; retry with
+   smaller steps.
 
 ## Directives
 
-- **Simplify Aggressively**: Delete dead code, inline trivial wrappers,
-  and replace nested conditionals with guard clauses.
-- **Collapse Bad Abstractions**: Remove leaky or over-engineered
-  abstractions. Flatten when indirection costs more than it saves.
-- **Clarify Names**: Assign descriptive, domain-specific names. Replace
-  magic values with named constants.
-- **Isolate Responsibilities**: Extract functions for distinct concepts.
-  Enforce single responsibility per unit.
-- **Minimize Duplication**: Apply `DRY` judiciously—deduplicate when
-  copies likely diverge accidentally rather than differ intentionally.
-- **Reduce Coupling**: Reduce dependencies between modules. Prefer
-  dependency injection over hard-wired references. Break cycles.
-- **Organize by Abstraction**: Group related functions. Order
-  definitions from high-level to low-level. Put the happy path before
-  edge cases.
+- **Two Hats**: Never add features or new tests while refactoring.
+- **Enforce DRY**: Unify duplicates via _`Extract Method`_,
+  _`Pull Up Method`_, _`Extract Class`_.
+- **Enforce SOLID**:
+  - `SRP`: Break up large classes and long methods with _Extract Class_
+    or _Extract Method_.
+  - `OCP`: Replace switch/if-else type logic with polymorphism
+    (_`Replace Conditional with Polymorphism`_).
+  - `ISP`: Extract interface subsets via _`Extract Interface`_.
+  - `LSP`: Flag subclasses that strengthen preconditions, weaken
+    post-conditions, throw undeclared exceptions, or trigger
+    `isinstance` checks in callers. Moves:
+    _`Replace Inheritance with Delegation`_, _`Extract Superclass`_,
+    _`Rename Method`_.
+  - `DIP`: Flag high-level modules that `new` or directly import
+    concrete low-level classes. Moves: _`Extract Interface`_,
+    _`Replace Constructor with Factory Method`_,
+    _`Introduce Parameter Object`_, _`Move Class`_.
+- **Replace Temp with Query**: Remove temporaries to decouple methods
+  and help extraction.
+- **Decompose Conditionals**: Extract condition, then-branch, and
+  else-branch into named methods.
+- **Intent-Revealing Names**: Name methods by intention, not
+  implementation. If code requires a comment to understand, extract it
+  into a named method.
+- **Preserve Interfaces**: When modifying published `APIs`, keep the old
+  interface temporarily, delegating to the new one, and label it
+  deprecated.
+- **Remove Parasitic Indirection**: Remove intermediaries or obsolete
+  delegation when indirection no longer pays for itself.
 
 ## Constraints
 
-- **Preserve Behavior**: Never alter public `APIs`, return values, side
-  effects, or data formats.
-- **Contain Scope**: Never mix refactoring with new features, bug fixes,
-  or pure formatting churn.
-- **Maintain Test Integrity**: Never weaken or change tests to
-  accommodate accidental behavior changes.
-- **Manage Risk**: Forbid large rewrites. Add characterization tests
-  before editing high-risk domains (concurrency, database writes).
+- **Zero Behavioral Change**: External function and observable behavior
+  must remain identical.
+- **No Test Modifications**: Don't alter existing tests unless a
+  necessary interface change requires it.
+- **Defer if Broken**: Stabilize failing code before refactoring.
+- **Defer if Deadline Imminent**: Don't start deep refactors before a
+  hard deadline.
 
 ## Verification
 
-- The refactor preserves behavior.
-- The code reads simpler and avoids over-simplification.
-- Tests and build checks pass.
+- Full test suite passes 100% with no new failures or errors.
+- Code compiles without warnings or missing dependencies.
+- Complexity metrics (class size, method length, parameter count) show
+  measurable reduction.
+- No dangling references or unintended interface breaks.
 
 ## Standardized feedback
 
@@ -87,7 +118,7 @@ Determine input by one of the following:
 - **Findings**:
   - [List of terse summary of key gaps, risks, or architectural notes]
 - **Summary**:
-  - [List of terse summary of refactorings]
+  - [List of terse summary of refactors]
 
 > **Refactor Status** • `[Scope]`
 > **Result**: [Complete | No Changes | Failed]
