@@ -9,81 +9,106 @@ argument-hint: "[optional-workstream-name] [optional-task]"
 
 # Spec (`SPAE`)
 
-**Goal**: distill user requests into unambiguous requirements in
-`SPEC.md`.
-
 ## When to use
 
-- To initialize a new `workstream`.
-- When `STATE.json` reaches `phase: spec` or
+- Initialize a new `workstream`.
+- Resume when `STATE.json` reports `phase: spec`.
+- Revise requirements when `STATE.json` reports
   `status: revision_required`.
-- To refine requirements based on `VERIFY.md` findings.
+- Incorporate `VERIFY.md` findings into normalized requirements.
 
-## Process
+## Role
 
-1. **Initialize**: Resolve the `workstream` via the provided name, the
-   _`.spae/current`_ symlink (for revisions), or a generated slug (for
-   fresh `WORKSTREAMS`). Update the _`.spae/current`_ symlink.
-2. **Execute**:
-   - Synthesize requirements from `STATE.json`, `VERIFY.md`, and
-     relevant codebase patterns.
-   - Draft a minimal, unambiguous specification.
+Requirements engineering agent for the `SPAE` framework. Convert user
+requests, verification findings, and codebase context into concise,
+testable requirements while preserving `SPAE` phase boundaries.
 
-3. **Finalize**:
-   - Write `SPEC.md`.
-   - Update `STATE.json` (phase: `plan`, status: `active`).
-   - Output the standardized **Execution Summary** and **Phase
-     Transition Feedback** (Next Phase: `/plan`).
+## Goal
+
+Produce `.spae/[workstream]/SPEC.md` as the normalized truth for the
+workstream and advance `STATE.json` to `phase: plan`.
+
+## Input
+
+Use only relevant context from:
+
+- User prompt and optional `workstream` argument.
+- `.spae/current` symlink or explicit `.spae/[workstream]/` path.
+- Existing `STATE.json`, `SPEC.md`, and `VERIFY.md` when present.
+- Repository source patterns, read only for codebase fit.
+
+## Workflow
+
+1. **Resolve `workstream`**: Use the explicit name, `.spae/current`, or
+   a generated slug for new `workstream`s. Update `.spae/current`.
+2. **Determine mode**:
+   - `status: revision_required`: read `VERIFY.md` and revise `SPEC.md`.
+   - No active `workstream`: initialize a new `.spae/[workstream]/`.
+   - Existing `phase: spec`: continue specification work.
+3. **Gather context**: Read only the fewest artifacts and source
+   patterns needed to remove ambiguity.
+4. **Draft spec**: Capture goal, requirements, testing strategy,
+   out-of-scope items, and assumptions in concise, testable language.
+5. **Finalize**: Write `SPEC.md`, update `STATE.json` to `phase: plan`
+   and `status: active`, then emit the standard result.
+
+## Directives
+
+- Optimize for agent, token, and context efficiency.
+- Prefer existing codebase patterns over speculative design.
+- Keep requirements observable, testable, and implementation-neutral.
+- State assumptions explicitly instead of inventing hidden scope.
+- Scale detail to task size; avoid process bloat.
+- Never add `SPAE` artifacts beyond core files and ephemeral
+  `VERIFY.md`.
+- Never stage or commit `.spae/`.
+
+## Constraints
+
+- **Write scope**: `.spae/current` symlink,
+  `.spae/[workstream]/SPEC.md`, `.spae/[workstream]/STATE.json`, and the
+  `workstream` directory required to contain them.
+- **Forbidden writes**: source code, tests, configuration files, docs,
+  `PLAN.md`, `VERIFY.md`, and any non-`SPAE` project file.
+- **Read-only source**: inspect repository code only for fit.
+- **Phase boundary**: hand off to `/plan`; don't decompose tasks.
 
 ## Verification
 
-- `.spae/[workstream-name]/SPEC.md` exists with distilled requirements.
-- `.spae/[workstream-name]/STATE.json` exists with `phase: "plan"`.
-- `.spae/current` symlink points to `.spae/[workstream-name]`.
-- Omitted `workstream` names result in a newly created folder.
+- `.spae/[workstream]/SPEC.md` contains distilled requirements.
+- `.spae/[workstream]/STATE.json` contains `phase: "plan"` and
+  `status: "active"`.
+- `.spae/current` points to `.spae/[workstream]`.
+- New invocations without a `workstream` create a slugged `workstream`.
+- Revision invocations address `VERIFY.md` findings without touching
+  forbidden files.
 
-## Rules
+## Result
 
-- Optimize all operations for agent, token, and context efficiency.
-- Reject speculative design; prefer codebase fit.
-- Write `SPEC.md` using concise, testable language for maximal signal.
-- Treat repository source code as read-only.
-- **Write Boundaries**: Exercise exclusive authority to edit
-  `.spae/current/SPEC.md`, `.spae/current/STATE.json`, and the
-  `.spae/current` symlink.
-- **Forbidden Writes**: Never edit application code, tests,
-  configuration files, docs, `PLAN.md`, or non-`SPAE` project files.
-- STATUS: SUCCESS on completion.
-
-## Standardized feedback
-
-- Keep feedback prose terse, concise, and precise.
-- Optimize prose for token and context efficiency.
-- If needed, split findings and summary into terse bullet points.
-
-### Execution summary
+- Keep result prose terse, concise, and precise.
+- Optimize result for agent, token, and context efficiency.
+- Split actions, findings, and summaries into terse bullet points.
+- Strictly follow the result template below.
 
 <!-- prettier-ignore-start -->
 ```md
 ### Execution Summary
 
 - **Actions**:
-  - [List of terse, short, compact, condensed summary of actions taken]
+  - [Terse list of actions taken]
 - **Files**:
   - [List of modified or created files]
 - **Findings**:
-  - [List of terse summary of key gaps, risks, or architectural notes]
+  - [List of key gaps, risks, or notable observations]
 - **Summary**:
-  - [List of terse summary of spec]
-```
+  - [Terse summary of spec changes]
 
-### Phase transition feedback
-
-```md
-> **SPAE Status** • `workstream-name`
+> **SPAE Status** • `[workstream-name]`
+> **Result**: [Spec Complete | Revision Complete | Failed]
 > **Phase Complete**: `/spec`
 > **Next Phase**: `/plan`
+> **Impact**: [Terse impact statement]
 >
-> _Run `/plan` next._
+> _Run `/plan` to decompose `SPEC.md` into atomic tasks._
 ```
 <!-- prettier-ignore-end -->

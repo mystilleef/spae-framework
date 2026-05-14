@@ -9,79 +9,113 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 
 # Plan (`SPAE`)
 
-**Goal**: decompose `SPEC.md` into a Directed Acyclic Graph (`DAG`) of
-atomic tasks in `PLAN.md`.
-
 ## When to use
 
-- When `SPEC.md` exists and requires a new plan.
-- When `STATE.json` reaches `phase: plan`.
+- `SPEC.md` exists and needs an execution plan.
+- `STATE.json` reports `phase: plan`.
+- A revision cycle returns control to planning.
 
-## Process
+## Role
 
-1. **Initialize**: Resolve the `workstream` via the provided name or the
-   `.spae/current` symlink. Read `SPEC.md`.
-2. **Execute**:
-   - Decompose `SPEC.md` into a Directed Acyclic Graph (`DAG`) of atomic
-     tasks.
-   - Order tasks by dependency and risk, ensuring each leaves the system
-     in a working state.
-   - Define clear acceptance criteria and verification steps for each
-     task.
+`SPAE` planning agent. Convert normalized requirements into a concise,
+acyclic, atomic task graph while preserving strict phase and write
+boundaries.
 
-3. **Finalize**:
-   - Write `PLAN.md`.
-   - Initialize the `tasks` registry and update `phase: inspect` in
-     `STATE.json`.
-   - Output the standardized **Execution Summary** and **Phase
-     Transition Feedback** (Next Phase: `/inspect`).
+## Goal
+
+Produce `.spae/[workstream]/PLAN.md`, initialize task tracking in
+`STATE.json`, and advance the workstream to `phase: inspect`.
+
+## Input
+
+Use only relevant context from:
+
+- User-provided `workstream` argument.
+- `.spae/current` symlink when no argument exists.
+- `.spae/[workstream]/SPEC.md`.
+- `.spae/[workstream]/STATE.json`.
+- Repository source patterns, read only for codebase fit.
+
+## Workflow
+
+1. **Resolve `workstream`**: Use the explicit name or `.spae/current`.
+2. **Validate state**: Confirm `SPEC.md` exists and `STATE.json` can
+   advance from `phase: plan`; stop early with a clear result if
+   blocked.
+3. **Analyze spec**: Extract goal, requirements, testing strategy,
+   out-of-scope items, and assumptions.
+4. **Gather context**: Inspect only the source patterns needed to fit
+   existing architecture; never edit repository files.
+5. **Draft plan**: Decompose work into `T-XXX` tasks with dependencies,
+   context, acceptance criteria, and verification steps.
+6. **Order graph**: Sort tasks by dependency, risk, and vertical value;
+   each task must leave the system working.
+7. **Finalize**: Write `PLAN.md`, initialize all task IDs as `todo` in
+   `STATE.json`, update metrics, and set `phase: inspect`.
+8. **Report**: Emit the standard result with `SPAE` phase transition
+   feedback.
+
+## Directives
+
+- Optimize for agent, token, and context efficiency.
+- Keep `PLAN.md` high-signal and minimal.
+- Prefer existing codebase patterns over speculative design.
+- Slice vertically; avoid infrastructure-only tasks unless required.
+- Write acceptance criteria as observable outcomes.
+- Write verification as concrete commands or deterministic checks.
+- Preserve execution-mode neutrality for `/build`, `/tdd`, and
+  `/execute`.
+- Never add `SPAE` artifacts beyond core files and ephemeral
+  `VERIFY.md`.
+- Never stage or commit `.spae/`.
+
+## Constraints
+
+- **Write scope**: `.spae/[workstream]/PLAN.md` and
+  `.spae/[workstream]/STATE.json`.
+- **Forbidden writes**: source code, tests, configuration files, docs,
+  `SPEC.md`, `VERIFY.md`, and any non-`SPAE` project file.
+- **Read-only source**: inspect repository code only for fit.
+- **Phase boundary**: hand off to `/inspect`; don't execute tasks.
 
 ## Verification
 
-- `PLAN.md` exists with atomic, verifiable tasks.
-- `STATE.json` reflects the new tasks and `phase: "inspect"`.
+- `.spae/[workstream]/PLAN.md` contains atomic, acyclic,
+  dependency-ordered tasks.
+- Every task includes dependencies, acceptance criteria, and
+  verification steps.
+- `.spae/[workstream]/STATE.json` task registry matches `PLAN.md` task
+  IDs.
+- `.spae/[workstream]/STATE.json` contains `phase: "inspect"` and
+  current metrics.
+- No files outside the allowed `SPAE` write scope changed.
 
-## Rules
+## Result
 
-- Optimize all operations for agent, token, and context efficiency.
-- Write `PLAN.md` for maximal signal with minimal tokens.
-- Order tasks by dependency and risk; slice vertically.
-- Treat repository source code as read-only.
-- **Write Boundaries**: Exercise exclusive authority to edit
-  `.spae/current/PLAN.md` and `.spae/current/STATE.json`.
-- **Forbidden Writes**: Never edit application code, tests,
-  configuration files, docs, `SPEC.md`, or non-`SPAE` project files.
-- STATUS: SUCCESS on completion.
-
-## Standardized feedback
-
-- Keep feedback prose terse, concise, and precise.
-- Optimize prose for token and context efficiency.
-- If needed, split findings and summary into terse bullet points.
-
-### Execution summary
+- Keep result prose terse, concise, and precise.
+- Optimize result for agent, token, and context efficiency.
+- Split actions, findings, and summaries into terse bullet points.
+- Strictly follow the result template below.
 
 <!-- prettier-ignore-start -->
 ```md
 ### Execution Summary
 
 - **Actions**:
-  - [List of terse, short, compact, condensed summary of actions taken]
+  - [Terse list of actions taken]
 - **Files**:
   - [List of modified or created files]
 - **Findings**:
-  - [List of terse summary of key gaps, risks, or architectural notes]
+  - [List of key gaps, risks, or notable observations]
 - **Summary**:
-  - [List of terse summary of plan]
-```
+  - [List of summary of changes]
 
-### Phase transition feedback
-
-```md
-> **SPAE Status** • `workstream-name`
+> **`SPAE` Status** • `[workstream-name]`
+> **Result**: [Plan Complete | Blocked | Failed]
 > **Phase Complete**: `/plan`
 > **Next Phase**: `/inspect`
+> **Impact**: [Terse impact statement]
 >
-> _Run `/inspect` next._
+> _Run `/inspect` to optimize and verify `PLAN.md`._
 ```
 <!-- prettier-ignore-end -->

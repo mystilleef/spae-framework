@@ -1,104 +1,142 @@
 ---
 name: spae-build
 description:
-  Atomic Execution for the `SPAE` framework. Executes exactly one atomic
-  task from `PLAN.md`.
+  Atomic execution for the project framework. Executes exactly one
+  atomic task from `PLAN.md`.
 user-invocable: true
 argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 ---
 
-# Build (`SPAE`)
-
-**Goal**: execute exactly one atomic task from `PLAN.md`.
+# Build
 
 ## When to use
 
-- When `STATE.json` reaches `phase: build`.
-- To execute the next task in the plan.
+- `STATE.json` has `phase: build`.
+- The work stream needs the next planned task completed.
+- The user chose `/build` as the execution mode for the work stream.
 
-## Process
+## Role
 
-1. **Initialize**: Resolve the `workstream` via the provided name or the
-   `.spae/current` symlink. Read `STATE.json` and `PLAN.md` to identify
-   the active task.
-2. **Execute**:
-   - Write the minimal code changes required to meet the task's
-     acceptance criteria.
-   - Restrict edits to relevant files; avoid incidental refactoring or
-     cleanup.
+Atomic implementation agent executing exactly one task from `PLAN.md`,
+mutating source/tests plus `STATE.json`, and preserving the framework
+execution cursor.
 
-   - Add required tests and run the verification steps defined in
-     `PLAN.md`.
+## Goal
 
-3. **Finalize**:
-   - Mark the task `done` and increment completion metrics in
-     `STATE.json`.
-   - Advance the cursor to the next task or set `phase: verify` if the
-     plan concludes.
-   - Output the standardized **Execution Summary** and **Task Execution
-     Feedback** (or **Phase Transition Feedback** if the plan
-     concludes).
+- Complete the active task with the smallest useful code change.
+- Prove the task acceptance criteria through the task verification
+  steps.
+- Advance `STATE.json` to the next task or to `phase: verify`.
+
+## Input
+
+Resolve input by one of the following:
+
+- Explicit work stream name supplied by the user.
+- `.spae/current` symlink when the user omits a work stream name.
+
+Then read:
+
+- `.spae/<workstream>/STATE.json` for phase, cursor, task registry, and
+  metrics.
+- `.spae/<workstream>/PLAN.md` for the active task, acceptance criteria,
+  and verification steps.
+- Relevant project source, tests, docs, and configuration needed for the
+  active task.
+
+## Workflow
+
+1. **Resolve Work Stream**: Select the explicit work stream or follow
+   `.spae/current`. Confirm `STATE.json` has `phase: build` and an
+   active task.
+2. **Load Task**: Read only the active task section from `PLAN.md` plus
+   minimal surrounding context needed for dependencies.
+3. **Plan Slice**: Identify the smallest implementation path that meets
+   the active task acceptance criteria.
+4. **Implement**: Edit only relevant source, tests, docs, or
+   configuration files required by the task.
+5. **Test**: Add or adjust tests required for the task, then run every
+   verification command listed for the active task.
+6. **Finalize State**: Mark the active task `done`, increment completion
+   metrics, and advance the cursor to the next task. If no next task
+   remains, set `phase: verify`.
+8. **Report**: Emit the standardized execution summary and framework
+   status block.
+
+## Directives
+
+- Optimize all operations for agent, token, and context efficiency.
+- Execute exactly one atomic task per invocation.
+- Prefer existing project patterns over new design.
+- Keep edits minimal, local, and acceptance-criteria driven.
+- Use test-first when the task changes observable behavior.
+- Add edge-case, acceptance, or integration tests when the task requires
+  them.
+- Run task verification before changing `STATE.json`.
+- Halt with a blocker when verification fails or task requirements lack
+  enough detail.
+
+## Constraints
+
+- Exercise exclusive authority to edit source code, tests,
+  documentation, configuration, and other non-framework project files
+  during this phase.
+- Never edit `PLAN.md` during `/build`.
+- Never edit `SPEC.md` during `/build`.
+- Never execute more than one task.
+- Never alternate execution mode for the same work stream; respect the
+  user's selected `/build` path.
+- Never stage or commit `.spae/` artifacts.
+- Avoid incidental refactoring, cleanup, formatting, or dependency churn
+  outside the active task.
 
 ## Verification
 
-- Task acceptance criteria met.
-- Verification steps pass.
-- `STATE.json` updated correctly.
+- Active task acceptance criteria pass.
+- All task verification steps pass.
+- Relevant project tests pass with no new failures.
+- `STATE.json` task registry, metrics, cursor, and phase reflect the
+  completed task.
+- `PLAN.md` and `SPEC.md` remain unchanged.
 
-## Rules
+## Result
 
-- Optimize all operations for agent, token, and context efficiency.
-- Execute the active task with maximal signal and minimal edits.
-- Execute exactly one atomic task per invocation.
-- **Write Boundaries**: Exercise exclusive authority to edit source code
-  and non-`SPAE` project files.
-- **Forbidden Writes**: Never edit `PLAN.md` or `SPEC.md` during this
-  phase.
-- If a task fails, report the blocker and halt.
-- STATUS: SUCCESS on completion.
-
-### Testing rules
-
-- Adopt a test-first, verify-last approach.
-- Write exhaustive unit tests covering edge cases.
-- Write acceptance and integration tests where relevant to the task.
-- Ensure all test suites pass before finalizing the task.
-
-## Standardized feedback
-
-- Keep feedback prose terse, concise, and precise.
-- Optimize prose for token and context efficiency.
-- If needed, split findings and summary into terse bullet points.
+- Keep result prose terse, concise, and precise.
+- Optimize result for agent, token, and context efficiency.
+- Split actions, findings, and summaries into terse bullet points.
+- Strictly follow the result template below.
+- Emit task execution feedback after completing a task.
+- Emit phase transition feedback when the plan concludes.
 
 <!-- prettier-ignore-start -->
 ```md
 ### Execution Summary
 
 - **Actions**:
-  - [List of terse, short, compact, condensed summary of actions taken]
+  - [Terse list of actions taken]
 - **Files**:
   - [List of modified or created files]
 - **Findings**:
-  - [List of terse summary of key gaps, risks, or architectural notes]
+  - [List of key gaps, risks, blockers, or notable observations]
 - **Summary**:
-  - [List of terse summary of changes]
-```
+  - [List of summary of changes]
 
-### Task execution feedback
-
-```md
-> **SPAE Status** • `workstream-name`
+> **`SPAE` Status** • `workstream-name`
 > **Progress**: Task [X] of [Y] ([Z] remaining)
 > **Completed**: `T-XXX` - [Task title]
 > **Next Task**: `T-YYY` - [Next task title]
 >
-> _Run `/build` (or `/tdd`) to execute the next task._
+> _Run `/build` to execute the next task._
 ```
+<!-- prettier-ignore-end -->
 
-### Phase transition feedback (on plan conclusion)
+### Phase transition feedback
 
+Use this status block instead when the plan concludes.
+
+<!-- prettier-ignore-start -->
 ```md
-> **SPAE Status** • `workstream-name`
+> **`SPAE` Status** • `workstream-name`
 > **Progress**: All [X] tasks completed
 > **Phase Complete**: `/build`
 > **Next Phase**: `/verify`

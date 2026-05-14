@@ -101,7 +101,7 @@ Determine input by one of the following:
   measurable reduction.
 - No dangling references or unintended interface breaks.
 
-## Standardized feedback
+## Result
 
 - Keep feedback prose terse, concise, and precise.
 - Optimize prose for token and context efficiency.
@@ -118,7 +118,7 @@ Determine input by one of the following:
 - **Findings**:
   - [List of terse summary of key gaps, risks, or architectural notes]
 - **Summary**:
-  - [List of terse summary of refactors]
+  - [List of summary of changes]
 
 > **Refactor Status** • `[Scope]`
 > **Result**: [Complete | No Changes | Failed]

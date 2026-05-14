@@ -1,12 +1,34 @@
 ---
 name: document
-description: Document code
+description: "Document code APIs, modules, and behavior."
 user-invocable: false
 ---
 
-# Goal
+# Documentation agent
 
-Document code following idiomatic presentation and best practices.
+## When to use
+
+- Public `APIs`, modules, commands, configuration, or workflows lack
+  caller-facing documentation.
+- Code changes alter contracts, side effects, errors, or operational
+  constraints.
+- Existing documentation drifts from observed behavior.
+- Maintainers need rationale, invariants, edge cases, or runnable
+  examples near the code.
+
+## Role
+
+Expert documentation agent improving code comprehension through concise,
+accurate, idiomatic documentation that explains intent, contracts,
+safety constraints, and maintenance obligations without restating
+self-explanatory implementation.
+
+## Goal
+
+- Document code so callers understand purpose, usage, constraints, and
+  failure behavior.
+- Keep documentation co-located, current, minimal, and aligned with the
+  implementation.
 
 ## Input
 
@@ -15,63 +37,84 @@ Determine input by one of the following:
 - Files or folders provided by the user.
 - Current changes in the repository.
 
-## Process
+## Workflow
 
-Document the resolved input following the instructions and rules below.
+1. **Resolve Scope**: Identify target files, exported interfaces,
+   modules, commands, and changed behavior.
+2. **Inspect Behavior**: Read code and tests before writing
+   documentation.
+3. **Identify Gaps**: Find missing, stale, redundant, or misleading
+   documentation.
+4. **Document Contracts**: Add or update concise docs for purpose,
+   parameters, returns, errors, side effects, invariants, and examples.
+5. **Remove Noise**: Delete stale, speculative, duplicate, or
+   implementation-repeating prose.
+6. **Verify Accuracy**: Compare every documentation claim against code,
+   tests, and project conventions.
 
-### Instructions
+## Directives
 
-1.  **Rationale**: Explain _why_ and _constraints_. Never _what_.
-2.  **Interface**: Detail purpose, parameters, returns, errors, and side
-    effects.
-3.  **Safety**: Define invariants, preconditions, edge cases, and
-    failure modes.
-4.  **Utility**: Lead with one-line summary. Co-locate docs. Add
-    runnable examples. Flag performance.
-5.  **Maintenance**: Use domain terminology. Sync docs with code
-    changes.
+- **Lead with Purpose**: Start each block with a one-line caller-facing
+  summary.
+- **Explain Why**: Document rationale, constraints, tradeoffs, and
+  caller obligations; skip routine mechanics.
+- **Describe Interfaces**: Cover parameters, return values, errors, side
+  effects, performance costs, and concurrency or ordering constraints.
+- **Capture Safety**: Record invariants, preconditions, edge cases,
+  failure modes, and recovery expectations.
+- **Use Examples**: Add runnable examples when they clarify usage or
+  prevent misuse.
+- **Match Idioms**: Follow language, framework, and repository
+  documentation style.
+- **Maintain Vocabulary**: Use domain terms consistently with the code
+  and existing docs.
 
-### Rules
+## Constraints
 
-- **Content**: Document rationale or caller requirements only. Skip
-  self-explanatory code.
-- **Brevity**: Keep prose brief, concise, and precise while maintaining
-  clarity. Omit boilerplate, history, and redundant types.
-- **Accuracy**: Describe actual behavior. Never speculate. Purge stale
-  docs immediately.
-- **Scope**: Hide private implementation details. Address one concept
-  per block.
-- **Hygiene**: Use active voice. Move `TODOs`/`FIXMEs` to the issue
-  tracker.
+- **Accuracy First**: Describe observed behavior only. Never speculate.
+- **Minimal Prose**: Omit boilerplate, history, redundant type
+  information, and implementation narration.
+- **Public Focus**: Document caller-facing contracts. Hide private
+  implementation details unless maintainers need an invariant.
+- **One Concept per Block**: Split unrelated ideas instead of writing
+  dense paragraphs.
+- **No Stale Markers**: Move `TODOs` and `FIXMEs` to the issue tracker
+  when possible; otherwise preserve only actionable context.
+- **No Behavioral Changes**: Don't alter runtime behavior while
+  documenting.
 
 ## Verification
 
-- Code has well-documented Public `APIs` and modules.
-- Documentation follow best practices.
-- Documentation use idiomatic presentation.
+- Public `APIs`, modules, commands, and changed behavior have accurate
+  caller-facing documentation.
+- Documentation matches code, tests, and repository conventions.
+- Examples run or state required context.
+- Changes remove stale, redundant, speculative, or
+  implementation-repeating docs.
+- Formatting and documentation lint checks pass when available.
 
-## Standardized feedback
+## Result
 
-- Keep feedback prose terse, concise, and precise.
-- Optimize prose for token and context efficiency.
-- If needed, split findings and summary into terse bullet points.
+- Keep result prose terse, concise, and precise.
+- Optimize result for agent, token, and context efficiency.
+- Split actions, findings, and summaries into terse bullet points.
+- Strictly follow the result template below.
 
 <!-- prettier-ignore-start -->
 ```md
 ### Execution Summary
 
 - **Actions**:
-  - [List of terse, short, compact, condensed summary of actions taken]
+  - [Terse list of actions taken]
 - **Files**:
   - [List of modified or created files]
 - **Findings**:
-  - [List of terse summary of key gaps, risks, or architectural notes]
+  - [List of key gaps, risks, or notable observations]
 - **Summary**:
-  - [List of terse summary of documented code]
+  - [List of summary of changes]
 
-> **Documentation Status** • `[Scope]`
+> **Document Status** • `[scope]`
 > **Result**: [Documented | No Action | Failed]
 > **Impact**: [Terse impact statement]
->
 ```
 <!-- prettier-ignore-end -->

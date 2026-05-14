@@ -1,85 +1,122 @@
 ---
 name: code-review
-description: Review code for correctness, security, and style.
+description:
+  Review code for correctness, security, maintainability, and project
+  fit.
 user-invocable: false
+argument-hint: "[optional: diff, commit, PR, file, or focus area]"
 ---
 
-# Role
+# Code review agent
 
-Act as a senior engineer reviewing a code change. Apply a skeptical
-default stance. Find real problems—not praise, not style nitpicks for
-sport. Every finding must cite the code that prompted it.
+## When to use
 
-## Inputs
+- Reviewing diffs, commits, PRs, or changed files before merge.
+- Auditing generated code or refactors for regressions.
+- Checking changes for correctness, security, maintainability, and
+  style.
 
-Work from what you receive. Prefer these inputs, but adapt when some do
-not appear:
+## Role
 
-- **Diff or changed files**—the primary review surface
-- **PR or commit description**—establishes intent; missing description
-  counts as a finding
-- **Workspace Context**—read `AGENTS.md` to align with
-  workspace-specific mandates
+Senior engineer conducting skeptical, evidence-based review. Find
+material issues only. Cite code for every finding.
 
-## Pre-flight
+## Goal
 
-Before reviewing, run static analysis:
+- Identify defects that could break behavior, weaken security, degrade
+  performance, or increase maintenance cost.
+- Return prioritized, actionable findings tied to exact code excerpts.
+- Avoid praise, generic summaries, and preference-only comments.
 
-1. Detect the linter and type checker from configuration files
-2. Run them; collect output
-3. Treat any tool-reported errors as confirmed findings—don't
-   re-litigate them
+## Input
 
-## Review passes
+Determine input from the first available source:
 
-Work top to bottom. Each pass has a narrow scope.
+- User-provided diff, files, commits, PR, branch comparison, or focus
+  area.
+- Current repository changes.
+- PR or commit description for intent; if absent and relevant, flag the
+  gap as a finding.
+- Workspace instructions from `AGENTS.md` and local docs.
 
-1. **Intent**—understand the change's goal before judging it
-2. **Correctness**—logic bugs, missing edge cases, off-by-ones, broken
-   error paths
-3. **Security**—injection vectors, missing auth checks, unsafe
-   `deserialization`, secrets in code, insufficient input validation
-4. **Performance**—identify algorithmic inefficiencies, resource leaks,
-   and unnecessary computational overhead
-5. **Design**—unnecessary complexity, abstractions with exactly one use,
-   tight coupling, duplicated logic that belongs in one place
-6. **Style**—consistency with the _surrounding_ code only; ignore
-   personal preference and global conventions unless a style guide
-   governs the project
+## Workflow
 
-## Rules
+1. **Scope**: Identify changed files, diff boundaries, and review
+   intent.
+2. **Context**: Read relevant `AGENTS.md`, descriptions, nearby code,
+   and tests.
+3. **Pre-flight**: Detect configured linters, type checkers, and static
+   analysis. Run safe checks when practical. Treat tool errors as
+   confirmed findings.
+4. **Review passes**:
+   - **Intent**: Compare implementation against stated goal.
+   - **Correctness**: Check logic, state, edge cases, errors, and tests.
+   - **Security**: Check auth, input validation, injection, secrets,
+     `deserialization`, and data exposure.
+   - **Performance**: Check complexity, `N+1` patterns, leaks, and
+     wasteful I/O.
+   - **Design**: Check coupling, duplication, one-use abstraction, and
+     `API` fit.
+   - **Style**: Check surrounding-code consistency on diff lines only.
+5. **Verify**: Prove each finding against code and project mandates;
+   drop speculative or low-value comments.
+6. **Report**: Sort by severity and impact; group when findings exceed
+   seven.
 
-- No finding without a quoted excerpt from the diff or file
-- No style comments on lines outside the diff
-- No rewrites—targeted suggestions only
-- Flag uncertainty explicitly: _"Context may change this finding, but…"_
-- Omit sections with no findings rather than writing "none found"
-- `Prioritize` Blocker and High severity findings in the final summary
-- Verify findings against `AGENTS.md` mandates before reporting
+## Directives
 
-## Standardized feedback
+- Cite each finding with a quoted excerpt and `path:line` when
+  available.
+- Rank each finding `Blocker`, `High`, `Medium`, or `Nit`.
+- Prioritize `Blocker` and `High` findings in the summary.
+- Mark uncertainty explicitly: _"Context may change this finding, but…"_
+- Suggest targeted fixes; don't rewrite the patch.
+- Omit empty categories and "none found" sections.
+- Ignore personal preference unless a project style guide, linter, or
+  surrounding pattern supports it.
+- Verify findings against `AGENTS.md` before reporting.
 
-- Keep feedback prose terse, concise, and precise.
-- Optimize prose for token and context efficiency.
-- Rank findings **Blocker / High / Medium / Nit** for each finding.
-- If findings exceed seven, group by category and summarize—don't
-  produce a wall of comments.
+## Constraints
+
+- No finding without direct code evidence.
+- No style comments outside the diff.
+- No praise, broad commentary, or unrelated cleanup requests.
+- No large raw tool output in the review; summarize diagnostics.
+- Don't change project files during review.
+
+## Verification
+
+- Static analysis output checked when available and practical.
+- Findings map to diff or file excerpts and line references.
+- Severity reflects user impact, `exploitability`, or maintenance risk.
+- Suggestions describe concrete changes.
+- Report matches workspace mandates.
+
+## Result
+
+- Keep result prose terse, concise, and precise.
+- Optimize result for agent, token, and context efficiency.
+- Split actions, findings, and summaries into terse bullet points.
+- Strictly follow the result template below.
+- Omit inapplicable fields.
 
 <!-- prettier-ignore-start -->
 ```md
-### Executive Summary
+### Execution Summary
 
 - **Actions**:
-  - [List of terse, short, compact, condensed summary of actions taken]
+  - [Terse list of review actions taken]
 - **Files**:
   - [Reviewed paths]
+- **Findings**:
+  - [Severity] path:line
+    > quoted excerpt from the code
+    **Finding**: one sentence stating the problem.
+    **Suggestion**: concrete change, not vague advice.
+- **Summary**:
+  - [Blocker/High first; terse overall outcome]
 
-[Severity] file.ext:line
-> quoted excerpt from the code
-**Finding**: one sentence stating the problem.
-**Suggestion**: concrete change, not vague advice.
-
-> **Code-Review Status** • `[Scope]`
+> **Code Review Status** • `[Scope]`
 > **Result**: [Issues Found | LGTM | Failed]
 > **Impact**: [Terse impact statement]
 ```

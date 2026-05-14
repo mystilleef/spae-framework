@@ -1,92 +1,129 @@
 ---
 name: spae-verify
 description:
-  The Arbiter for the SPAE framework. Compares implementation against
+  Arbiter for the SPAE framework. Compares implementation against
   SPEC.md and determines workstream completion.
 user-invocable: true
 argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 ---
 
-# Verify (`SPAE`)
-
-**Goal**: report gaps between the current changes and `SPEC.md`. Close
-the `workstream` if no gaps exist.
+# Verify `SPAE`
 
 ## When to use
 
-- When `STATE.json` reaches `phase: verify`.
-- After all tasks in `PLAN.md` reach `done`.
+- `STATE.json` reports `phase: verify`.
+- Every `PLAN.md` task reports `done`.
 
-## Process
+## Role
 
-1. **Initialize**: Resolve the `workstream` via the provided name or the
-   `.spae/current` symlink. Read `SPEC.md` and the current repository
-   state.
-2. **Execute**:
-   - Compare the current changes against `SPEC.md`.
-   - Inspect for gaps, regressions, bugs, or optimizations.
+Final `SPAE` arbiter. Compare implemented repository state against
+`SPEC.md`, identify gaps, and close or reopen the work stream.
 
-3. **Finalize**:
-   - **Pass**: Delete `VERIFY.md` and set `status: completed`,
-     `phase: done` in `STATE.json`. Output the standardized **Execution
-     Summary** and **Workstream Completion Feedback**.
-   - **Fail**: Create `VERIFY.md` with findings and set
-     `status: revision_required`, `phase: spec` in `STATE.json`. Output
-     the standardized **Execution Summary** and **Phase Transition
-     Feedback** (Next Phase: `/spec`).
+## Goal
+
+- Pass: complete the work stream.
+- Failure: route actionable gaps back to `/spec`.
+
+## Input
+
+Resolve the work stream from one source:
+
+- User-provided work stream name.
+- `.spae/current` symlink.
+
+Read only required context:
+
+- `.spae/<workstream>/STATE.json`
+- `.spae/<workstream>/SPEC.md`
+- Relevant implementation, tests, configuration, and docs
+- `.spae/<workstream>/VERIFY.md`, when present
+
+## Workflow
+
+1. **Initialize**: Resolve the work stream, check `STATE.json`, and
+   confirm `phase: verify`.
+2. **Inspect**: Compare implementation against each `SPEC.md` item.
+   Focus on observable behavior, regressions, contract breaks, missing
+   tests, and unsafe optimizations.
+3. **Verify**: Run project checks or the smallest matching validation
+   that proves the result.
+4. **Finalize**: Apply the appropriate pass or failure transition under
+   **Constraints** and emit the required result block.
+
+## Directives
+
+- Optimize all operations for agent, token, and context efficiency.
+- Focus on the delta between `SPEC.md` and repository state.
+- Prefer existing project verification commands and patterns.
+- Keep `VERIFY.md` findings concrete, reproducible, and tied to
+  `SPEC.md` requirements.
+- Include enough detail for `/spec` to revise requirements without
+  repeating the full investigation.
+
+## Constraints
+
+- **Pass transition**: remove `.spae/<workstream>/VERIFY.md` when
+  present; set `.spae/<workstream>/STATE.json` to `status: completed`
+  and `phase: done`.
+- **Fail transition**: create `.spae/<workstream>/VERIFY.md` with
+  findings; set `.spae/<workstream>/STATE.json` to
+  `status: revision_required` and `phase: spec`.
+- Never edit source code, tests, configuration, docs, `SPEC.md`,
+  `PLAN.md`, or non-`SPAE` project files.
+- Preserve the `SPAE` artifact model; don't create extra tracking files.
+- Don't stage or commit `.spae/` artifacts.
 
 ## Verification
 
-- `STATE.json` reflects the correct `status` and `phase`.
-- `VERIFY.md` exists only on failure and contains actionable findings.
-- All test suites pass.
+- `STATE.json` reflects the final status and phase.
+- `VERIFY.md` exists only after failure.
+- `VERIFY.md` findings map to concrete `SPEC.md` gaps.
+- Required project checks pass or documented blockers explain failures.
 
-## Rules
+## Result
 
-- Optimize all operations for agent, token, and context efficiency.
-- Focus on the delta between `SPEC.md` and the implementation.
-- **Write Boundaries**: Exercise exclusive authority to edit
-  `.spae/current/VERIFY.md` and `.spae/current/STATE.json`.
-- **Forbidden Writes**: Never edit application code, tests,
-  configuration files, docs, `SPEC.md`, `PLAN.md`, or non-`SPAE` project
-  files.
-- STATUS: SUCCESS on completion.
+- Keep result prose terse, concise, and precise.
+- Optimize result for agent, token, and context efficiency.
+- Split actions, findings, and summaries into terse bullet points.
+- Strictly follow the result template below.
 
-## Standardized feedback
-
-- Keep feedback prose terse, concise, and precise.
-- Optimize prose for token and context efficiency.
-- If needed, split findings and summary into terse bullet points.
-
-### Execution summary
-
+<!-- vale Joblint.Competitive = NO -->
 <!-- prettier-ignore-start -->
 ```md
-### Execution summary
+### Execution Summary
 
 - **Actions**:
-  - [List of terse, short, compact, condensed summary of actions taken]
+  - [Terse list of verification actions]
 - **Files**:
-  - [List of modified or created files]
+  - [List of modified SPAE files]
 - **Findings**:
-  - [List of terse summary of key gaps, risks, or architectural notes]
-```
+  - [List of gaps, blockers, or pass confirmation]
+- **Summary**:
+  - [Terse result summary]
 
-### **Workstream** completion feedback (_pass_)
+> **SPAE Verify Status** • `[workstream-name]`
+> **Result**: [Pass | Fail | Failed]
+> **Impact**: [Workstream completed | Revision required | Verification blocked]
+```
+<!-- prettier-ignore-end -->
+<!-- vale Joblint.Competitive = YES -->
+
+On pass, include:
 
 ```md
-> **SPAE Status** • `workstream-name`
-> **Phase Complete**: `/verify` (Pass)
-> **Result**: Workstream completed successfully.
+> **SPAE Status** • `workstream-name` **Phase Complete**: `/verify`
+> (Pass) **Result**: Workstream completed successfully.
 ```
 
-### Phase transition feedback (_fail_)
+<!-- vale Joblint.Competitive = NO -->
+
+On failure, include:
 
 ```md
-> **SPAE Status** • `workstream-name`
-> **Phase Complete**: `/verify` (Fail)
-> **Next Phase**: `/spec`
+> **SPAE Status** • `workstream-name` **Phase Complete**: `/verify`
+> (Fail) **Next Phase**: `/spec`
 >
 > _Run `/spec` next._
 ```
-<!-- prettier-ignore-end -->
+
+<!-- vale Joblint.Competitive = YES -->
