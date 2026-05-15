@@ -126,6 +126,7 @@ secret types or placeholder examples.
   - [Commit hash and subject per created commit]
 
 > **Commit Status** • `[Scope]` **Result**: [Committed | Clean Tree | >
+>
 > > Failed] **Impact**: [Terse working-tree and commit outcome]
 ```
 
