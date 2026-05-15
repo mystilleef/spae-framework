@@ -63,11 +63,12 @@ Read only required context:
 ## Constraints
 
 - **Pass transition**: remove `.spae/<workstream>/VERIFY.md` when
-  present; set `.spae/<workstream>/STATE.json` to `status: completed`
-  and `phase: done`.
-- **Fail transition**: create `.spae/<workstream>/VERIFY.md` with
-  findings; set `.spae/<workstream>/STATE.json` to
-  `status: revision_required` and `phase: spec`.
+  present; remove `.spae/current`; set `.spae/<workstream>/STATE.json`
+  to `status: completed` and `phase: done`.
+- **Fail transition**: overwrite `.spae/<workstream>/VERIFY.md` with
+  findings from the current run only; set
+  `.spae/<workstream>/STATE.json` to `status: revision_required` and
+  `phase: spec`.
 - Never edit source code, tests, configuration, docs, `SPEC.md`,
   `PLAN.md`, or non-`SPAE` project files.
 - Preserve the `SPAE` artifact model; don't create extra tracking files.
@@ -76,6 +77,7 @@ Read only required context:
 ## Verification
 
 - `STATE.json` reflects the final status and phase.
+- `.spae/current` doesn't exist after a passing run.
 - `VERIFY.md` exists only after failure.
 - `VERIFY.md` findings map to concrete `SPEC.md` gaps.
 - Required project checks pass or documented blockers explain failures.

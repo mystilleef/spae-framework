@@ -42,9 +42,11 @@ Use only relevant context from:
 1. **Resolve `workstream`**: Use the explicit name, `.spae/current`, or
    a generated slug for new `workstream`s. Update `.spae/current`.
 2. **Determine mode**:
+   - No `.spae/current` symlink: initialize a new `.spae/[workstream]/`.
    - `status: revision_required`: read `VERIFY.md` and revise `SPEC.md`.
-   - No active `workstream`: initialize a new `.spae/[workstream]/`.
-   - Existing `phase: spec`: continue specification work.
+   - `phase: spec`: continue specification work.
+   - Any other phase: report current state and stop; don't change
+     artifacts.
 3. **Gather context**: Read only the fewest artifacts and source
    patterns needed to remove ambiguity.
 4. **Draft spec**: Capture goal, requirements, testing strategy,

@@ -155,11 +155,13 @@ failing-test-first execution, or `/execute` for comprehensive execution.
 
 - **Input**: `STATE.json` + `VERIFY.md` (if present) + `SPEC.md` + raw
   user prompt + codebase context.
-- **Action**: Checks `STATE.json` first. If `status` equals
+- **Action**: Checks for `.spae/current` first. If absent, initializes a
+  new workstream immediately. If present and `status` equals
   `revision_required`, enters revision mode, reads `VERIFY.md`, and
-  updates `SPEC.md` to address findings. If `status` equals `completed`
-  or empty, initializes a new workstream. Distills requests into
-  unambiguous requirements. Reads repository code for context only.
+  updates `SPEC.md` to address findings. If `phase` equals `spec`,
+  continues specification work. Any other phase: reports current state
+  and stops. Distills requests into unambiguous requirements. Reads
+  repository code for context only.
 - **Output**: Overwrites `SPEC.md`. Updates `STATE.json` with
   `phase: plan` and `status: active`. Updates `.spae/current`.
 - **Write scope**: `SPEC.md`, `STATE.json`, `.spae/current`, and the
@@ -262,9 +264,9 @@ sequentially. Avoid alternating between them within the same
   workstream completion.
 - **Output (Fail)**: Creates `VERIFY.md` with detailed findings. Updates
   `STATE.json` with `status: revision_required` and `phase: spec`.
-- **Output (Pass)**: Deletes `VERIFY.md`. Updates `STATE.json` with
-  `status: completed` and `phase: done`.
-- **Write scope**: `VERIFY.md` and `STATE.json`.
+- **Output (Pass)**: Deletes `VERIFY.md`. Removes `.spae/current`.
+  Updates `STATE.json` with `status: completed` and `phase: done`.
+- **Write scope**: `VERIFY.md`, `STATE.json`, and `.spae/current`.
 - **Forbidden writes**: Source code, tests, configuration files, docs,
   `SPEC.md`, `PLAN.md`, and any other non-`SPAE` project file.
 
