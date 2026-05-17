@@ -106,6 +106,7 @@ Then read:
 - Split actions, findings, and summaries into terse bullet points.
 - Strictly follow the result template below.
 - Emit task execution feedback after completing a task.
+- Prefer lists, and sub-lists, over long paragraphs and sentences.
 - Emit phase transition feedback when the plan concludes.
 
 <!-- prettier-ignore-start -->

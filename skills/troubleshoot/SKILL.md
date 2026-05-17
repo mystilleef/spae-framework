@@ -77,6 +77,7 @@ If no concrete symptom exists, ask for clarification before debugging.
 - Keep result prose terse, concise, and precise.
 - Optimize result for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
+- Prefer lists, and sub-lists, over long paragraphs and sentences.
 - Strictly follow the result template below.
 
 <!-- prettier-ignore-start -->

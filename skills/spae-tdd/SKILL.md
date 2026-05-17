@@ -68,9 +68,9 @@ Then read:
    verification from the task.
 8. **Test**: Run every verification command listed for the active task
    plus relevant regression tests.
-9. **Finalize State**: Mark the active task `done`, increment completion
-   metrics, and advance the cursor to the next task. If no next task
-   remains, set `phase: verify`.
+9. **Finalize State**: Mark the active task `done`, increment
+    completion metrics, and advance the cursor to the next task. If no
+    next task remains, set `phase: verify`.
 10. **Report**: Emit the standardized execution summary and framework
     status block.
 
@@ -124,6 +124,7 @@ Then read:
 - Split actions, findings, and summaries into terse bullet points.
 - Strictly follow the result template below.
 - Emit task execution feedback after completing a task.
+- Prefer lists, and sub-lists, over long paragraphs and sentences.
 - Emit phase transition feedback when the plan concludes.
 
 <!-- prettier-ignore-start -->
