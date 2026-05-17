@@ -32,22 +32,28 @@ altering observable behavior.
 
 ## Input
 
-Determine input by one of the following:
+Determine scope by the first available source:
 
 - Files or folders provided by the user.
 - Current changes in the repository.
 
+Abort if no scope exists.
+
 ## Workflow
 
-1. **Verify Tests**: Confirm a solid, automated, self-checking suite
+1. **Scope Target**: Identify the smallest production area worth
+   testing.
+2. **Inspect Context**: Read only relevant production code, adjacent
+   tests, and existing test or coverage commands.
+3. **Verify Tests**: Confirm a solid, automated, self-checking suite
    exists before touching code.
-2. **Identify Smells**: Analyze for target `antipatterns`.
-3. **Select Mechanism**: Choose the appropriate refactoring move (for
+4. **Identify Smells**: Analyze for target `antipatterns`.
+5. **Select Mechanism**: Choose the appropriate refactoring move (for
    example, _`Extract Method`_, _`Move Field`_).
-4. **Execute in Micro-Steps**: Apply one transformation at a time.
-5. **Test After Each Step**: Compile and run the full suite after every
+6. **Execute in Micro-Steps**: Apply one transformation at a time.
+7. **Test After Each Step**: Compile and run the full suite after every
    change.
-6. **Backtrack on Failure**: Revert to last known-good state; retry with
+8. **Backtrack on Failure**: Revert to last known-good state; retry with
    smaller steps.
 
 ## Directives
@@ -105,6 +111,7 @@ Determine input by one of the following:
 
 - Keep feedback prose terse, concise, and precise.
 - Optimize prose for token and context efficiency.
+- Prefer lists, and sub-lists, over long paragraphs and sentences.
 - If necessary, split findings and summary into terse bullet points.
 
 <!-- prettier-ignore-start -->

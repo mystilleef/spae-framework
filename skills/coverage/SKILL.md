@@ -31,14 +31,12 @@ failure paths, state changes, and integration points.
 
 Determine scope by the first available source:
 
-1. `$ARGUMENTS` from the user.
-2. Current repository changes.
-3. Existing generated coverage reports.
-4. Most recently changed testable production code.
+- Files or folders provided by the user.
+- Current repository changes.
+- Analytics from coverage report tool.
+- Existing generated coverage reports.
 
-If scope remains unclear, choose the highest-risk recently changed
-candidate. If no useful candidate exists, report that no coverage work
-applies and stop.
+Abort if no scope exists.
 
 ## Workflow
 
@@ -89,6 +87,7 @@ applies and stop.
 - Keep result prose terse, concise, and precise.
 - Optimize result for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
+- Prefer lists, and sub-lists, over long paragraphs and sentences.
 - Strictly follow the result template below.
 
 <!-- prettier-ignore-start -->

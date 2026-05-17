@@ -30,14 +30,12 @@ material issues only. Cite code for every finding.
 
 ## Input
 
-Determine input from the first available source:
+Determine scope by the first available source:
 
-- User-provided diff, files, commits, PR, branch comparison, or focus
-  area.
+- Files or folders provided by the user.
 - Current repository changes.
-- PR or commit description for intent; if absent and relevant, flag the
-  gap as a finding.
-- Workspace instructions from `AGENTS.md` and local docs.
+
+Abort if no scope exists.
 
 ## Workflow
 
@@ -98,6 +96,7 @@ Determine input from the first available source:
 - Optimize result for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Strictly follow the result template below.
+- Prefer lists, and sub-lists, over long paragraphs and sentences.
 - Omit inapplicable fields.
 
 <!-- prettier-ignore-start -->

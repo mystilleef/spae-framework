@@ -31,12 +31,12 @@ paths while preserving intended behavior.
 
 ## Input
 
-Determine input by one of the following:
+Determine scope by the first available source:
 
 - Files or folders provided by the user.
-- Current changes in the repository.
+- Current repository changes.
 
-Abort if no input exists.
+Abort if no scope exists.
 
 ## Workflow
 
@@ -95,6 +95,7 @@ Abort if no input exists.
 - Keep result prose terse, concise, and precise.
 - Optimize result for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
+- Prefer lists, and sub-lists, over long paragraphs and sentences.
 - Strictly follow the result template below.
 
 <!-- prettier-ignore-start -->
