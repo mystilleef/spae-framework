@@ -112,8 +112,8 @@ secret types or placeholder examples.
 - Split actions, findings, and summaries into terse bullet points.
 - Prefer lists, and sub-lists, over long paragraphs and sentences.
 - Strictly follow the result template below.
-<!-- prettier-ignore-start -->
 
+<!-- prettier-ignore-start -->
 ```md
 ### Execution Summary
 
@@ -126,9 +126,10 @@ secret types or placeholder examples.
 - **Commits**:
   - [Commit hash and subject per created commit]
 
-> **Commit Status** • `[Scope]` **Result**: [Committed | Clean Tree | >
+> **Commit Status** • `[Scope]`
+> **Result**: [Committed | Clean Tree | Failed]
+> **Impact**: [Terse working-tree and commit outcome]
 >
-> > Failed] **Impact**: [Terse working-tree and commit outcome]
+> _[Working tree summary]_
 ```
-
 <!-- prettier-ignore-end -->
