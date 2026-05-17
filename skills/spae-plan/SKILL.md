@@ -42,18 +42,20 @@ Use only relevant context from:
 2. **Validate state**: Confirm `SPEC.md` exists and `STATE.json` can
    advance from `phase: plan`; stop early with a clear result if
    blocked.
-3. **Analyze spec**: Extract goal, requirements, testing strategy,
+3. **Reset prior cycle**: Delete `PLAN.md` (ignore if absent) and clear
+   the `tasks` registry in `STATE.json` to empty. Run unconditionally.
+4. **Analyze spec**: Extract goal, requirements, testing strategy,
    out-of-scope items, and assumptions.
-4. **Gather context**: Inspect only the source patterns needed to fit
+5. **Gather context**: Inspect only the source patterns needed to fit
    existing architecture; never edit repository files.
-5. **Draft plan**: Decompose work into `T-XXX` tasks with dependencies,
+6. **Draft plan**: Decompose work into `T-XXX` tasks with dependencies,
    context, acceptance criteria, and verification steps.
-6. **Order graph**: Sort tasks by dependency, risk, and vertical value;
+7. **Order graph**: Sort tasks by dependency, risk, and vertical value;
    each task must leave the system working.
-7. **Finalize**: Write `PLAN.md`, initialize all task IDs as `todo` in
-   `STATE.json`, update metrics, and set `phase: inspect`.
-8. **Report**: Emit the standard result with `SPAE` phase transition
-   feedback.
+8. **Finalize**: Write `PLAN.md`. Initialize all new task IDs as `todo`
+   in `STATE.json`. Update metrics and set `phase: inspect`.
+9. **Report**: Emit the standard result with `SPAE` phase transition
+    feedback.
 
 ## Directives
 
@@ -95,6 +97,7 @@ Use only relevant context from:
 - Keep result prose terse, concise, and precise.
 - Optimize result for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
+- Prefer lists, and sub-lists, over long paragraphs and sentences.
 - Strictly follow the result template below.
 
 <!-- prettier-ignore-start -->

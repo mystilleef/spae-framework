@@ -35,7 +35,7 @@ Read only required context:
 
 - `.spae/<workstream>/STATE.json`
 - `.spae/<workstream>/SPEC.md`
-- Relevant implementation, tests, configuration, and docs
+- Current repository source code changes.
 - `.spae/<workstream>/VERIFY.md`, when present
 
 ## Workflow
@@ -47,8 +47,16 @@ Read only required context:
    tests, and unsafe optimizations.
 3. **Verify**: Run project checks or the smallest matching validation
    that proves the result.
-4. **Finalize**: Apply the appropriate pass or failure transition under
-   **Constraints** and emit the required result block.
+4. **Finalize**:
+   - **Pass transition**: remove `.spae/<workstream>/VERIFY.md` when
+     present; remove `.spae/current`; set
+     `.spae/<workstream>/STATE.json` to `status: completed` and
+     `phase: done`.
+   - **Fail transition**: create or overwrite
+     `.spae/<workstream>/VERIFY.md` with findings from the current run
+     only; set `.spae/<workstream>/STATE.json` to
+     `status: revision_required` and `phase: spec`.
+   - **Result:** Emit the required result block.
 
 ## Directives
 
@@ -62,13 +70,6 @@ Read only required context:
 
 ## Constraints
 
-- **Pass transition**: remove `.spae/<workstream>/VERIFY.md` when
-  present; remove `.spae/current`; set `.spae/<workstream>/STATE.json`
-  to `status: completed` and `phase: done`.
-- **Fail transition**: overwrite `.spae/<workstream>/VERIFY.md` with
-  findings from the current run only; set
-  `.spae/<workstream>/STATE.json` to `status: revision_required` and
-  `phase: spec`.
 - Never edit source code, tests, configuration, docs, `SPEC.md`,
   `PLAN.md`, or non-`SPAE` project files.
 - Preserve the `SPAE` artifact model; don't create extra tracking files.
@@ -87,6 +88,7 @@ Read only required context:
 - Keep result prose terse, concise, and precise.
 - Optimize result for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
+- Prefer lists, and sub-lists, over long paragraphs and sentences.
 - Strictly follow the result template below.
 
 <!-- vale Joblint.Competitive = NO -->

@@ -48,7 +48,8 @@ Use only relevant context from:
    - Any other phase: report current state and stop; don't change
      artifacts.
 3. **Gather context**: Read only the fewest artifacts and source
-   patterns needed to remove ambiguity.
+   patterns needed to remove ambiguity. Then refine, streamline,
+   `consolidate`, and optimize.
 4. **Draft spec**: Capture goal, requirements, testing strategy,
    out-of-scope items, and assumptions in concise, testable language.
 5. **Finalize**: Write `SPEC.md`, update `STATE.json` to `phase: plan`
@@ -90,6 +91,7 @@ Use only relevant context from:
 - Keep result prose terse, concise, and precise.
 - Optimize result for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
+- Prefer lists, and sub-lists, over long paragraphs and sentences.
 - Strictly follow the result template below.
 
 <!-- prettier-ignore-start -->
