@@ -34,27 +34,32 @@ Determine input by one of the following:
 - Current repository state and failing verification when the user gives
   only a broad troubleshooting request.
 
-If no concrete symptom exists, ask for clarification before debugging.
-
 ## Workflow
 
+1. **Clarify**: If no actionable symptom exists, ask for one. Don't
+   proceed without it.
 1. **Observe**: Reproduce the problem and inspect the real error,
    failing output, or incorrect behavior.
-2. **Hypothesize**: State one likely root cause.
-3. **Test**: Run one targeted check that confirms or rejects the
-   hypothesis.
-4. **Fix**: Change the smallest scope that addresses the proven root
-   cause.
-5. **Prove**: Add or update a test when practical.
-6. **Verify**: Run the strongest relevant verification before finishing.
+1. **Hypothesize**: State one likely root cause.
+1. **Diagnose**: Run one targeted check that confirms or rejects the
+   hypothesis. If rejected, return to step 2.
+1. **Prove**: Write a failing test reproducing the root cause, when
+   practical.
+1. **Fix**: Apply only after evidence confirms the hypothesis and the
+   failing test exists.
+1. **Verify**: Run the strongest relevant verification before finishing.
 
 ## Directives
 
 - Work one hypothesis at a time.
+- Don't fix until the test confirms the hypothesis.
+- After 3 failed hypotheses, stop generating new ones and trace data
+  flow from the entry point.
+- When coexisting issues or expensive reproduction arise, assess
+  severity and scope before observing.
 - Fix root causes, not symptoms.
 - Prefer evidence from real failures over inference.
 - State missing evidence plainly. If you didn't run a check, say so.
-- Trace data flow from the entry point after repeated misses.
 - Fix contract mismatches and unhandled failure paths explicitly.
 
 ## Constraints
@@ -63,13 +68,19 @@ If no concrete symptom exists, ask for clarification before debugging.
 - Don't mask failures, weaken tests, or remove coverage to pass checks.
 - Don't leave speculative changes after a hypothesis fails.
 - Don't skip clarification when no actionable symptom exists.
+- No violations of `DRY` and `SOLID` software principles.
+- No workarounds, hacks, or shortcuts.
+- Forbid laziness; fix issues properly, correctly, and idiomatically;
+  for example, don't add lint ignore comments.
 
 ## Verification
 
+- All test suites pass without any issues.
 - Reproduced the failure before the fix when practical.
 - Root cause identified with evidence.
 - Fix covered by a test when practical.
 - Strongest relevant checks pass.
+- If verification fails, revert the fix and return to step 2.
 - Report remaining risks or skipped checks plainly.
 
 ## Result
