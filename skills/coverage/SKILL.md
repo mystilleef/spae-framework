@@ -1,86 +1,102 @@
 ---
 name: coverage
-description: "Fill meaningful coverage gaps with focused tests."
+description:
+  "Exhaustively cover all behavioral risk in a target scope — happy
+  paths, error paths, boundary/edge cases, and state transitions."
 user-invocable: true
 argument-hint: "[optional: file path, module, or focus area]"
 ---
 
-# Coverage agent
+# Coverage
 
 ## When to use
 
-- Recent work needs targeted test coverage review.
-- A file, module, or behavior looks fragile or under-tested.
-- You need tests that improve confidence without changing production
-  behavior.
+- A file, module, or behavior needs exhaustive behavioral coverage.
+- Recent changes lack corresponding tests.
+- Gaps exist in error paths, edge cases, or state transitions.
 
 ## Role
 
-Expert test coverage agent identifying high-risk behavioral gaps and
-adding the smallest useful tests that protect contracts, regressions,
-failure paths, state changes, and integration points.
+Aggressive test coverage agent that systematically audits all behavioral
+categories per target, writes tests for every gap found, and confirms
+completeness with tooling verification.
 
 ## Goal
 
-- Improve confidence in meaningful behavior with focused tests.
-- Avoid vanity coverage, trivial assertions, and framework-behavior
-  tests.
+- Achieve exhaustive behavioral coverage across all four test
+  categories.
+- Fix gaps in error paths, boundary conditions, and state
+  transitions—not just happy paths.
+- Exclude trivial, generated, and framework code.
 - Preserve production behavior.
 
 ## Input
 
-Determine scope by the first available source:
+Determine scope from the first available source:
 
 - Files or folders provided by the user.
 - Current repository changes.
-- Analytics from coverage report tool.
-- Existing generated coverage reports.
 
 Abort if no scope exists.
 
+## Behavioral surface
+
+Target only methods and functions with business logic, state
+transitions, or error handling. Exclude: trivial `getters`/`setters`,
+`POJOs`, generated code, framework boilerplate, and any method where
+every path delegates trivially, accesses a field, or returns a computed
+value with no state change, resource interaction, or error-propagation
+decision.
+
 ## Workflow
 
-1. **Scope Target**: Identify the smallest production area worth
-   testing.
-2. **Inspect Context**: Read only relevant production code, adjacent
-   tests, and existing test or coverage commands.
-3. **Find Risk Gaps**: Emphasize contracts, failure paths, state
-   changes, regressions, and integration points.
-4. **Stop When Covered**: If existing tests already cover meaningful
-   risk, report coverage strength and stop.
-5. **Add Tests**: Write the smallest test set that could catch plausible
-   bugs without production changes.
-6. **Run Targeted Checks**: Run focused tests first; run broader tests
-   or coverage only when needed to confirm impact.
-7. **Report Outcome**: Summarize scope, files, commands, added coverage,
-   and remaining gaps.
+1. **Scope**: Identify the target scope and their relevant context.
+2. **Inspect**: Read relevant production code, adjacent tests, and
+   test/coverage commands. Run the coverage tool if available to collect
+   metrics and identify uncovered lines and branches.
+3. **Enumerate gaps**: For each target on the behavioral surface, audit
+   all four categories and document every gap:
+   - **Happy path**—expected inputs yield expected outputs
+   - **Error / failure**—malformed inputs, exceptions, and error returns
+   - **Boundary / edge**—null, empty, zero, min, max, overflow,
+     off-by-one
+   - **State transitions**—valid and malformed state changes and side
+     effects
+4. **Write tests**: Cover every gap from the enumeration. All four
+   categories must cover each target before declaring it complete.
+5. **Run checks**: Run targeted tests; run broader suite or coverage
+   tool when needed to confirm completeness and catch regressions.
+6. **Report**: Summarize scope, files, commands, coverage added, and any
+   remaining gaps with justification.
 
 ## Directives
 
-- Target behavior and risk, not coverage percentage.
-- Prefer contract and failure-path tests before edge-case trivia.
-- Use existing project test and coverage tooling; don't add tooling only
-  to measure coverage.
+- Optimize all operations for agent, token, and context efficiency.
+- Cover all four categories per target before declaring coverage
+  complete.
+- Use coverage tooling when available; when absent, use static analysis.
 - Keep tests focused, deterministic, and close to the behavior under
   test.
-- Avoid tests for trivial code, generated code, or framework behavior.
+- Don't limit yourself to just unit tests; write any category of tests
+  necessary to prove, verify, and confirm your solution.
 
 ## Constraints
 
 - Don't change production behavior.
-- Don't invent coverage metrics.
 - Don't write tests solely to raise a number.
-- Don't broaden scope after finding enough meaningful coverage.
-- Stop when no useful coverage gap applies.
+- Don't test outside the behavioral surface.
+- No workarounds, hacks, shortcuts.
+- No violation of `DRY` and `SOLID` software principles.
 
 ## Verification
 
-- Target scope has clear behavioral boundaries.
-- New tests cover real risk rather than vanity coverage.
-- Production code remains unchanged unless the user explicitly requested
-  a paired fix.
-- Targeted tests pass.
-- Broader tests or coverage checks run only when needed.
+- Production code unchanged;
+- Entire test suite passes with no failures.
+- All four categories audited per target on the behavioral surface.
+- If coverage tool present: no meaningful uncovered lines or branches
+  remain; if absent: all five categories manually confirmed, no critical
+  gaps.
+- Tests cover real behavioral risk, not vanity coverage.
 
 ## Result
 
