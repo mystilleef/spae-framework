@@ -85,8 +85,10 @@ Then read:
 - Prefer observable behavior tests over implementation-detail tests.
 - Use mocks sparingly and only at stable boundaries.
 - Run task verification before changing `STATE.json`.
-- Halt with a blocker when the red phase produces an unexpected result,
-  green doesn't pass, or task requirements lack enough detail.
+- Halt with a blocker when the red phase produces an unexpected result
+  or green doesn't pass.
+- When task requirements lack detail, make the most conservative
+  assumption, record it in `STATE.json`, and proceed.
 
 ## Constraints
 
@@ -103,6 +105,8 @@ Then read:
 - Never stage or commit `.spae/` artifacts.
 - Avoid incidental refactoring, cleanup, formatting, or dependency churn
   outside the active task.
+- **Autonomy**: Never ask users for input or clarification
+  mid-execution; halts and blockers stop autonomously.
 
 ## Verification
 

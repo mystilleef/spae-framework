@@ -48,8 +48,9 @@ Use only relevant context from:
    out-of-scope items, and assumptions.
 5. **Gather context**: Inspect only the source patterns needed to fit
    existing architecture; never edit repository files.
-6. **Draft plan**: Decompose work into `T-XXX` tasks with dependencies,
-   context, acceptance criteria, and verification steps.
+6. **Draft plan**: Read the template from `references/PLAN.md`.
+   Decompose work into `T-000` tasks. Structure `PLAN.md` following this
+   template exactly.
 7. **Order graph**: Sort tasks by dependency, risk, and vertical value;
    each task must leave the system working.
 8. **Finalize**: Write `PLAN.md`. Initialize all new task IDs as `todo`
@@ -79,6 +80,8 @@ Use only relevant context from:
   `SPEC.md`, `VERIFY.md`, and any non-`SPAE` project file.
 - **Read-only source**: inspect repository code only for fit.
 - **Phase boundary**: hand off to `/inspect`; don't execute tasks.
+- **Autonomy**: Never ask users for input or clarification
+  mid-execution; halts and blockers stop autonomously.
 
 ## Verification
 
@@ -86,6 +89,8 @@ Use only relevant context from:
   dependency-ordered tasks.
 - Every task includes dependencies, acceptance criteria, and
   verification steps.
+- `.spae/[workstream]/PLAN.md` structures tasks and metadata matching
+  `references/PLAN.md` exactly.
 - `.spae/[workstream]/STATE.json` task registry matches `PLAN.md` task
   IDs.
 - `.spae/[workstream]/STATE.json` contains `phase: "inspect"` and

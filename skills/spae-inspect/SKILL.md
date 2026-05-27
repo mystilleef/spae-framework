@@ -83,6 +83,8 @@ Read only what the inspection requires:
   not grounded in `SPEC.md` or concrete codebase constraints.
 - **Status**: Report `SUCCESS` only after writing the optimized plan and
   advancing state.
+- **Autonomy**: Never ask users for input or clarification
+  mid-execution; halts and blockers stop autonomously.
 
 ## Verification
 

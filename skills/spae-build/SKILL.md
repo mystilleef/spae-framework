@@ -56,7 +56,8 @@ Then read:
 4. **Implement**: Edit only relevant source, tests, docs, or
    configuration files required by the task.
 5. **Test**: Add or adjust tests required for the task, then run every
-   verification command listed for the active task.
+   verification command listed for the active task. Tests must prove,
+   verify, and confirm your solution.
 6. **Finalize State**: Mark the active task `done`, increment completion
    metrics, and advance the cursor to the next task. If no next task
    remains, set `phase: verify`.
@@ -70,11 +71,12 @@ Then read:
 - Prefer existing project patterns over new design.
 - Keep edits minimal, local, and acceptance-criteria driven.
 - Use test-first when the task changes observable behavior.
-- Add edge-case, acceptance, or integration tests when the task requires
-  them.
+- Don't limit yourself to just unit tests; write any category of tests
+  necessary to prove, verify, and confirm your solution.
 - Run task verification before changing `STATE.json`.
-- Halt with a blocker when verification fails or task requirements lack
-  enough detail.
+- Halt with a blocker when verification fails.
+- When task requirements lack detail, make the most conservative
+  assumption, record it in `STATE.json`, and proceed.
 
 ## Constraints
 
@@ -89,6 +91,8 @@ Then read:
 - Never stage or commit `.spae/` artifacts.
 - Avoid incidental refactoring, cleanup, formatting, or dependency churn
   outside the active task.
+- **Autonomy**: Never ask users for input or clarification
+  mid-execution; halts and blockers stop autonomously.
 
 ## Verification
 

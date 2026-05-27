@@ -74,6 +74,8 @@ Read only required context:
   `PLAN.md`, or non-`SPAE` project files.
 - Preserve the `SPAE` artifact model; don't create extra tracking files.
 - Don't stage or commit `.spae/` artifacts.
+- **Autonomy**: Never ask users for input or clarification
+  mid-execution; halts and blockers stop autonomously.
 
 ## Verification
 

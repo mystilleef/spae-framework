@@ -49,11 +49,9 @@ Resolve input from:
    Skip tasks already marked `done`.
 3. **Execute**: For each remaining task, build the smallest useful slice
    that satisfies acceptance criteria. Add tests when needed.
-4. **Verify**: Run the task's verification steps. Use project-native
-   checks when task steps lack coverage.
-5. **Advance**: After each successful task, mark it `done`, update the
+4. **Advance**: After each successful task, mark it `done`, update the
    cursor, task registry, blockers, and metrics in `STATE.json`.
-6. **Finalize**: After the final task passes verification, set
+5. **Finalize**: After the final task passes verification, set
    `phase: verify` in `STATE.json` and emit the required result.
 
 ## Directives
@@ -75,6 +73,8 @@ Resolve input from:
 - **Blockers**: On failure, update `STATE.json` with the blocker, leave
   remaining tasks `todo`, report the issue, and halt.
 - **Version control**: Never stage or commit `.spae/` artifacts.
+- **Autonomy**: Never ask users for input or clarification
+  mid-execution; halts and blockers stop autonomously.
 
 ## Verification
 
