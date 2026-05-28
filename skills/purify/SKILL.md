@@ -34,9 +34,13 @@ paths while preserving intended behavior.
 Determine scope by the first available source:
 
 - Files or folders provided by the user.
-- Current repository changes.
+- Current changes in the repository.
 
 Abort if no scope exists.
+
+*Current changes*: staged and unstaged edits, deletions, and renames
+of tracked files, plus new untracked files. Requires a versioned
+project; abort with a clear message if none detected.
 
 ## Workflow
 
