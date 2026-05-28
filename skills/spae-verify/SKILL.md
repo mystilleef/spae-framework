@@ -22,7 +22,7 @@ Final `SPAE` arbiter. Compare implemented repository state against
 ## Goal
 
 - Pass: complete the work stream.
-- Failure: route actionable gaps back to `/spec`.
+- No pass: route actionable gaps back to `/spec`.
 
 ## Input
 
@@ -35,28 +35,48 @@ Read only required context:
 
 - `.spae/<workstream>/STATE.json`
 - `.spae/<workstream>/SPEC.md`
-- Current repository source code changes.
-- `.spae/<workstream>/VERIFY.md`, when present
+- `.spae/<workstream>/PLAN.md`
+- All source files modified by this **workstream** (committed and
+  uncommitted changes). Use `PLAN.md` tasks to scope the delta.
+- `.spae/<workstream>/VERIFY.md`, when present.
 
 ## Workflow
 
-1. **Initialize**: Resolve the work stream, check `STATE.json`, and
-   confirm `phase: verify`.
-2. **Inspect**: Compare implementation against each `SPEC.md` item.
-   Focus on observable behavior, regressions, contract breaks, missing
-   tests, and unsafe optimizations.
-3. **Verify**: Run project checks or the smallest matching validation
-   that proves the result.
+1. **Initialize**: Resolve the work stream, check `STATE.json`, confirm
+   `phase: verify`, and cross-check that every `PLAN.md` task reports
+   `done`. On failure: halt, report which check failed and why, make no
+   state changes.
+2. **Check**: Run all relevant project checks. If no automated checks
+   exist, manually verify observable behavior against each `SPEC.md`
+   spec item. Record all results; any check failure mapping to a
+   `SPEC.md` spec item classifies as a hard block in Step 3.
+3. **Inspect**: Compare implementation against each `SPEC.md` item using
+   check results as evidence.
+   - When `VERIFY.md` exists: treat each prior finding as an explicit
+     re-check item; confirm each addressed before moving on.
+   - Classify each finding:
+     - **Hard block**: regression, contract break, missing or incorrect
+       required behavior, check failure mapping to a `SPEC.md` spec
+       item—always drives verdict to no-pass.
+     - **Soft finding**: missing tests for required behavior, unsafe
+       optimization—document in `VERIFY.md`; drives verdict to no-pass.
+     - **Observation**: ambiguous or untestable spec item, minor
+       deviation outside SPEC scope—note only; no verdict impact.
 4. **Finalize**:
-   - **Pass transition**: remove `.spae/<workstream>/VERIFY.md` when
-     present; remove `.spae/current`; set
-     `.spae/<workstream>/STATE.json` to `status: completed` and
-     `phase: done`.
-   - **Fail transition**: create or overwrite
-     `.spae/<workstream>/VERIFY.md` with findings from the current run
-     only; set `.spae/<workstream>/STATE.json` to
-     `status: revision_required` and `phase: spec`.
-   - **Result:** Emit the required result block.
+   - **Pass**: remove `.spae/<workstream>/VERIFY.md` when present;
+     remove `.spae/current`; set `STATE.json` to `status: completed`,
+     `phase: done`. Surface observations, if any, in the result output
+     under Findings as informational notes.
+   - **No pass**: create or overwrite `.spae/<workstream>/VERIFY.md`
+     with hard blocks and soft findings from the current run only,
+     followed by observations as informational notes; set `STATE.json`
+     to `status: revision_required`, `phase: spec`.
+   - **Blocked**: when checks can't run due to broken build, missing
+     tooling, or environment failure—write blocker details only to
+     `.spae/<workstream>/VERIFY.md` (omit observations); set
+     `STATE.json` to `status: revision_required`, `phase: spec`; emit
+     the Blocked result block.
+   - **Result**: emit the required result block.
 
 ## Directives
 
@@ -64,8 +84,8 @@ Read only required context:
 - Focus on the delta between `SPEC.md` and repository state.
 - Prefer existing project verification commands and patterns.
 - Keep `VERIFY.md` findings concrete, reproducible, and tied to
-  `SPEC.md` requirements.
-- Include enough detail for `/spec` to revise requirements without
+  `SPEC.md` spec items.
+- Include enough detail for `/spec` to revise spec items without
   repeating the full investigation.
 
 ## Constraints
@@ -80,9 +100,10 @@ Read only required context:
 ## Verification
 
 - `STATE.json` reflects the final status and phase.
-- `.spae/current` doesn't exist after a passing run.
-- `VERIFY.md` exists only after failure.
-- `VERIFY.md` findings map to concrete `SPEC.md` gaps.
+- `.spae/current` absent after a passing run.
+- `VERIFY.md` exists only after failure or a blocked run.
+- `VERIFY.md` findings map to concrete `SPEC.md` gaps or blocker
+  details.
 - Required project checks pass or documented blockers explain failures.
 
 ## Result
@@ -106,24 +127,16 @@ Read only required context:
   - [List of gaps, blockers, or pass confirmation]
 - **Summary**:
   - [Terse result summary]
-
-> **SPAE Verify Status** • `[workstream-name]`
-> **Result**: [Pass | Fail | Failed]
-> **Impact**: [Workstream completed | Revision required | Verification blocked]
 ```
-<!-- prettier-ignore-end -->
-<!-- vale Joblint.Competitive = YES -->
 
-On pass, include:
+On pass:
 
 ```md
 > **SPAE Status** • `workstream-name` **Phase Complete**: `/verify`
 > (Pass) **Result**: Workstream completed successfully.
 ```
 
-<!-- vale Joblint.Competitive = NO -->
-
-On failure, include:
+On failure:
 
 ```md
 > **SPAE Status** • `workstream-name` **Phase Complete**: `/verify`
@@ -132,4 +145,13 @@ On failure, include:
 > _Run `/spec` next._
 ```
 
+On blocked:
+
+```md
+> **SPAE Status** • `workstream-name` **Phase Complete**: `/verify`
+> (Blocked) **Reason**: [one-line blocker description] **Next Phase**: `/spec`
+>
+> _Resolve the blocker, then run `/spec` next._
+```
+<!-- prettier-ignore-end -->
 <!-- vale Joblint.Competitive = YES -->
