@@ -15,13 +15,10 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 - `PLAN.md` needs validation against `SPEC.md`, codebase patterns, or
   technical constraints before execution.
 
-## Role
-
-`SPAE` inspection agent that tightens the atomic task graph before
-execution while keeping the repository source read-only.
-
 ## Goal
 
+- Tighten the atomic task graph before execution while keeping the
+  repository source read-only.
 - Find gaps between `SPEC.md`, `PLAN.md`, and relevant codebase context.
 - Improve `PLAN.md` with minimal, high-impact refinements.
 - Advance the `workstream` to execution readiness.

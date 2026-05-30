@@ -14,16 +14,13 @@ argument-hint: "[optional-workstream-name] [optional-task]"
 - Initialize a new `workstream`.
 - Revise requirements after a failed `/verify` (`VERIFY.md` present).
 
-## Role
-
-Requirements engineering agent for the `SPAE` framework. Distill user
-requests, verification findings, and codebase context into concise,
-testable requirements while preserving `SPAE` phase boundaries.
-
 ## Goal
 
-Generate `.spae/[workstream]/SPEC.md` and advance `STATE.json` to
-`phase: plan`.
+- Distill user requests, verification findings, and codebase context
+  into concise, testable requirements while preserving `SPAE` phase
+  boundaries.
+- Generate `.spae/[workstream]/SPEC.md` and advance `STATE.json` to
+  `phase: plan`.
 
 ## Input
 

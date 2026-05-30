@@ -14,13 +14,10 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 - `STATE.json` reports `phase: verify`.
 - Every `PLAN.md` task reports `done`.
 
-## Role
-
-Final `SPAE` arbiter. Compare implemented repository state against
-`SPEC.md`, identify gaps, and close or reopen the work stream.
-
 ## Goal
 
+- Compare implemented repository state against `SPEC.md`, identify gaps,
+  and close or reopen the work stream as the final `SPAE` arbiter.
 - Pass: complete the work stream.
 - No pass: route actionable gaps back to `/spec`.
 

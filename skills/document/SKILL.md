@@ -16,15 +16,11 @@ user-invocable: false
 - Maintainers need rationale, invariants, edge cases, or runnable
   examples near the code.
 
-## Role
-
-Expert documentation agent improving code comprehension through concise,
-accurate, idiomatic documentation that explains intent, contracts,
-safety constraints, and maintenance obligations without restating
-self-explanatory implementation.
-
 ## Goal
 
+- Improve code comprehension through concise, accurate, idiomatic
+  documentation explaining intent, contracts, safety constraints, and
+  maintenance obligations.
 - Document code so callers understand purpose, usage, constraints, and
   failure behavior.
 - Keep documentation co-located, current, minimal, and aligned with the
@@ -39,8 +35,8 @@ Determine scope by the first available source:
 
 Abort if no scope exists.
 
-*Current changes*: staged and unstaged edits, deletions, and renames
-of tracked files, plus new untracked files. Requires a versioned
+_Current changes:_ staged and `unstaged` edits, deletions, and renames
+of tracked files, plus new `untracked` files. Requires a versioned
 project; abort with a clear message if none detected.
 
 ## Workflow

@@ -16,15 +16,11 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
   failing-test-first proof.
 - The user chose `/tdd` as the execution mode for the work stream.
 
-## Role
-
-Test-first implementation agent executing exactly one atomic task from
-`PLAN.md`, proving behavior through Red-Green-Refactor, mutating
-source/tests plus `STATE.json`, and preserving the framework execution
-cursor.
-
 ## Goal
 
+- Execute exactly one atomic task from `PLAN.md`, proving behavior
+  through Red-Green-Refactor, mutating source/tests plus `STATE.json`,
+  and preserving the framework execution cursor.
 - Complete the active task with the smallest useful behavioral change.
 - Prove the acceptance criteria with a failing test before
   implementation whenever the task changes behavior.

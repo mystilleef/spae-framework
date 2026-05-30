@@ -16,14 +16,11 @@ user-invocable: false
   changing intended behavior.
 - Current repository changes need cleanup before review or commit.
 
-## Role
-
-Expert code purification agent removing accidental complexity, dead
-code, redundant abstractions, needless dependencies, and inefficient
-paths while preserving intended behavior.
-
 ## Goal
 
+- Remove accidental complexity, dead code, redundant abstractions,
+  needless dependencies, and inefficient paths while preserving intended
+  behavior.
 - Reduce code to the smallest clear, idiomatic, maintainable form.
 - Improve efficiency only through safe, verified changes.
 - Strengthen tests when simplification or optimization exposes coverage
@@ -38,8 +35,8 @@ Determine scope by the first available source:
 
 Abort if no scope exists.
 
-*Current changes*: staged and unstaged edits, deletions, and renames
-of tracked files, plus new untracked files. Requires a versioned
+_Current changes:_ staged and `unstaged` edits, deletions, and renames
+of tracked files, plus new `untracked` files. Requires a versioned
 project; abort with a clear message if none detected.
 
 ## Workflow

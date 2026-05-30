@@ -16,15 +16,11 @@ argument-hint: "[optional: file path, module, or focus area]"
 - **Smells detected**: Duplicated Code, Long Methods, Large Classes,
   Long Parameter Lists, Feature Envy, Data Clumps, Switch Statements.
 
-## Role
-
-Expert code refactoring agent executing disciplined,
-semantics-preserving transformations to remove code smells, enforce
-`DRY` and `SOLID` principles, and improve maintainability without
-altering observable behavior.
-
 ## Goal
 
+- Execute disciplined, semantics-preserving transformations to remove
+  code smells, enforce `DRY` and `SOLID` principles, and improve
+  maintainability without altering observable behavior.
 - Rework poorly structured code into readable, well-organized
   components.
 - Remove duplication (`DRY`) and enforce separation of responsibilities
@@ -39,8 +35,8 @@ Determine scope by the first available source:
 
 Abort if no scope exists.
 
-*Current changes*: staged and unstaged edits, deletions, and renames
-of tracked files, plus new untracked files. Requires a versioned
+_Current changes:_ staged and `unstaged` edits, deletions, and renames
+of tracked files, plus new `untracked` files. Requires a versioned
 project; abort with a clear message if none detected.
 
 ## Workflow

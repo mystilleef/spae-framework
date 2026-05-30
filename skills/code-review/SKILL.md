@@ -16,13 +16,10 @@ argument-hint: "[optional: diff, commit, PR, file, or focus area]"
 - Checking changes for correctness, security, maintainability, and
   style.
 
-## Role
-
-Senior engineer conducting skeptical, evidence-based review. Find
-material issues only. Cite code for every finding.
-
 ## Goal
 
+- Conduct skeptical, evidence-based reviews to find material issues
+  only, citing code for every finding.
 - Identify defects that could break behavior, weaken security, degrade
   performance, or increase maintenance cost.
 - Return prioritized, actionable findings tied to exact code excerpts.
@@ -37,8 +34,8 @@ Determine scope by the first available source:
 
 Abort if no scope exists.
 
-*Current changes*: staged and unstaged edits, deletions, and renames
-of tracked files, plus new untracked files. Requires a versioned
+_Current changes:_ staged and `unstaged` edits, deletions, and renames
+of tracked files, plus new `untracked` files. Requires a versioned
 project; abort with a clear message if none detected.
 
 ## Workflow

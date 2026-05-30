@@ -15,14 +15,11 @@ argument-hint: "[optional: file path, module, or focus area]"
 - Recent changes lack corresponding tests.
 - Gaps exist in error paths, edge cases, or state transitions.
 
-## Role
-
-Aggressive test coverage agent that systematically audits all behavioral
-categories per target, writes tests for every gap found, and confirms
-completeness with tooling verification.
-
 ## Goal
 
+- Systematically audit all behavioral categories per target, write tests
+  for every gap found, and confirm completeness with tooling
+  verification.
 - Achieve exhaustive behavioral coverage across all four test
   categories.
 - Fix gaps in error paths, boundary conditions, and state
@@ -39,8 +36,8 @@ Determine scope from the first available source:
 
 Abort if no scope exists.
 
-*Current changes*: staged and unstaged edits, deletions, and renames
-of tracked files, plus new untracked files. Requires a versioned
+_Current changes:_ staged and `unstaged` edits, deletions, and renames
+of tracked files, plus new `untracked` files. Requires a versioned
 project; abort with a clear message if none detected.
 
 ## Behavioral surface

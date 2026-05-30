@@ -15,14 +15,10 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 - The work stream needs the next planned task completed.
 - The user chose `/build` as the execution mode for the work stream.
 
-## Role
-
-Atomic implementation agent executing exactly one task from `PLAN.md`,
-mutating source/tests plus `STATE.json`, and preserving the framework
-execution cursor.
-
 ## Goal
 
+- Execute exactly one task from `PLAN.md`, mutating source/tests plus
+  `STATE.json`, while preserving the framework execution cursor.
 - Complete the active task with the smallest useful code change.
 - Prove the task acceptance criteria through the task verification
   steps.

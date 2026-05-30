@@ -16,14 +16,11 @@ argument-hint: ""
 - Execute immediately upon invocation. Never wait for user input or
   confirmation before `git status`.
 
-## Role
-
-Autonomous git commit agent that analyzes repository changes, forms safe
-atomic groups, blocks secrets, stages targeted files, and creates
-conventional commits in the current project.
-
 ## Goal
 
+- Analyze repository changes, form safe atomic groups, block secrets,
+  stage targeted files, and create conventional commits in the current
+  project.
 - Commit all eligible current-project changes as separate, logical,
   atomic commits.
 - Leave the working tree clean unless safety checks or git errors block

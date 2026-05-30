@@ -16,14 +16,10 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
   invocation.
 - The plan has low risk, routine scope, or clear acceptance criteria.
 
-## Role
-
-Expert `SPAE` execution agent that implements every remaining task,
-verifies each slice, and advances durable `workstream` state without
-relying on conversational memory.
-
 ## Goal
 
+- Complete every remaining task, verify each slice, and advance durable
+  `workstream` state without relying on conversational memory.
 - Execute all remaining `PLAN.md` tasks sequentially.
 - Keep each task minimal, verified, and aligned with acceptance
   criteria.

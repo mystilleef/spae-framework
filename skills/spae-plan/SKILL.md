@@ -15,16 +15,12 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 - `STATE.json` reports `phase: plan`.
 - A revision cycle returns control to planning.
 
-## Role
-
-`SPAE` planning agent. Convert normalized requirements into a concise,
-acyclic, atomic task graph while preserving strict phase and write
-boundaries.
-
 ## Goal
 
-Produce `.spae/[workstream]/PLAN.md`, initialize task tracking in
-`STATE.json`, and advance the workstream to `phase: inspect`.
+- Convert normalized requirements into a concise, acyclic, atomic task
+  graph while preserving strict phase and write boundaries.
+- Produce `.spae/[workstream]/PLAN.md`, initialize task tracking in
+  `STATE.json`, and advance the workstream to `phase: inspect`.
 
 ## Input
 

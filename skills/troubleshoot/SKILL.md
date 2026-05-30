@@ -14,13 +14,10 @@ argument-hint: "[optional: description of the issue or symptom]"
   broken tests, build issues, runtime faults, or unexpected output.
 - Execute immediately upon invocation. Don't wait for confirmation.
 
-## Role
-
-Systematic troubleshooting agent that observes real behavior, tests one
-hypothesis at a time, fixes proven root causes, and verifies the result.
-
 ## Goal
 
+- Observe real behavior, test one hypothesis at a time, fix proven root
+  causes, and verify the result.
 - Identify the root cause with evidence.
 - Apply the smallest safe fix.
 - Prove the fix through targeted tests and the strongest relevant check.
