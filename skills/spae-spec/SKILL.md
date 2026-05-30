@@ -12,7 +12,9 @@ argument-hint: "[optional-workstream-name] [optional-task]"
 ## When to use
 
 - Initialize a new `workstream`.
-- Revise requirements after a failed `/verify` (`VERIFY.md` present).
+- Resume interrupted spec work (`phase: spec`, `status: active`).
+- Revise requirements after a failed `/verify`
+  (`status: revision_required`).
 
 ## Goal
 
@@ -36,19 +38,26 @@ Use only relevant context from:
 1. **Resolve `workstream`**: Use the explicit name, `.spae/current`
    symlink, or a generated slug. Update `.spae/current` for new or
    explicitly named `workstream`s.
-2. **Determine mode**:
-   - Missing `.spae/current`: initialize a new `.spae/[workstream]/`.
-   - `.spae/current` exists with `VERIFY.md`: revise `SPEC.md` using
-     `VERIFY.md` findings.
-   - `.spae/current` exists without `VERIFY.md`: report current state
-     and exit without changes.
+2. **Determine mode**—read `STATE.json` if present:
+   - No `.spae/current` and no existing artifacts: **new**—create
+     `.spae/[workstream]/`; initialize `STATE.json` with `phase: spec`,
+     `status: active`.
+   - `STATE.json` exists but malformed: halt with diagnostic.
+   - `STATE.json` absent but `SPEC.md` or `VERIFY.md` exist: halt with
+     diagnostic indicating missing state.
+   - `status: revision_required`: **revise**.
+   - `phase: spec`, `status: active`: **continue**—resume in-progress
+     spec work.
+   - Any other phase or status: report current state and exit.
 3. **Gather context**: Inspect only the minimal source files and
-   artifacts required to resolve ambiguity.
-4. **Draft spec**: Read the template from `references/SPEC.md`. Define
-   the goal, requirements, testing strategy, out-of-scope boundaries,
-   and assumptions. Structure `SPEC.md` following this template exactly.
-5. **Finalize**: Write `SPEC.md`, set `STATE.json` to `phase: plan` and
-   `status: active`, then output the execution summary.
+   artifacts required to resolve ambiguity. In revision mode, read
+   existing `SPEC.md` in full before `VERIFY.md`.
+4. **Formulate spec**: Derive goal, requirements, testing strategy,
+   out-of-scope boundaries, and assumptions from gathered context and
+   template. Don't write to disk.
+5. **Finalize**: Write `SPEC.md` from the approved plan, set
+   `STATE.json` to `phase: plan`, `status: active`, then output the
+   execution summary.
 
 ## Directives
 
@@ -85,7 +94,9 @@ Use only relevant context from:
   `workstream`.
 - Confirm revision processes resolve `VERIFY.md` findings without
   editing forbidden files.
-- Verify halt conditions leave all artifacts intact.
+- Confirm invalid `STATE.json` or orphaned artifacts halt with
+  diagnostics; no artifacts modified.
+- Verify all other halt conditions leave artifacts intact.
 
 ## Result
 
