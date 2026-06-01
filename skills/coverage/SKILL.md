@@ -114,11 +114,11 @@ decision.
 - **Actions**:
   - [Terse list of actions taken]
 - **Files**:
-  - [List of modified or created files]
+  - [Terse list of modified or created files]
 - **Findings**:
-  - [List of key gaps, risks, or notable observations]
+  - [Terse list of key gaps, risks, or notable observations]
 - **Summary**:
-  - [List of summary of changes]
+  - [Terse list of summary of changes]
 
 > **Coverage Status** • `[scope]`
 > **Result**: [Improved | No Gaps | Failed]
