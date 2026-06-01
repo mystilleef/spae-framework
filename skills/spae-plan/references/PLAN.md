@@ -1,4 +1,4 @@
-```md
+````md
 # PLAN: [workstream — goal title]
 
 ## Goal
@@ -14,10 +14,11 @@
 
 ## Task graph
 
-~~~mermaid
+```mermaid
 flowchart TD
   T01[T-001] --> T02[T-002]
-~~~
+```
+````
 
 - T-001: [title]
 - T-002: [title] — depends on T-001
@@ -44,4 +45,7 @@ flowchart TD
 ## Source audit notes
 
 - [file path, seam, or test file]
+
+```
+
 ```

@@ -4,7 +4,6 @@ description:
   Task Decomposition for the `SPAE` framework. Decomposes `SPEC.md` into
   a `DAG` of atomic tasks in `PLAN.md`.
 user-invocable: true
-argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 ---
 
 # Plan (`SPAE`)
@@ -19,40 +18,45 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 
 - Convert normalized requirements into a concise, acyclic, atomic task
   graph while preserving strict phase and write boundaries.
-- Produce `.spae/[workstream]/PLAN.md`, initialize task tracking in
-  `STATE.json`, and advance the workstream to `phase: inspect`.
+- Produce `.spae/current/PLAN.md`, initialize task tracking in
+  `.spae/current/STATE.json`, and advance the `workstream` to
+  `phase: inspect`.
 
 ## Input
 
 Use only relevant context from:
 
-- User-provided `workstream` argument.
-- `.spae/current` symlink when no argument exists.
-- `.spae/[workstream]/SPEC.md`.
-- `.spae/[workstream]/STATE.json`.
+- `.spae/current/SPEC.md`.
+- `.spae/current/STATE.json`.
 - Repository source patterns, read only for codebase fit.
+
+## `STATE.json`
+
+See `references/STATE.md` for the field reference, directives, and phase
+snapshots.
 
 ## Workflow
 
-1. **Resolve `workstream`**: Use the explicit name or `.spae/current`.
-2. **Validate state**: Confirm `SPEC.md` exists and `STATE.json` can
-   advance from `phase: plan`; stop early with a clear result if
-   blocked.
-3. **Reset prior cycle**: Delete `PLAN.md` (ignore if absent) and clear
-   the `tasks` registry in `STATE.json` to empty. Run unconditionally.
-4. **Analyze spec**: Extract goal, requirements, testing strategy,
+1. **Validate state**: Confirm `.spae/current/SPEC.md` exists and
+   `.spae/current/STATE.json` can advance from `phase: plan`; stop early
+   with a clear result if blocked.
+2. **Reset prior cycle**: Always delete `.spae/current/PLAN.md` (ignore
+   if absent) and clear the `tasks` registry in
+   `.spae/current/STATE.json` to empty. Run unconditionally.
+3. **Analyze spec**: Extract goal, requirements, testing strategy,
    out-of-scope items, and assumptions.
-5. **Gather context**: Inspect only the source patterns needed to fit
+4. **Gather context**: Inspect only the source patterns needed to fit
    existing architecture; never edit repository files.
-6. **Draft plan**: Read the template from `references/PLAN.md`.
+5. **Draft plan**: Read the template from `references/PLAN.md`.
    Decompose work into `T-000` tasks. Structure `PLAN.md` following this
    template exactly.
-7. **Order graph**: Sort tasks by dependency, risk, and vertical value;
+6. **Order graph**: Sort tasks by dependency, risk, and vertical value;
    each task must leave the system working.
-8. **Finalize**: Write `PLAN.md`. Initialize all new task IDs as `todo`
-   in `STATE.json`. Update metrics and set `phase: inspect`.
-9. **Report**: Emit the standard result with `SPAE` phase transition
-    feedback.
+7. **Finalize**: Write `.spae/current/PLAN.md`. Initialize all new task
+   IDs as `todo` in `.spae/current/STATE.json`. Update metrics and set
+   `phase: inspect`.
+8. **Report**: Emit the standard result with `SPAE` phase transition
+   feedback.
 
 ## Directives
 
@@ -70,8 +74,8 @@ Use only relevant context from:
 
 ## Constraints
 
-- **Write scope**: `.spae/[workstream]/PLAN.md` and
-  `.spae/[workstream]/STATE.json`.
+- **Write scope**: `.spae/current/PLAN.md` and
+  `.spae/current/STATE.json`.
 - **Forbidden writes**: source code, tests, configuration files, docs,
   `SPEC.md`, `VERIFY.md`, and any non-`SPAE` project file.
 - **Read-only source**: inspect repository code only for fit.
@@ -81,16 +85,15 @@ Use only relevant context from:
 
 ## Verification
 
-- `.spae/[workstream]/PLAN.md` contains atomic, acyclic,
-  dependency-ordered tasks.
+- `.spae/current/PLAN.md` contains atomic, acyclic, dependency-ordered
+  tasks.
 - Every task includes dependencies, acceptance criteria, and
   verification steps.
-- `.spae/[workstream]/PLAN.md` structures tasks and metadata matching
+- `.spae/current/PLAN.md` structures tasks and metadata matching
   `references/PLAN.md` exactly.
-- `.spae/[workstream]/STATE.json` task registry matches `PLAN.md` task
-  IDs.
-- `.spae/[workstream]/STATE.json` contains `phase: "inspect"` and
-  current metrics.
+- `.spae/current/STATE.json` task registry matches `PLAN.md` task IDs.
+- `.spae/current/STATE.json` contains `phase: "inspect"` and current
+  metrics.
 - No files outside the allowed `SPAE` write scope changed.
 
 ## Result
