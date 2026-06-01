@@ -4,7 +4,6 @@ description:
   Comprehensive Execution for the `SPAE` framework. Executes all tasks
   from `PLAN.md` sequentially in one invocation.
 user-invocable: true
-argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 ---
 
 # Execute (`SPAE`)
@@ -20,35 +19,42 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 
 - Complete every remaining task, verify each slice, and advance durable
   `workstream` state without relying on conversational memory.
-- Execute all remaining `PLAN.md` tasks sequentially.
+- Execute all remaining `.spae/current/PLAN.md` tasks sequentially.
 - Keep each task minimal, verified, and aligned with acceptance
   criteria.
 - Leave the `workstream` ready for `/verify`.
 
 ## Input
 
-Resolve input from:
+Read:
 
-- Optional `workstream` name argument.
-- `.spae/current` symlink when the user omits a `workstream` name.
-- `.spae/<workstream>/STATE.json` for phase, cursor, task registry, and
+- `.spae/current/STATE.json` for phase, cursor, task registry, and
   metrics.
-- `.spae/<workstream>/PLAN.md` for remaining tasks, acceptance criteria,
-  and verification steps.
+- `.spae/current/PLAN.md` for remaining tasks, acceptance criteria, and
+  verification steps.
 - Relevant source, tests, configuration, and documentation.
+
+## `STATE.json`
+
+See `references/STATE.md` for the field reference, directives, and phase
+snapshots.
 
 ## Workflow
 
-1. **Resolve**: Locate the `workstream`. Read `STATE.json` and
-   `PLAN.md`. Confirm `phase: build`.
+1. **Load**: Read `.spae/current/STATE.json` and
+   `.spae/current/PLAN.md`. Confirm `phase: build`.
 2. **Select**: Identify all `todo` or `in_progress` tasks in plan order.
    Skip tasks already marked `done`.
-3. **Execute**: For each remaining task, build the smallest useful slice
-   that satisfies acceptance criteria. Add tests when needed.
+3. **Execute**: For each remaining task: set `cursor.task_status` and
+   `tasks[task_id]` to `"in_progress"` in `.spae/current/STATE.json`,
+   then build the smallest useful slice that satisfies acceptance
+   criteria. Add tests when needed.
 4. **Advance**: After each successful task, mark it `done`, update the
-   cursor, task registry, blockers, and metrics in `STATE.json`.
+   cursor, task registry, blockers, and metrics in
+   `.spae/current/STATE.json`.
 5. **Finalize**: After the final task passes verification, set
-   `phase: verify` in `STATE.json` and emit the required result.
+   `phase: verify` in `.spae/current/STATE.json` and emit the required
+   result.
 
 ## Directives
 
@@ -63,11 +69,12 @@ Resolve input from:
 ## Constraints
 
 - **Authorized writes**: Source code, tests, configuration, docs, other
-  non-`SPAE` project files, and `STATE.json`.
-- **Forbidden writes**: Never edit `PLAN.md`, `SPEC.md`, or `.spae/`
-  artifacts other than `STATE.json` during execution.
-- **Blockers**: On failure, update `STATE.json` with the blocker, leave
-  remaining tasks `todo`, report the issue, and halt.
+  non-`SPAE` project files, and `.spae/current/STATE.json`.
+- **Forbidden writes**: Never edit `.spae/current/PLAN.md`,
+  `.spae/current/SPEC.md`, or `.spae/` artifacts other than
+  `.spae/current/STATE.json` during execution.
+- **Blockers**: On failure, update `.spae/current/STATE.json` with the
+  blocker, leave remaining tasks `todo`, report the issue, and halt.
 - **Version control**: Never stage or commit `.spae/` artifacts.
 - **Autonomy**: Never ask users for input or clarification
   mid-execution; halts and blockers stop autonomously.
@@ -77,8 +84,8 @@ Resolve input from:
 - Every completed task meets its acceptance criteria.
 - Every task verification step passes.
 - Added or existing tests cover changed behavior when applicable.
-- `STATE.json` accurately records completed tasks, metrics, cursor,
-  blockers, and `phase: verify` after full completion.
+- `.spae/current/STATE.json` accurately records completed tasks,
+  metrics, cursor, blockers, and `phase: verify` after full completion.
 
 ## Result
 
