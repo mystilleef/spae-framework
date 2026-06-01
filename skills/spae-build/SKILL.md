@@ -4,7 +4,6 @@ description:
   Atomic execution for the project framework. Executes exactly one
   atomic task from `PLAN.md`.
 user-invocable: true
-argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 ---
 
 # Build
@@ -22,31 +21,34 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 - Complete the active task with the smallest useful code change.
 - Prove the task acceptance criteria through the task verification
   steps.
-- Advance `STATE.json` to the next task or to `phase: verify`.
+- Advance `.spae/current/STATE.json` to the next task or to
+  `phase: verify`.
 
 ## Input
 
-Resolve input by one of the following:
+Read:
 
-- Explicit work stream name supplied by the user.
-- `.spae/current` symlink when the user omits a work stream name.
-
-Then read:
-
-- `.spae/<workstream>/STATE.json` for phase, cursor, task registry, and
+- `.spae/current/STATE.json` for phase, cursor, task registry, and
   metrics.
-- `.spae/<workstream>/PLAN.md` for the active task, acceptance criteria,
-  and verification steps.
+- `.spae/current/PLAN.md` for the active task, acceptance criteria, and
+  verification steps.
 - Relevant project source, tests, docs, and configuration needed for the
   active task.
 
+## `STATE.json`
+
+See `references/STATE.md` for the field reference, directives, and phase
+snapshots.
+
 ## Workflow
 
-1. **Resolve Work Stream**: Select the explicit work stream or follow
-   `.spae/current`. Confirm `STATE.json` has `phase: build` and an
-   active task.
-2. **Load Task**: Read only the active task section from `PLAN.md` plus
-   minimal surrounding context needed for dependencies.
+1. **Load Task**: Confirm `.spae/current/STATE.json` has `phase: build`
+   and an active task. Read only the active task section from
+   `.spae/current/PLAN.md` plus minimal surrounding context needed for
+   dependencies.
+2. **Mark In Progress**: Set `cursor.task_status` and
+   `tasks[active_task_id]` to `"in_progress"` in
+   `.spae/current/STATE.json`.
 3. **Plan Slice**: Identify the smallest implementation path that meets
    the active task acceptance criteria.
 4. **Implement**: Edit only relevant source, tests, docs, or
@@ -54,9 +56,10 @@ Then read:
 5. **Test**: Add or adjust tests required for the task, then run every
    verification command listed for the active task. Tests must prove,
    verify, and confirm your solution.
-6. **Finalize State**: Mark the active task `done`, increment completion
-   metrics, and advance the cursor to the next task. If no next task
-   remains, set `phase: verify`.
+6. **Finalize State**: Mark the active task `done` in
+   `.spae/current/STATE.json`, increment completion metrics, and advance
+   the cursor to the next task. If no next task remains, set
+   `phase: verify`.
 7. **Report**: Emit the standardized execution summary and framework
    status block.
 
@@ -69,18 +72,18 @@ Then read:
 - Use test-first when the task changes observable behavior.
 - Don't limit yourself to just unit tests; write any category of tests
   necessary to prove, verify, and confirm your solution.
-- Run task verification before changing `STATE.json`.
+- Run task verification before changing `.spae/current/STATE.json`.
 - Halt with a blocker when verification fails.
 - When task requirements lack detail, make the most conservative
-  assumption, record it in `STATE.json`, and proceed.
+  assumption, record it in `.spae/current/STATE.json`, and proceed.
 
 ## Constraints
 
 - Exercise exclusive authority to edit source code, tests,
   documentation, configuration, and other non-framework project files
   during this phase.
-- Never edit `PLAN.md` during `/build`.
-- Never edit `SPEC.md` during `/build`.
+- Never edit `.spae/current/PLAN.md` during `/build`.
+- Never edit `.spae/current/SPEC.md` during `/build`.
 - Never execute more than one task.
 - Never alternate execution mode for the same work stream; respect the
   user's selected `/build` path.
@@ -95,9 +98,9 @@ Then read:
 - Active task acceptance criteria pass.
 - All task verification steps pass.
 - Relevant project tests pass with no new failures.
-- `STATE.json` task registry, metrics, cursor, and phase reflect the
-  completed task.
-- `PLAN.md` and `SPEC.md` remain unchanged.
+- `.spae/current/STATE.json` task registry, metrics, cursor, and phase
+  reflect the completed task.
+- `.spae/current/PLAN.md` and `.spae/current/SPEC.md` remain unchanged.
 
 ## Result
 
@@ -116,11 +119,11 @@ Then read:
 - **Actions**:
   - [Terse list of actions taken]
 - **Files**:
-  - [List of modified or created files]
+  - [Terse list of modified or created files]
 - **Findings**:
-  - [List of key gaps, risks, blockers, or notable observations]
+  - [Terse list of key gaps, risks, blockers, or notable observations]
 - **Summary**:
-  - [List of summary of changes]
+  - [Terse list of summary of changes]
 
 > **`SPAE` Status** • `workstream-name`
 > **Progress**: Task [X] of [Y] ([Z] remaining)
