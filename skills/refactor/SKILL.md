@@ -1,6 +1,8 @@
 ---
 name: refactor
-description: "Refactor code to simplify it while preserving behavior."
+description:
+  "Refactor code to fix DRY, SOLID, and Structure violations while
+  preserving behavior."
 user-invocable: true
 argument-hint: "[optional: file path, module, or focus area]"
 ---
@@ -9,22 +11,19 @@ argument-hint: "[optional: file path, module, or focus area]"
 
 ## When to use
 
-- **Rule of Three**: Third instance of similar code triggers extraction.
+- **Rule of Three**: Third instance triggers extraction. Exception:
+  security and validation logic warrants unification at 2+.
 - **Adding features**: Restructure to accommodate the change first.
 - **Fixing bugs**: Clarify structure to expose the error.
 - **Code review**: Improve unfamiliar code incrementally.
-- **Smells detected**: Duplicated Code, Long Methods, Large Classes,
-  Long Parameter Lists, Feature Envy, Data Clumps, Switch Statements.
+- **Smells detected**: See violation catalog in
+  `references/refactoring-guide.md`.
 
 ## Goal
 
 - Execute disciplined, semantics-preserving transformations to remove
-  code smells, enforce `DRY` and `SOLID` principles, and improve
-  maintainability without altering observable behavior.
-- Rework poorly structured code into readable, well-organized
-  components.
-- Remove duplication (`DRY`) and enforce separation of responsibilities
-  (`SOLID`) using safe, incremental mechanics.
+  `DRY`, `SOLID`, and `Structure` violations, improving maintainability
+  without altering observable behavior.
 
 ## Input
 
@@ -37,67 +36,50 @@ Abort if no scope exists.
 
 _Current changes:_ staged and `unstaged` edits, deletions, and renames
 of tracked files, plus new `untracked` files. Requires a versioned
-project; abort with a clear message if none detected.
+project. Abort with a clear message if none detected.
 
 ## Workflow
 
 1. **Scope Target**: Identify the smallest production area worth
-   testing.
+   refactoring.
 2. **Inspect Context**: Read only relevant production code, adjacent
    tests, and existing test or coverage commands.
 3. **Verify Tests**: Confirm a solid, automated, self-checking suite
    exists before touching code.
-4. **Identify Smells**: Analyze for target `antipatterns`.
-5. **Select Mechanism**: Choose the appropriate refactoring move (for
-   example, _`Extract Method`_, _`Move Field`_).
-6. **Execute in Micro-Steps**: Apply one transformation at a time.
-7. **Test After Each Step**: Compile and run the full suite after every
+4. **Identify Smells**: Analyze for target `antipatterns` using the
+   violation catalog in `references/refactoring-guide.md`.
+   - **Post-Smell Short-Circuit**: Exit immediately if smell detection
+     finds zero instances of: duplicated logic, long methods, large
+     classes, primitive obsession, SOLID violations.
+   - Skips steps 5–9 (dependency analysis, execution, verification).
+     Steps 1–4 always run.
+   - Emit `Result: No Changes` via the template below and halt.
+5. **Analyze Dependencies**: Check package, module, or class boundaries
+   for cyclic imports or unresolved downstream consumers before
+   restructuring.
+6. **Select Mechanism**: Choose the appropriate move from the fix
+   playbook; resolve compound violations using the triage rules in
+   `references/refactoring-guide.md`.
+7. **Execute in Micro-Steps**: Apply one transformation at a time.
+8. **Test After Each Step**: Compile and run the full suite after every
    change.
-8. **Backtrack on Failure**: Revert to last known-good state; retry with
+9. **Backtrack on Failure**: Revert to last known-good state; retry with
    smaller steps.
 
 ## Directives
 
 - **Two Hats**: Never add features or new tests while refactoring.
-- **Enforce DRY**: Unify duplicates via _`Extract Method`_,
-  _`Pull Up Method`_, _`Extract Class`_.
-- **Enforce SOLID**:
-  - `SRP`: Break up large classes and long methods with _Extract Class_
-    or _Extract Method_.
-  - `OCP`: Replace switch/if-else type logic with polymorphism
-    (_`Replace Conditional with Polymorphism`_).
-  - `ISP`: Extract interface subsets via _`Extract Interface`_.
-  - `LSP`: Flag subclasses that strengthen preconditions, weaken
-    post-conditions, throw undeclared exceptions, or trigger
-    `isinstance` checks in callers. Moves:
-    _`Replace Inheritance with Delegation`_, _`Extract Superclass`_,
-    _`Rename Method`_.
-  - `DIP`: Flag high-level modules that `new` or directly import
-    concrete low-level classes. Moves: _`Extract Interface`_,
-    _`Replace Constructor with Factory Method`_,
-    _`Introduce Parameter Object`_, _`Move Class`_.
-- **Replace Temp with Query**: Remove temporaries to decouple methods
-  and help extraction.
-- **Decompose Conditionals**: Extract condition, then-branch, and
-  else-branch into named methods.
-- **Intent-Revealing Names**: Name methods by intention, not
-  implementation. If code requires a comment to understand, extract it
-  into a named method.
-- **Preserve Interfaces**: When modifying published `APIs`, keep the old
-  interface temporarily, delegating to the new one, and label it
-  deprecated.
-- **Remove Parasitic Indirection**: Remove intermediaries or obsolete
-  delegation when indirection no longer pays for itself.
+- **Violations**: Detect and fix using the violation catalog and fix
+  playbook in `references/refactoring-guide.md`.
 
 ## Constraints
 
 - **Zero Behavioral Change**: External function and observable behavior
   must remain identical.
-- **No Test Modifications**: Don't alter existing tests unless a
-  necessary interface change requires it.
 - **Defer if Broken**: Stabilize failing code before refactoring.
-- **Defer if Deadline Imminent**: Don't start deep refactors before a
-  hard deadline.
+- **Inherit Baseline**: Treat the test suite as-found at refactor start
+  as the authoritative baseline, regardless of prior tooling in the same
+  session.
 
 ## Verification
 
@@ -106,28 +88,30 @@ project; abort with a clear message if none detected.
 - Complexity metrics (class size, method length, parameter count) show
   measurable reduction.
 - No dangling references or unintended interface breaks.
+- Re-run smell detection against the violation catalog to confirm no new
+  violations introduced.
 
 ## Result
 
-- Keep feedback prose terse, concise, and precise.
-- Optimize prose for token and context efficiency.
+- Keep result prose terse, concise, and precise.
+- Optimize result for agent, token, and context efficiency.
 - Prefer lists, and sub-lists, over long paragraphs and sentences.
-- If necessary, split findings and summary into terse bullet points.
+- Strictly follow the result template below.
 
 <!-- prettier-ignore-start -->
 ```md
 ### Execution Summary
 
 - **Actions**:
-  - [List of terse, short, compact, condensed summary of actions taken]
+  - [Terse list of actions taken]
 - **Files**:
-  - [List of modified or created files]
+  - [Terse list of modified or created files]
 - **Findings**:
-  - [List of terse summary of key gaps, risks, or architectural notes]
+  - [Terse list of key gaps, risks, or notable observations]
 - **Summary**:
-  - [List of summary of changes]
+  - [Terse list of summary of changes]
 
-> **Refactor Status** • `[Scope]`
+> **Refactor Status** • `[scope]`
 > **Result**: [Complete | No Changes | Failed]
 > **Impact**: [Terse impact statement]
 ```
