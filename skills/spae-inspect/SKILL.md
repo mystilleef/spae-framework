@@ -4,7 +4,6 @@ description:
   Optimization & Verification for the `SPAE` framework. Performs gap
   analysis on `PLAN.md`.
 user-invocable: true
-argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 ---
 
 # Inspect (`SPAE`)
@@ -25,35 +24,36 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 
 ## Input
 
-Determine the `workstream` by one of the following:
-
-- `workstream` name supplied by the user.
-- `.spae/current` symlink.
-
 Read only what the inspection requires:
 
-- `.spae/<workstream>/SPEC.md`
-- `.spae/<workstream>/PLAN.md`
-- `.spae/<workstream>/STATE.json`
+- `.spae/current/SPEC.md`
+- `.spae/current/PLAN.md`
+- `.spae/current/STATE.json`
 - Relevant source files for context only.
+
+## `STATE.json`
+
+See `references/STATE.md` for the field reference, directives, and phase
+snapshots.
 
 ## Workflow
 
-1. **Resolve `workstream`**: Locate the requested `workstream` or
-   resolve `.spae/current`.
-2. **Load Artifacts**: Read `STATE.json`, `SPEC.md`, and `PLAN.md`.
-   Continue only when the state expects `phase: inspect`.
-3. **Inspect Fit**: Compare requirements, plan tasks, acceptance
+1. **Load Artifacts**: Read `.spae/current/STATE.json`,
+   `.spae/current/SPEC.md`, and `.spae/current/PLAN.md`. Continue only
+   when the state expects `phase: inspect`.
+2. **Inspect Fit**: Compare requirements, plan tasks, acceptance
    criteria, verification steps, dependencies, and codebase patterns.
-4. **Classify Findings**:
+3. **Classify Findings**:
    - `Must fix`: gaps that would break requirements, contracts, safety,
      or verification.
    - `Should fix`: refinements that reduce risk or simplify execution.
    - `Observations`: useful notes that shouldn't expand scope.
-5. **Refine Plan**: Rewrite only the smallest necessary parts of
-   `PLAN.md`; preserve atomic, independently verifiable tasks.
-6. **Advance State**: Update `STATE.json` to `phase: build`, set the
-   cursor to `T-001`, and mark the active task `todo`.
+4. **Refine Plan**: Rewrite only the smallest necessary parts of
+   `.spae/current/PLAN.md`; preserve atomic, independently verifiable
+   tasks.
+5. **Advance State**: Update `.spae/current/STATE.json` to
+   `phase: build`, set the cursor to `T-001`, and mark the active task
+   `todo`.
 
 ## Directives
 
@@ -70,8 +70,8 @@ Read only what the inspection requires:
 
 ## Constraints
 
-- **Write Boundaries**: Edit only `.spae/<workstream>/PLAN.md` and
-  `.spae/<workstream>/STATE.json`.
+- **Write Boundaries**: Edit only `.spae/current/PLAN.md` and
+  `.spae/current/STATE.json`.
 - **Forbidden Writes**: Never edit source code, tests, configuration,
   docs, `SPEC.md`, `VERIFY.md`, or any non-`SPAE` project file.
 - **Artifact Limit**: Don't create new `SPAE` artifacts beyond the
@@ -85,11 +85,12 @@ Read only what the inspection requires:
 
 ## Verification
 
-- `PLAN.md` satisfies `SPEC.md` and reflects required refinements.
+- `.spae/current/PLAN.md` satisfies `.spae/current/SPEC.md` and reflects
+  required refinements.
 - Each task remains atomic, ordered, and independently verifiable.
 - Findings use `Must fix`, `Should fix`, or `Observations`.
-- `STATE.json` has `phase: build` and cursor `T-001` ready for
-  execution.
+- `.spae/current/STATE.json` has `phase: build` and cursor `T-001` ready
+  for execution.
 - No forbidden files changed.
 
 ## Result
