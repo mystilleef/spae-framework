@@ -4,7 +4,6 @@ description:
   "Use test-first development for behavioral changes. Write a failing
   test, make it pass, then simplify."
 user-invocable: true
-argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 ---
 
 # Test-driven development
@@ -18,37 +17,41 @@ argument-hint: "[optional-workstream-name] e.g. 'user-auth'"
 
 ## Goal
 
-- Execute exactly one atomic task from `PLAN.md`, proving behavior
-  through Red-Green-Refactor, mutating source/tests plus `STATE.json`,
-  and preserving the framework execution cursor.
+- Execute exactly one atomic task from `.spae/current/PLAN.md`, proving
+  behavior through Red-Green-Refactor, mutating source/tests plus
+  `.spae/current/STATE.json`, and preserving the framework execution
+  cursor.
 - Complete the active task with the smallest useful behavioral change.
 - Prove the acceptance criteria with a failing test before
   implementation whenever the task changes behavior.
-- Advance `STATE.json` to the next task or to `phase: verify`.
+- Advance `.spae/current/STATE.json` to the next task or to
+  `phase: verify`.
 
 ## Input
 
-Resolve input by one of the following:
+Read:
 
-- Explicit work stream name supplied by the user.
-- `.spae/current` symlink when the user omits a work stream name.
-
-Then read:
-
-- `.spae/<workstream>/STATE.json` for phase, cursor, task registry, and
+- `.spae/current/STATE.json` for phase, cursor, task registry, and
   metrics.
-- `.spae/<workstream>/PLAN.md` for the active task, acceptance criteria,
-  and verification steps.
+- `.spae/current/PLAN.md` for the active task, acceptance criteria, and
+  verification steps.
 - Relevant project source, tests, docs, and configuration needed for the
   active task.
 
+## `STATE.json`
+
+See `references/STATE.md` for the field reference, directives, and phase
+snapshots.
+
 ## Workflow
 
-1. **Resolve Work Stream**: Select the explicit work stream or follow
-   `.spae/current`. Confirm `STATE.json` has `phase: build`, the `/tdd`
-   path remains selected, and an active task exists.
-2. **Load Task**: Read only the active task section from `PLAN.md` plus
+1. **Load Task**: Confirm `.spae/current/STATE.json` has `phase: build`,
+   the `/tdd` path remains selected, and an active task exists. Read
+   only the active task section from `.spae/current/PLAN.md` plus
    minimal surrounding context needed for dependencies.
+2. **Mark In Progress**: Set `cursor.task_status` and
+   `tasks[active_task_id]` to `"in_progress"` in
+   `.spae/current/STATE.json`.
 3. **Classify Task**: Label the task `behavioral`, `refactor`, or
    `non-testable` before editing.
 4. **Red**: For behavioral tasks, write the smallest failing test that
@@ -64,9 +67,10 @@ Then read:
    verification from the task.
 8. **Test**: Run every verification command listed for the active task
    plus relevant regression tests.
-9. **Finalize State**: Mark the active task `done`, increment
-    completion metrics, and advance the cursor to the next task. If no
-    next task remains, set `phase: verify`.
+9. **Finalize State**: Mark the active task `done` in
+    `.spae/current/STATE.json`, increment completion metrics, and
+    advance the cursor to the next task. If no next task remains, set
+    `phase: verify`.
 10. **Report**: Emit the standardized execution summary and framework
     status block.
 
@@ -80,21 +84,20 @@ Then read:
   behavioral task.
 - Prefer observable behavior tests over implementation-detail tests.
 - Use mocks sparingly and only at stable boundaries.
-- Run task verification before changing `STATE.json`.
+- Run task verification before changing `.spae/current/STATE.json`.
 - Halt with a blocker when the red phase produces an unexpected result
   or green doesn't pass.
 - When task requirements lack detail, make the most conservative
-  assumption, record it in `STATE.json`, and proceed.
+  assumption, record it in `.spae/current/STATE.json`, and proceed.
 
 ## Constraints
 
 - Exercise exclusive authority to edit source code, tests,
   documentation, configuration, and other non-framework project files
   during this phase.
-- Edit `.spae/<workstream>/STATE.json` only for execution-cursor
-  updates.
-- Never edit `PLAN.md` during `/tdd`.
-- Never edit `SPEC.md` during `/tdd`.
+- Edit `.spae/current/STATE.json` only for execution-cursor updates.
+- Never edit `.spae/current/PLAN.md` during `/tdd`.
+- Never edit `.spae/current/SPEC.md` during `/tdd`.
 - Never execute more than one task.
 - Never alternate execution mode for the same work stream; respect the
   user's selected `/tdd` path.
@@ -113,9 +116,9 @@ Then read:
 - Active task acceptance criteria pass.
 - All task verification steps pass.
 - Relevant project tests pass with no new failures.
-- `STATE.json` task registry, metrics, cursor, and phase reflect the
-  completed task.
-- `PLAN.md` and `SPEC.md` remain unchanged.
+- `.spae/current/STATE.json` task registry, metrics, cursor, and phase
+  reflect the completed task.
+- `.spae/current/PLAN.md` and `.spae/current/SPEC.md` remain unchanged.
 
 ## Result
 
