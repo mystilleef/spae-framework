@@ -1,9 +1,10 @@
 ---
 name: purify
 description:
-  "Aggressively simplify and optimize code while preserving intended
-  behavior."
-user-invocable: false
+  "Eliminate KISS, YAGNI, Idiomatic, and Hygiene violations while
+  preserving intended behavior."
+user-invocable: true
+argument-hint: "[optional: file path, module, or focus area]"
 ---
 
 # Purification agent
@@ -14,13 +15,12 @@ user-invocable: false
 - Existing implementation looks correct but heavier than necessary.
 - Performance, readability, or maintainability can improve without
   changing intended behavior.
-- Current repository changes need cleanup before review or commit.
 
 ## Goal
 
-- Remove accidental complexity, dead code, redundant abstractions,
-  needless dependencies, and inefficient paths while preserving intended
-  behavior.
+- Eliminate `KISS`, `YAGNI`, `Idiomatic`, and `Hygiene` violations: dead
+  code, redundant abstractions, over-engineering, non-idiomatic
+  patterns, and hygiene debt.
 - Reduce code to the smallest clear, idiomatic, maintainable form.
 - Improve efficiency only through safe, verified changes.
 - Strengthen tests when simplification or optimization exposes coverage
@@ -37,12 +37,20 @@ Abort if no scope exists.
 
 _Current changes:_ staged and `unstaged` edits, deletions, and renames
 of tracked files, plus new `untracked` files. Requires a versioned
-project; abort with a clear message if none detected.
+project, abort with a clear message if none detected.
 
 ## Workflow
 
 1. **Survey Scope**: Inspect target code, tests, build commands, and
-   recent changes.
+   recent changes. Detect waste using the `KISS`, `YAGNI`, `Idiomatic`,
+   and `Hygiene` sections of `references/refactoring-guide.md`.
+   - **Post-Survey Short-Circuit**: Exit immediately if the survey finds
+     none of: dead code, redundant abstractions, unused helpers,
+     over-engineered constructs, non-idiomatic patterns, or hygiene debt
+     (cryptic names, debug artifacts, "what" comments).
+   - Skips steps 2–7 (baseline, test runs, multi-pass analysis). Survey
+     always runs.
+   - Emit `Result: No Changes` via the template below and halt.
 2. **Establish Baseline**: Run relevant tests or identify why
    verification can't run.
 3. **Remove Waste**: Delete dead code, unused branches, redundant state,
@@ -74,6 +82,8 @@ project; abort with a clear message if none detected.
 
 ## Constraints
 
+- Never introduce `SOLID` or coupling violations; evaluate against the
+  `SOLID` sections of `references/refactoring-guide.md`.
 - Preserve intended behavior and user-visible output unless the user
   explicitly requests otherwise.
 - Don't expand feature scope.
@@ -95,7 +105,6 @@ project; abort with a clear message if none detected.
 
 - Keep result prose terse, concise, and precise.
 - Optimize result for agent, token, and context efficiency.
-- Split actions, findings, and summaries into terse bullet points.
 - Prefer lists, and sub-lists, over long paragraphs and sentences.
 - Strictly follow the result template below.
 
@@ -106,14 +115,14 @@ project; abort with a clear message if none detected.
 - **Actions**:
   - [Terse list of actions taken]
 - **Files**:
-  - [List of modified or created files]
+  - [Terse list of modified or created files]
 - **Findings**:
-  - [List of key gaps, risks, or notable observations]
+  - [Terse list of key gaps, risks, or notable observations]
 - **Summary**:
-  - [List of summary of changes]
+  - [Terse list of summary of changes]
 
 > **Purify Status** • `[scope]`
-> **Result**: [Purified | No Action | Failed]
+> **Result**: [Complete | No Changes | Failed]
 > **Impact**: [Terse impact statement]
 ```
 <!-- prettier-ignore-end -->
