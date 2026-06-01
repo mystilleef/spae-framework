@@ -1,8 +1,8 @@
 ---
 name: spae-spec
 description:
-  Requirements Engineering for the SPAE framework. Distills requests
-  into unambiguous requirements in SPEC.md.
+  Given a proposal, or task, generate a spec and state file for SPAE
+  structured workflow.
 user-invocable: true
 argument-hint: "[optional-workstream-name] [optional-task]"
 ---
@@ -11,7 +11,7 @@ argument-hint: "[optional-workstream-name] [optional-task]"
 
 ## When to use
 
-- Initialize a new `workstream`.
+- Initialize a new `SPAE workstream`.
 - Resume interrupted spec work (`phase: spec`, `status: active`).
 - Revise requirements after a failed `/verify`
   (`status: revision_required`).
@@ -26,38 +26,61 @@ argument-hint: "[optional-workstream-name] [optional-task]"
 
 ## Input
 
-Use only relevant context from:
+Determine scope by the first available source:
 
-- User prompt and optional `workstream` argument.
-- `.spae/current` symlink or explicit `.spae/[workstream]/` path.
-- Existing `STATE.json`, `SPEC.md`, and `VERIFY.md` when present.
-- Repository source patterns, read only for codebase fit.
+- proposal or task from user
+- Existing `STATE.json`, `SPEC.md`, and `VERIFY.md` in `.spae/current`
+  when present.
+
+## `STATE.json`
+
+See `references/STATE.md` for the field reference, directives, and phase
+snapshots.
 
 ## Workflow
 
-1. **Resolve `workstream`**: Use the explicit name, `.spae/current`
-   symlink, or a generated slug. Update `.spae/current` for new or
-   explicitly named `workstream`s.
-2. **Determine mode**—read `STATE.json` if present:
-   - No `.spae/current` and no existing artifacts: **new**—create
-     `.spae/[workstream]/`; initialize `STATE.json` with `phase: spec`,
-     `status: active`.
-   - `STATE.json` exists but malformed: halt with diagnostic.
-   - `STATE.json` absent but `SPEC.md` or `VERIFY.md` exist: halt with
-     diagnostic indicating missing state.
-   - `status: revision_required`: **revise**.
-   - `phase: spec`, `status: active`: **continue**—resume in-progress
-     spec work.
-   - Any other phase or status: report current state and exit.
-3. **Gather context**: Inspect only the minimal source files and
-   artifacts required to resolve ambiguity. In revision mode, read
-   existing `SPEC.md` in full before `VERIFY.md`.
-4. **Formulate spec**: Derive goal, requirements, testing strategy,
-   out-of-scope boundaries, and assumptions from gathered context and
-   template. Don't write to disk.
-5. **Finalize**: Write `SPEC.md` from the approved plan, set
-   `STATE.json` to `phase: plan`, `status: active`, then output the
-   execution summary.
+Follow the appropriate sub-workflow depending on the existence of
+`.spae/current` symlink:
+
+- **New Workstream** (symlink absent): follow the
+  [New spec workflow](#new-spec-workflow).
+- **Existing Workstream** (symlink present): follow the
+  [Revision spec workflow](#revision-spec-workflow).
+
+### New spec workflow
+
+1. **Initialize Directory**:
+   - Create `.spae/[workstream]/`.
+   - Point `.spae/current` to `.spae/[workstream]/`.
+   - Create `STATE.json` with `phase: spec` and `status: active`.
+2. **Gather Context**:
+   - Inspect minimal source files to resolve prompt ambiguity.
+3. **Formulate Spec**:
+   - Derive goal, requirements, testing strategy, out-of-scope
+     boundaries, and assumptions.
+4. **Finalize**:
+   - Write `SPEC.md`, using `references/SPEC.md` as a template.
+   - Update `STATE.json` (`phase: plan`, `status: active`).
+   - Output the execution summary.
+
+### Revision spec workflow
+
+1. **Validate State**:
+   - Confirm `VERIFY.md` exists and `STATE.json` status equals
+     `revision_required`.
+   - Abort immediately if either condition fails.
+2. **Gather Context**:
+   - Read the existing `SPEC.md` in full.
+   - Read `VERIFY.md` in full.
+   - Inspect source files to resolve findings.
+3. **Formulate Spec**:
+   - Rewrite `SPEC.md` to address all findings and gaps from
+     `VERIFY.md`.
+4. **Finalize**:
+   - Overwrite `SPEC.md` with the revised version, using
+     `references/SPEC.md` as a template.
+   - Update `STATE.json` (`phase: plan`, `status: active`).
+   - Output the execution summary.
 
 ## Directives
 
@@ -66,21 +89,17 @@ Use only relevant context from:
 - Write observable, testable, and implementation-neutral requirements.
 - Document assumptions explicitly instead of guessing scope.
 - Match level of detail to task size; avoid process bloat.
-- Limit `SPAE` artifacts to core files and ephemeral `VERIFY.md`.
 - Never stage or commit the `.spae/` directory.
 
 ## Constraints
 
-- **Write scope**: `.spae/current` symlink,
-  `.spae/[workstream]/SPEC.md`, `.spae/[workstream]/STATE.json`, and
-  their parent directories.
-- **Forbidden writes**: source files, tests, configuration,
-  documentation, `PLAN.md`, `VERIFY.md`, and all non-`SPAE` files.
+- **Write Scope**: write only `.spae/current` symlink,
+  `.spae/[workstream]/SPEC.md`, `.spae/[workstream]/STATE.json`, forbid
+  all other writes.
 - **Read-only files**: inspect source code only to verify project fit.
-- **Phase boundary**: Hand off work to `/plan`; don't decompose tasks.
-- **Autonomy**: Avoid mid-execution user queries; halt or block
-  autonomously.
-- **Ambiguity**: Resolve ambiguous requirements using conservative
+- **Phase boundary**: hand off work to `/plan`; don't decompose tasks.
+- **Autonomy**: never request input from user.
+- **Ambiguity**: resolve ambiguous requirements using conservative
   assumptions; document these in `SPEC.md` under **Assumptions**.
 
 ## Verification
