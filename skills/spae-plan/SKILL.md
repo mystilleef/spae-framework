@@ -61,7 +61,10 @@ snapshots.
    exemption; note a task with empty or missing `Satisfies` as a
    possible scope-creep observation.
 7. **Order graph**: Sort tasks by dependency, risk, and vertical value;
-   each task must leave the system working.
+   each task must leave the system working. Enforce before writing:
+   **(1) no cycles** — no task transitively depends on itself;
+   **(2) forward order** — every `Dependencies` ID numerically precedes
+   the declaring task. Detect and correct both before finalizing.
 8. **Finalize**: Write `.spae/current/PLAN.md`. Initialize all new task
    IDs as `todo` in `.spae/current/STATE.json`. Update metrics and set
    `phase: inspect`.
@@ -96,11 +99,11 @@ snapshots.
   mid-execution; halts and blockers stop autonomously.
 - Never introduce fields to `STATE.json` outside the schema reference.
 
-
 ## Verification
 
 - `.spae/current/PLAN.md` contains atomic, acyclic, dependency-ordered
-  tasks.
+  tasks — no cycles; every `Dependencies` ID numerically precedes its
+  declaring task.
 - Every task includes dependencies, acceptance criteria, and
   verification steps.
 - Every task's Acceptance section names the behaviors, failure modes,

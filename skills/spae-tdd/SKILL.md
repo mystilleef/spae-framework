@@ -52,7 +52,9 @@ snapshots.
    the `/tdd` path remains selected, and an active task exists. Read the
    plan `## Goal` and the active task section (including its `Intent`)
    from `.spae/current/PLAN.md`. Read dependent and forward task titles
-   plus acceptance to map seams, not to build them.
+   plus acceptance to map seams, not to build them. Verify every task ID
+   in the active task's `Dependencies` field carries `task_status: done`
+   in `STATE.json`; halt with a blocker if any dependency is incomplete.
 2. **Mark In Progress**: Set `cursor.task_status` and
    `tasks[active_task_id]` to `"in_progress"` in
    `.spae/current/STATE.json`.
@@ -72,9 +74,9 @@ snapshots.
 8. **Test**: Run every verification command listed for the active task
    plus relevant regression tests.
 9. **Finalize State**: Mark the active task `done` in
-   `.spae/current/STATE.json`, increment completion metrics, and
-   advance the cursor to the next task. If no next task remains, set
-   `phase: verify`.
+    `.spae/current/STATE.json`, increment completion metrics, and
+    advance the cursor to the next task. If no next task remains, set
+    `phase: verify`.
 10. **Report**: Emit the standardized execution summary and framework
     status block.
 
@@ -106,8 +108,8 @@ snapshots.
   or broken external dependency; never to escape fixing your own code,
   never by gaming a test or editing the plan.
 - Halt with a blocker when the task as written logically contradicts the
-  plan `## Goal`, the task `Intent`, or a downstream task, an undeniable
-  conflict, not a subjective doubt. Record it in
+  plan `## Goal`, the task `Intent`, or a downstream task — an
+  undeniable conflict, not a subjective doubt. Record it in
   `.spae/current/STATE.json`. Leave ambiguous interpretation to
   `/verify`; never ship a locally correct, globally wrong
   implementation.
@@ -124,7 +126,7 @@ snapshots.
 - Never edit `.spae/current/PLAN.md` during `/tdd`.
 - Never edit `.spae/current/SPEC.md` during `/tdd`.
 - Never execute more than one task.
-- Never alternate execution mode for the same work stream; respect the
+- Never alternate execution mode for the same `workstream`; respect the
   user's selected `/tdd` path.
 - Never stage or commit `.spae/` artifacts.
 - Avoid incidental refactoring, cleanup, formatting, or dependency churn
@@ -184,7 +186,7 @@ snapshots.
 - **Summary**:
   - [List of summary of changes]
 
-> **`SPAE` Status** • `workstream-name`
+> **`SPAE` Status** • `[workstream-name]`
 > **Progress**: Task [X] of [Y] ([Z] remaining)
 > **Completed**: `T-XXX` - [Task title]
 > **Next Task**: `T-YYY` - [Next task title]
@@ -199,7 +201,7 @@ Use this status block instead when the plan concludes.
 
 <!-- prettier-ignore-start -->
 ```md
-> **`SPAE` Status** • `workstream-name`
+> **`SPAE` Status** • `[workstream-name]`
 > **Progress**: All [X] tasks completed
 > **Phase Complete**: `/tdd`
 > **Next Phase**: `/verify`

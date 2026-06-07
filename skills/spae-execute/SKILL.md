@@ -46,15 +46,18 @@ snapshots.
 1. **Load**: Read `.spae/current/STATE.json`, the plan `## Goal`, and
    the tasks (including each `Intent`) in `.spae/current/PLAN.md`.
    Confirm `phase: build`.
-2. **Select**: Identify all `todo` or `in_progress` tasks in plan order.
-   Skip tasks already marked `done`.
-3. **Execute**: For each remaining task in plan order: set
-   `cursor.task_status` and `tasks[task_id]` to `"in_progress"` in
-   `.spae/current/STATE.json`, then map the test surface (expected
+2. **Select**: Reset any `in_progress` task to `todo` in `STATE.json`
+   (prior run interrupted before completion). Identify all `todo` tasks
+   in plan order; skip tasks marked `done`.
+3. **Execute**: For each remaining task in plan order: verify every task
+   ID in its `Dependencies` field carries `task_status: done` in
+   `STATE.json` — halt with a blocker if any dependency is incomplete.
+   Then set `cursor.task_status` and `tasks[task_id]` to `"in_progress"`
+   in `.spae/current/STATE.json`, map the test surface (expected
    behavior, failure modes, edge cases), write exhaustive failing tests,
-   and write the minimal code that satisfies them. Never write
-   production code before its tests exist. Keep later tasks' seams open;
-   never merge, reorder, or skip ahead.
+   and write the minimal code that satisfies them. Never write production
+   code before its tests exist. Keep later tasks' seams open; never
+   merge, reorder, or skip ahead.
 4. **Advance**: After each successful task, mark it `done`, update the
    cursor, task registry, blockers, and metrics in
    `.spae/current/STATE.json`.
@@ -123,6 +126,7 @@ snapshots.
 - Each completed task advances its `Intent` and the plan `## Goal`.
 - `.spae/current/STATE.json` accurately records completed tasks,
   metrics, cursor, blockers, and `phase: verify` after full completion.
+- `.spae/current/PLAN.md` and `.spae/current/SPEC.md` remain unchanged.
 
 ## Result
 
@@ -147,8 +151,9 @@ snapshots.
 - **Summary**:
   - [Summary of implementation changes]
 
-> **SPAE Execute Status** • `[workstream-name]`
+> **`SPAE` Status** • `[workstream-name]`
 > **Result**: [Complete | Blocked | Failed]
+> **Phase Complete**: `/execute`
 > **Progress**: All [X] tasks completed
 > **Completed**: [`T-001` through `T-XXX`]
 > **Next Phase**: `/verify`

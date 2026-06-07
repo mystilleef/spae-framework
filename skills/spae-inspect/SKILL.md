@@ -52,6 +52,15 @@ snapshots.
    task whose Acceptance section omits test requirements — expected
    behavior, failure modes, and edge cases — as `Should fix`. Flag any
    Verification section lacking test execution commands as `Should fix`.
+   Flag any task whose `Dependencies` list references a `T-NNN` ID
+   numerically greater than or equal to the task's own ID as `Must fix`
+   (topological violation). Flag any cycle — a task transitively
+   depending on itself — as `Must fix`. Flag any `Dependencies` entry
+   referencing a `T-NNN` absent from `PLAN.md` as `Must fix` (dangling
+   reference). Flag any mismatch between `Task graph` mermaid edges and
+   per-task `Dependencies` fields as `Should fix`. Flag any task with
+   `Satisfies: none` lacking a credible enabling-task rationale in its
+   `Context` as `Should fix` (orphan task — likely scope creep).
 3. **Classify Findings**:
    - `Must fix`: gaps that would break requirements, contracts, safety,
      or verification.
@@ -65,6 +74,9 @@ snapshots.
      tasks, update every `T-NNN` reference in lockstep — task headers,
      the `Task graph` mermaid edges, the dependency overview list, and
      each `Dependencies` field. Leave no dangling or stale ID.
+   - **Topological correction**: when fixing a topological violation,
+     reorder tasks so every dependency precedes its dependent by ID,
+     then apply atomic renumbering.
 5. **Advance State**: Update `.spae/current/STATE.json`: set
    `phase: build`, set the cursor to `T-001` with `task_status: todo`.
    Rebuild the `tasks` registry to mirror the refined `PLAN.md` IDs
@@ -101,12 +113,13 @@ snapshots.
   mid-execution; halts and blockers stop autonomously.
 - Never introduce fields to `STATE.json` outside the schema reference.
 
-
 ## Verification
 
 - `.spae/current/PLAN.md` satisfies `.spae/current/SPEC.md` and reflects
   required refinements.
-- Each task remains atomic, ordered, and independently verifiable.
+- Each task remains atomic, independently verifiable, and topologically
+  ordered — every `Dependencies` ID numerically precedes the declaring
+  task; no cycles survive.
 - Every task's Acceptance section names testable behaviors, failure
   modes, and edge cases; tasks lacking these flagged as `Should fix`.
 - Every task's Verification section includes test execution commands.
@@ -141,7 +154,7 @@ snapshots.
 - **Summary**:
   - [List of summary of changes]
 
-> **SPAE Status** • `[workstream-name]`
+> **`SPAE` Status** • `[workstream-name]`
 > **Phase Complete**: `/inspect`
 > **Next Phase**: `/build`, `/tdd`, or `/execute`
 > **Result**: [Ready | Revised | Failed]
