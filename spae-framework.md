@@ -133,9 +133,15 @@ Defines the execution sequence. Each task represents a single,
 verifiable unit of work. The framework treats this file as immutable
 during the execution phase (`/build`, `/tdd`, or `/execute`).
 
+- **Dependencies**: Prerequisite task IDs that form the `DAG` edges.
+- **Satisfies**: `SPEC.md` requirement IDs the task implements, or
+  `none` for an enabling task.
+- **Intent**: One-line goal the task serves, so execution stays
+  goal-aware.
 - **Context**: Least setup needed for execution.
-- **Acceptance criteria**: Outcomes, not implementation steps.
-- **Verify**: Concrete commands or steps to prove success.
+- **Scope**: Atomic changes the task makes.
+- **Acceptance**: Outcomes, not implementation steps.
+- **Verification**: Concrete commands or steps to prove success.
 
 ### 4. `VERIFY.md` (The ephemeral signal)
 
@@ -153,15 +159,14 @@ failing-test-first execution, or `/execute` for comprehensive execution.
 
 ### Step 1: `/spec` (Smart entry & requirements)
 
-- **Input**: `STATE.json` + `VERIFY.md` (if present) + `SPEC.md` + raw
+- **Input**: `STATE.json` + `VERIFY.md` (if revising) + `SPEC.md` + raw
   user prompt + codebase context.
-- **Action**: Checks for `.spae/current` first. If absent, initializes a
-  new workstream immediately. If present and `status` equals
-  `revision_required`, enters revision mode, reads `VERIFY.md`, and
-  updates `SPEC.md` to address findings. If `phase` equals `spec`,
-  continues specification work. Any other phase: reports current state
-  and stops. Distills requests into unambiguous requirements. Reads
-  repository code for context only.
+- **Action**: Resolve workstream using explicit argument or
+  `.spae/current` target. For new workstreams, create the directory,
+  update the symlink, and initialize state. For existing workstreams,
+  abort if `STATE.json` status lacks `revision_required` or `VERIFY.md`
+  does not exist; otherwise, rewrite `SPEC.md` to resolve all findings
+  in `VERIFY.md`.
 - **Output**: Overwrites `SPEC.md`. Updates `STATE.json` with
   `phase: plan` and `status: active`. Updates `.spae/current`.
 - **Write scope**: `SPEC.md`, `STATE.json`, `.spae/current`, and the
@@ -190,7 +195,10 @@ failing-test-first execution, or `/execute` for comprehensive execution.
   evolve into a heavyweight governance stage. Reports findings as
   `Must fix`, `Should fix`, or `Observations`. Reads source code for
   analysis only.
-- **Output**: Overwrites `PLAN.md` with the optimized version. Updates
+- **Output**: Overwrites `PLAN.md` with the optimized version. When
+  refinement resizes the task set, renumbers to contiguous `T-NNN` IDs,
+  updates every in-plan reference, and re-derives the `STATE.json`
+  `tasks` registry and `metrics.tasks_total` to match. Updates
   `STATE.json` phase to `build`, which signals execution readiness for
   `/build`, `/tdd`, or `/execute`.
 - **Write scope**: `PLAN.md` and `STATE.json`.
@@ -206,14 +214,28 @@ task at a time, while `/execute` processes all tasks in the plan
 sequentially. Avoid alternating between them within the same
 `workstream`.
 
+Across all three, agents write exhaustive tests first — expected
+behavior, failure modes, and edge cases — then implement the minimal
+code to satisfy them. They drive task verification to green by iterating
+test→implement, treating a failing check as ordinary work rather than a
+stop signal. They halt with a blocker only when a task cannot
+pass within its scope — an infeasible acceptance criterion, a plan or
+spec defect, or a broken external dependency — never by gaming a test or
+editing the plan. When a task legitimately changes a contract, they
+update the tests it invalidates to match; they never weaken, skip, or
+delete a test to force a pass.
+
 #### Option A: `/build` (Atomic execution)
 
-- **Input**: `STATE.json` (cursor) + `PLAN.md` (active task) + source
-  code.
-- **Action**: Executes exactly one atomic task. Implements the smallest
-  useful slice, adds tests as needed, and runs project checks. Holds
-  exclusive authority to edit source code and other non-`SPAE` project
-  files.
+- **Input**: `STATE.json` (cursor) + `PLAN.md` (plan `Goal` + active
+  task
+  - `Intent`) + source code.
+- **Action**: Executes exactly one atomic task. Writes exhaustive tests
+  first — expected behavior, failure modes, and edge cases — then writes
+  the minimal code that satisfies them. Runs project checks. Reads
+  forward tasks to avoid foreclosing them but never implements beyond
+  the active task. Holds exclusive authority to edit source code and
+  other non-`SPAE` project files.
 - **Output**: Mutates source code. Updates the `tasks` registry in
   `STATE.json` to mark the task as `done`. Advances the cursor. If the
   plan concludes, updates `phase: verify`. The agent never edits
@@ -221,12 +243,14 @@ sequentially. Avoid alternating between them within the same
 
 #### Option B: `/tdd` (Test-first atomic execution)
 
-- **Input**: `STATE.json` (cursor) + `PLAN.md` (active task) + source
-  code.
+- **Input**: `STATE.json` (cursor) + `PLAN.md` (plan `Goal` + active
+  task
+  - `Intent`) + source code.
 - **Action**: Executes exactly one atomic task with a failing-test-first
-  cycle: write a failing test, make the minimal change needed to pass,
-  and then refactor while keeping tests green. Use this path for
-  behavioral changes where explicit test-first proof adds clarity.
+  cycle: write a failing test, make the minimal change needed to pass
+  and serve the task `Intent` and plan goal, and then refactor while
+  keeping tests green. Use this path for behavioral changes where
+  explicit test-first proof adds clarity.
 - **Output**: Mutates source code and tests. Updates the `tasks`
   registry in `STATE.json` to mark the task as `done`. Advances the
   cursor. If the plan concludes, updates `phase: verify`. The agent
@@ -234,12 +258,14 @@ sequentially. Avoid alternating between them within the same
 
 #### Option C: `/execute` (Comprehensive execution)
 
-- **Input**: `STATE.json` (cursor) + `PLAN.md` (active task) + source
-  code.
-- **Action**: Executes all tasks in the plan sequentially. Implements
-  each slice, adds tests as needed, and runs project checks for each
-  task. Holds exclusive authority to edit source code and other
-  non-`SPAE` project files.
+- **Input**: `STATE.json` (cursor) + `PLAN.md` (plan `Goal` + tasks +
+  `Intent`) + source code.
+- **Action**: Executes all tasks in plan order, each slice aimed at its
+  `Intent` and the plan goal. Writes exhaustive tests first — expected
+  behavior, failure modes, and edge cases — then writes the minimal code
+  that satisfies them. Runs project checks for each task. Holds
+  exclusive authority to edit source code and other non-`SPAE` project
+  files.
 - **Output**: Mutates source code. Updates the `tasks` registry in
   `STATE.json` to mark all completed tasks as `done`. Updates
   `phase: verify`. The agent never edits `PLAN.md` during this phase.
