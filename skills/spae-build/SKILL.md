@@ -18,9 +18,11 @@ user-invocable: true
 
 - Execute exactly one task from `PLAN.md`, mutating source/tests plus
   `STATE.json`, while preserving the framework execution cursor.
-- Complete the active task with the smallest useful code change.
-- Prove the task acceptance criteria through the task verification
-  steps.
+- Complete the active task with minimal production code that satisfies
+  exhaustive tests, serves its `Intent` and the plan `## Goal`, and
+  leaves seams for downstream tasks.
+- Meet the task acceptance criteria through exhaustive tests and task
+  verification steps.
 - Advance `.spae/current/STATE.json` to the next task or to
   `phase: verify`.
 
@@ -30,8 +32,9 @@ Read:
 
 - `.spae/current/STATE.json` for phase, cursor, task registry, and
   metrics.
-- `.spae/current/PLAN.md` for the active task, acceptance criteria, and
-  verification steps.
+- `.spae/current/PLAN.md` for the plan `## Goal`, the active task, its
+  `Intent`, acceptance criteria, and verification steps; they carry all
+  the goal context build needs.
 - Relevant project source, tests, docs, and configuration needed for the
   active task.
 
@@ -43,24 +46,29 @@ snapshots.
 ## Workflow
 
 1. **Load Task**: Confirm `.spae/current/STATE.json` has `phase: build`
-   and an active task. Read only the active task section from
-   `.spae/current/PLAN.md` plus minimal surrounding context needed for
-   dependencies.
+   and an active task. Read the plan `## Goal` and the active task
+   section (including its `Intent`) from `.spae/current/PLAN.md`. Read
+   dependent and forward task titles plus acceptance to map seams, not
+   to build them.
 2. **Mark In Progress**: Set `cursor.task_status` and
    `tasks[active_task_id]` to `"in_progress"` in
    `.spae/current/STATE.json`.
 3. **Plan Slice**: Identify the smallest implementation path that meets
-   the active task acceptance criteria.
-4. **Implement**: Edit only relevant source, tests, docs, or
-   configuration files required by the task.
-5. **Test**: Add or adjust tests required for the task, then run every
-   verification command listed for the active task. Tests must prove,
-   verify, and confirm your solution.
-6. **Finalize State**: Mark the active task `done` in
+   the active task acceptance criteria, advances the task `Intent` and
+   plan `## Goal`, and leaves the seams forward tasks need. Map the test
+   surface: identify expected behaviors, failure modes, and edge cases
+   requiring tests before any production code exists. Choose among valid
+   implementations by goal fit, not local convenience.
+4. **Implement**: Write exhaustive tests first: expected behavior,
+   failure modes, and edge cases; then write the minimal code that
+   satisfies them. Never write production code before its tests exist.
+   Edit only source, tests, docs, or configuration files required by the
+   task. Run every verification command listed for the active task.
+5. **Finalize State**: Mark the active task `done` in
    `.spae/current/STATE.json`, increment completion metrics, and advance
    the cursor to the next task. If no next task remains, set
    `phase: verify`.
-7. **Report**: Emit the standardized execution summary and framework
+6. **Report**: Emit the standardized execution summary and framework
    status block.
 
 ## Directives
@@ -68,14 +76,34 @@ snapshots.
 - Optimize all operations for agent, token, and context efficiency.
 - Execute exactly one atomic task per invocation.
 - Prefer existing project patterns over new design.
-- Keep edits minimal, local, and acceptance-criteria driven.
-- Use test-first when the task changes observable behavior.
-- Don't limit yourself to just unit tests; write any category of tests
-  necessary to prove, verify, and confirm your solution.
+- Keep production code minimal, local, and test-driven; never reduce
+  test scope.
+- Look ahead, don't act ahead: read forward tasks to avoid foreclosing
+  them; never build beyond the active task. Name any forward task you
+  designed around in the result.
+- Tests drive every task; write them first, exhaustively, before any
+  production code. Implementation serves tests, never the reverse.
+- Write every category of test the task demands: unit, integration,
+  end-to-end, or otherwise. Cover expected behavior, failure modes, and
+  edge cases exhaustively.
+- When the task legitimately changes a contract, update the tests it
+  invalidates to the new contract; never weaken, skip, or delete a test
+  to force green.
 - Run task verification before changing `.spae/current/STATE.json`.
-- Halt with a blocker when verification fails.
-- When task requirements lack detail, make the most conservative
-  assumption, record it in `.spae/current/STATE.json`, and proceed.
+- Drive verification green: iterate test→build; treat red as ordinary
+  build work. Halt with a blocker only when verification can't pass
+  within task scope: infeasible acceptance criterion, plan/spec defect,
+  or broken external dependency; never to escape fixing your own code,
+  never by gaming a test or editing the plan.
+- Halt with a blocker when the task as written logically contradicts the
+  plan `## Goal`, the task `Intent`, or a downstream task, an undeniable
+  conflict, not a subjective doubt. Record it in
+  `.spae/current/STATE.json`. Leave ambiguous interpretation to
+  `/verify`; never ship a locally correct, globally wrong
+  implementation.
+- When task requirements lack detail, choose the assumption most
+  consistent with the task `Intent` and plan `## Goal`, record it in
+  `.spae/current/STATE.json`, and proceed.
 
 ## Constraints
 
@@ -92,14 +120,28 @@ snapshots.
   outside the active task.
 - **Autonomy**: Never ask users for input or clarification
   mid-execution; halts and blockers stop autonomously.
+- Never introduce fields to `STATE.json` outside the schema reference.
+- No hacks, workarounds, or shortcuts.
+- Forbid laziness; fix issues properly, correctly, and idiomatically.
+- Never edit build or tool configuration files as a workaround; build
+  and tool configuration changes only apply when the active task's
+  acceptance criteria explicitly require them.
+- Never suppress or disable compiler or linter diagnostics; for example,
+  `@ts-ignore`, `eslint-disable`, `@SuppressWarnings`, `# type: ignore`.
+- Never weaken type contracts to silence errors; for example, `as any`,
+  `!` non-null assertions, or broadening union types.
 
 ## Verification
 
 - Active task acceptance criteria pass.
 - All task verification steps pass.
 - Relevant project tests pass with no new failures.
+- Task tests cover expected behavior, failure modes, and edge cases
+  exhaustively; no thin-coverage shortcuts.
+- Implementation advances the task `Intent` and plan `## Goal`; no
+  forward-task work performed.
 - `.spae/current/STATE.json` task registry, metrics, cursor, and phase
-  reflect the completed task.
+  reflect the completed task, and the relevant tasks marked as `done`.
 - `.spae/current/PLAN.md` and `.spae/current/SPEC.md` remain unchanged.
 
 ## Result
@@ -118,6 +160,8 @@ snapshots.
 
 - **Actions**:
   - [Terse list of actions taken]
+- **Tests**:
+  - [Terse list of tests written — behaviors, failure modes, and edge cases covered]
 - **Files**:
   - [Terse list of modified or created files]
 - **Findings**:
