@@ -32,7 +32,7 @@ for the built-in `/run` command.
 | `tdd`          | Run a failing-test-first build cycle              |
 | `execute`      | Execute all tasks from `PLAN.md` sequentially     |
 | `verify`       | Verify implementation against `SPEC.md`           |
-| `coverage`     | Fill test coverage gaps                           |
+| `test`         | Fill test coverage gaps                           |
 | `purify`       | Simplify and optimize code                        |
 | `refactor`     | Improve structure and clarity                     |
 | `review`       | Review for correctness and style                  |
@@ -41,5 +41,17 @@ for the built-in `/run` command.
 | `work`         | Run ad-hoc tasks in an isolated session           |
 | `query`        | Answer questions or research without side effects |
 | `troubleshoot` | Diagnose and fix issues                           |
+
+## Orchestration agents
+
+These agents require nested subagent support via
+[`mystilleef/pi-subagent`](https://github.com/mystilleef/pi-subagent).
+
+| Agent         | Purpose                                             |
+| ------------- | --------------------------------------------------- |
+| `orchestrate` | Run all `SPAE` phases autonomously from current state |
+| `spawn`       | Run the build phase only—loops all remaining tasks  |
+| `coverage`    | Spawn test agents to address code coverage gaps     |
+| `clean`       | Run `purify` then `refactor` agents sequentially    |
 
 See the [top-level README](../README.md) for the full workflow.
