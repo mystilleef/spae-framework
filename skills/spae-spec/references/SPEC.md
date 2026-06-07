@@ -9,13 +9,16 @@
 
 ## Requirements
 
-- [Required behavior]
-- [Performance | security | compatibility | reliability constraint]
+- **R-001**: [Required behavior]
+- **R-002**: [Performance | security | compatibility | reliability
+  constraint]
 
 ## Testing strategy
 
-- **Approach**: [unit | integration | e2e | manual]
-- **Targets**: [Behavior to verify]
+- **Approach**: [unit | integration | e2e | manual — list all that apply]
+- **Expected behavior**: [What succeeds under valid inputs]
+- **Failure modes**: [What fails, errors, or rejects under invalid inputs or dependency failures]
+- **Edge cases**: [Boundary, empty, nil, or zero-value conditions]
 - **Exclusions**: [What to skip — why]
 
 ## Out of scope

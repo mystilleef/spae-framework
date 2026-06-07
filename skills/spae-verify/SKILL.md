@@ -50,6 +50,8 @@ snapshots.
    a hard block in Step 3.
 3. **Inspect**: Compare implementation against each
    `.spae/current/SPEC.md` item using check results as evidence.
+   Reference each finding by the `SPEC.md` **requirement** ID it maps
+   to.
    - When `.spae/current/VERIFY.md` exists: treat each prior finding as
      an explicit re-check item; confirm each addressed before moving on.
    - Classify each finding:
@@ -57,16 +59,17 @@ snapshots.
        required behavior, check failure mapping to a
        `.spae/current/SPEC.md` spec item—always drives verdict to
        no-pass.
-     - **Soft finding**: missing tests for required behavior, unsafe
+     - **Soft finding**: missing or thin tests — absent coverage of
+       required behavior, failure modes, or edge cases; unsafe
        optimization—document in `.spae/current/VERIFY.md`; drives
        verdict to no-pass.
      - **Observation**: ambiguous or untestable spec item, minor
        deviation outside SPEC scope—note only; no verdict impact.
 4. **Finalize**:
-   - **Pass**: remove `.spae/current/VERIFY.md` when present; remove
-     `.spae/current` symlink; set `.spae/current/STATE.json` to
-     `status: completed`, `phase: done`. Surface observations, if any,
-     in the result output under Findings as informational notes.
+   - **Pass**: set `.spae/current/STATE.json` to `status: completed`,
+     `phase: done`; remove `.spae/current/VERIFY.md` when present;
+     remove `.spae/current` symlink. Surface observations, if any, in
+     the result output under Findings as informational notes.
    - **No pass**: create or overwrite `.spae/current/VERIFY.md` with
      hard blocks and soft findings from the current run only, followed
      by observations as informational notes; set
@@ -84,6 +87,9 @@ snapshots.
 - Optimize all operations for agent, token, and context efficiency.
 - Focus on the delta between `.spae/current/SPEC.md` and repository
   state.
+- Check test exhaustiveness against the `.spae/current/SPEC.md` testing
+  strategy; thin coverage of failure modes or edge cases classifies as a
+  soft finding.
 - Prefer existing project verification commands and patterns.
 - Keep `.spae/current/VERIFY.md` findings concrete, reproducible, and
   tied to `.spae/current/SPEC.md` spec items.
@@ -99,6 +105,7 @@ snapshots.
 - Don't stage or commit `.spae/` artifacts.
 - **Autonomy**: Never ask users for input or clarification
   mid-execution; halts and blockers stop autonomously.
+- Never introduce fields to `STATE.json` outside the schema reference.
 
 ## Verification
 
@@ -107,7 +114,7 @@ snapshots.
 - `.spae/current` symlink absent after a passing run.
 - `.spae/current/VERIFY.md` exists only after failure or a blocked run.
 - `.spae/current/VERIFY.md` findings map to concrete
-  `.spae/current/SPEC.md` gaps or blocker details.
+  `.spae/current/SPEC.md` **requirement** IDs or blocker details.
 - Required project checks pass or documented blockers explain failures.
 
 ## Result
@@ -118,7 +125,6 @@ snapshots.
 - Prefer lists, and sub-lists, over long paragraphs and sentences.
 - Strictly follow the result template below.
 
-<!-- vale Joblint.Competitive = NO -->
 <!-- prettier-ignore-start -->
 ```md
 ### Execution Summary
@@ -126,36 +132,15 @@ snapshots.
 - **Actions**:
   - [Terse list of verification actions]
 - **Files**:
-  - [List of modified SPAE files]
+  - [Terse list of examined files]
 - **Findings**:
-  - [List of gaps, blockers, or pass confirmation]
+  - [Terse list of gaps, blockers, or pass confirmation]
 - **Summary**:
-  - [Terse result summary]
-```
+  - [Terse list of result summaries]
 
-On pass:
-
-```md
-> **SPAE Status** • `workstream-name` **Phase Complete**: `/verify`
-> (Pass) **Result**: Workstream completed successfully.
-```
-
-On failure:
-
-```md
-> **SPAE Status** • `workstream-name` **Phase Complete**: `/verify`
-> (Fail) **Next Phase**: `/spec`
->
-> _Run `/spec` next._
-```
-
-On blocked:
-
-```md
-> **SPAE Status** • `workstream-name` **Phase Complete**: `/verify`
-> (Blocked) **Reason**: [one-line blocker description] **Next Phase**: `/spec`
->
-> _Resolve the blocker, then run `/spec` next._
+> **SPAE Status** • `workstream-name`
+> **Phase Complete**: `/verify` ([Pass | Fail | Blocked])
+> **Reason**: [one-line blocker description]  _(if blocked)_
+> **Next Phase**: `/spec`  _(if fail or blocked)_
 ```
 <!-- prettier-ignore-end -->
-<!-- vale Joblint.Competitive = YES -->
