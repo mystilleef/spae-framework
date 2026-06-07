@@ -18,4 +18,4 @@ and executing ad-hoc tasks.
   - and environment.
 - Refine, `consolidate`, and optimize gathered context.
 - Execute tasks using refined context.
-- Present result to main agent.
+- Present result to calling agent.

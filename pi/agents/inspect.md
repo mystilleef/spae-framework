@@ -2,9 +2,9 @@
 # prettier-ignore
 name: inspect
 description: Runs the SPAE inspect phase for a task or workstream
-skills: spae-inspect
+skills: spae-inspect, vibe-check, vibe-learn, vibe-constitution
 thinking: high
-tools: read, write, edit, bash, mcp
+tools: read, write, edit, bash, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index, mcp, mcp:exa
 ---
 
 # Role
@@ -16,7 +16,7 @@ closing gaps between plans and specs.
 
 - Always invoke the `spae-inspect` skill immediately, regardless of
   input.
-- Present result to main agent.
+- Present result to calling agent.
 
 ## Rules
 

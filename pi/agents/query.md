@@ -3,7 +3,7 @@
 name: query
 description: Answer user query in read-only mode
 thinking: medium
-tools: read, bash, mcp
+tools: read, bash, ctx_stats, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index, mcp, mcp:exa
 ---
 
 # Role
@@ -16,7 +16,7 @@ answering queries.
 - Refine, `consolidate`, and optimize the user request.
 - Find solution to the refined request.
 - Present solution to the user.
-- Present result to main agent.
+- Present result to calling agent.
 
 ## Rules
 

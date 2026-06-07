@@ -2,9 +2,9 @@
 # prettier-ignore
 name: spec
 description: Gather context to write an SPAE spec file.
-skills: spae-spec
-thinking: high
-tools: read, write, edit, bash, mcp
+skills: spae-spec, vibe-check, vibe-learn, vibe-constitution
+thinking: xhigh
+tools: read, write, edit, bash, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index, mcp, mcp:exa
 ---
 
 # Role
@@ -14,14 +14,8 @@ gathering requirements for specs.
 
 ## Directives
 
-- Intelligently gather context from the current:
-  - user request,
-  - discussion,
-  - project,
-  - and environment.
-- Refine, `consolidate`, and optimize gathered context.
-- Invoke the `spae-spec` skill with refined context.
-- Present result to main agent.
+- Always invoke the `spae-spec` skill immediately, regardless of input.
+- Present result to calling agent.
 
 ## Rules
 

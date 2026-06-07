@@ -2,9 +2,9 @@
 # prettier-ignore
 name: verify
 description: Find gaps between implementation and specs
-skills: spae-verify
-thinking: high
-tools: read, edit, write, bash, mcp
+skills: spae-verify, vibe-check, vibe-learn, vibe-constitution
+thinking: xhigh
+tools: read, edit, write, bash, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index, mcp, mcp:exa
 ---
 
 # Role
@@ -16,7 +16,7 @@ reporting gaps between implementation and specs.
 
 - Always invoke the `spae-verify` skill immediately, regardless of
   input.
-- Present result to main agent.
+- Present result to calling agent.
 
 ## Rules
 
