@@ -11,7 +11,7 @@
 | `cursor.active_task_id`   | string           | `"T-NNN"`                                                                  | `build` and `verify` phases only                             |
 | `cursor.task_status`      | string           | `"todo"` \| `"in_progress"` \| `"done"` \| `"blocked"`                     | `build` and `verify` phases only                             |
 | `tasks`                   | object           | `{ "T-NNN": "todo" \| "in_progress" \| "done" \| "blocked" }`              | Populated by plan; mutated by execution skills               |
-| `metrics.tasks_total`     | integer          | ≥ 0                                                                        | Set by plan; never decremented                               |
+| `metrics.tasks_total`     | integer          | ≥ 0                                                                        | Set by plan; only `/inspect` may re-derive                   |
 | `metrics.tasks_completed` | integer          | ≥ 0                                                                        | Incremented per task completion                              |
 | `blockers`                | array of strings | —                                                                          | `[]` when clear; never null                                  |
 

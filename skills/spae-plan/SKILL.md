@@ -12,7 +12,7 @@ user-invocable: true
 
 - `SPEC.md` exists and needs an execution plan.
 - `STATE.json` reports `phase: plan`.
-- A revision cycle returns control to planning.
+- A revision cycle re-enters planning after `/spec` reprocesses findings.
 
 ## Goal
 
@@ -44,19 +44,29 @@ snapshots.
    if absent) and clear the `tasks` registry in
    `.spae/current/STATE.json` to empty. Run unconditionally.
 3. **Analyze spec**: Extract goal, requirements, testing strategy,
-   out-of-scope items, and assumptions.
+   out-of-scope items, and assumptions. Capture every requirement into
+   an in-memory coverage checklist, keyed by `R-NNN` ID.
 4. **Gather context**: Inspect only the source patterns needed to fit
    existing architecture; never edit repository files.
 5. **Draft plan**: Read the template from `references/PLAN.md`.
-   Decompose work into `T-000` tasks. Structure `PLAN.md` following this
-   template exactly.
-6. **Order graph**: Sort tasks by dependency, risk, and vertical value;
+   Decompose work into atomic tasks numbered from `T-001`. Structure
+   `PLAN.md` following this template exactly. Set each task's `Satisfies`
+   to the requirement IDs
+   it implements, and its `Intent` to a one-line distillation of the
+   goal those requirements serve — or, for an enabling task, the
+   structural purpose it serves toward the plan `## Goal`.
+6. **Reconcile coverage**: Confirm every requirement maps to at least
+   one task via `Satisfies`; for any requirement without a task, return
+   to drafting and add one. Treat `Satisfies: none` as an intentional
+   exemption; note a task with empty or missing `Satisfies` as a
+   possible scope-creep observation.
+7. **Order graph**: Sort tasks by dependency, risk, and vertical value;
    each task must leave the system working.
-7. **Finalize**: Write `.spae/current/PLAN.md`. Initialize all new task
+8. **Finalize**: Write `.spae/current/PLAN.md`. Initialize all new task
    IDs as `todo` in `.spae/current/STATE.json`. Update metrics and set
    `phase: inspect`.
-8. **Report**: Emit the standard result with `SPAE` phase transition
-   feedback.
+9. **Report**: Emit the standard result with `SPAE` phase transition
+    feedback.
 
 ## Directives
 
@@ -64,8 +74,10 @@ snapshots.
 - Keep `PLAN.md` high-signal and minimal.
 - Prefer existing codebase patterns over speculative design.
 - Slice vertically; avoid infrastructure-only tasks unless required.
-- Write acceptance criteria as observable outcomes.
-- Write verification as concrete commands or deterministic checks.
+- Write acceptance criteria as observable outcomes; name the behaviors,
+  failure modes, and edge cases tests must cover.
+- Write verification as concrete test commands and deterministic checks;
+  every task's Verification section must include test execution.
 - Preserve execution-mode neutrality for `/build`, `/tdd`, and
   `/execute`.
 - Never add `SPAE` artifacts beyond core files and ephemeral
@@ -82,6 +94,8 @@ snapshots.
 - **Phase boundary**: hand off to `/inspect`; don't execute tasks.
 - **Autonomy**: Never ask users for input or clarification
   mid-execution; halts and blockers stop autonomously.
+- Never introduce fields to `STATE.json` outside the schema reference.
+
 
 ## Verification
 
@@ -89,9 +103,19 @@ snapshots.
   tasks.
 - Every task includes dependencies, acceptance criteria, and
   verification steps.
+- Every task's Acceptance section names the behaviors, failure modes,
+  and edge cases tests must cover.
+- Every task's Verification section includes test execution commands.
+- Every task includes an `Intent` line distilled from the requirements
+  it satisfies, or — for an enabling task — its structural purpose
+  toward the plan `## Goal`.
 - `.spae/current/PLAN.md` structures tasks and metadata matching
   `references/PLAN.md` exactly.
+- Every `T-NNN` reference in `PLAN.md` — `Task graph` edges, the
+  dependency overview list, and `Dependencies` fields — resolves to a
+  defined task.
 - `.spae/current/STATE.json` task registry matches `PLAN.md` task IDs.
+- Every `SPEC.md` requirement maps to at least one task's `Satisfies`.
 - `.spae/current/STATE.json` contains `phase: "inspect"` and current
   metrics.
 - No files outside the allowed `SPAE` write scope changed.

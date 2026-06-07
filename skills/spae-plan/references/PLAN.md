@@ -18,25 +18,28 @@
 flowchart TD
   T01[T-001] --> T02[T-002]
 ```
-````
 
 - T-001: [title]
-- T-002: [title] — depends on T-001
+- T-002: [title] (depends on T-001)
 
 ## Tasks
 
 ### T-001: [Task title]
 
 - **Dependencies**: [none | T-00N, T-00M]
+- **Satisfies**: [R-001, R-003 | none (enabling task, see Context)]
+- **Intent**: [One line: the goal this task serves and why it matters]
 - **Context**: [Target files, current behavior, and seams]
 - **Scope**:
   - [Atomic change 1]
   - [Atomic change 2]
 - **Acceptance**:
-  - [Observable outcome 1]
-  - [Observable outcome 2]
+  - [Expected behavior — outcome when inputs are valid]
+  - [Failure mode — outcome when inputs are invalid or dependency fails]
+  - [Edge case — outcome at boundary or with empty/nil input]
 - **Verification**:
-  - `[command or check]`
+  - `[test command covering acceptance criteria above]`
+  - `[build or lint command]`
 
 ## Risk notes
 
@@ -45,7 +48,4 @@ flowchart TD
 ## Source audit notes
 
 - [file path, seam, or test file]
-
-```
-
-```
+````
