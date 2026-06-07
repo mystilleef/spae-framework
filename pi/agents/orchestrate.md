@@ -4,7 +4,7 @@ name: orchestrate
 description: Orchestrates SPAE agents for each phase to complete tasks.
 skills: spae-orchestrate
 thinking: medium
-tools: read, bash, subagent, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index
+tools: read, bash, subagent
 ---
 
 # Role

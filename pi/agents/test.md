@@ -2,9 +2,9 @@
 # prettier-ignore
 name: test
 description: Address gaps in code coverage.
-skills: test, vibe-check, vibe-learn, vibe-constitution
+skills: test
 thinking: xhigh
-tools: read, write, edit, bash, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index, mcp, mcp:exa
+tools: read, write, edit, bash
 ---
 
 # Role

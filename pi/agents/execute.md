@@ -2,9 +2,9 @@
 # prettier-ignore
 name: execute
 description: Runs sequential SPAE execution for a task or workstream
-skills: spae-execute, vibe-check, vibe-learn, vibe-constitution
+skills: spae-execute
 thinking: high
-tools: read, write, edit, bash, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index, mcp, mcp:exa
+tools: read, write, edit, bash
 ---
 
 # Role

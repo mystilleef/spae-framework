@@ -4,7 +4,7 @@ name: spawn
 description: Orchestrates SPAE build agents to complete tasks.
 skills: spae-spawn
 thinking: medium
-tools: read, bash, subagent, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index
+tools: read, bash, subagent
 ---
 
 # Role

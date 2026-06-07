@@ -2,9 +2,9 @@
 # prettier-ignore
 name: tdd
 description: Runs one atomic SPAE tdd task for a task or workstream
-skills: spae-tdd, vibe-check, vibe-learn, vibe-constitution
+skills: spae-tdd
 thinking: high
-tools: read, write, edit, bash, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index, mcp, mcp:exa
+tools: read, write, edit, bash
 ---
 
 # Role

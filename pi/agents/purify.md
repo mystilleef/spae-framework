@@ -2,9 +2,9 @@
 # prettier-ignore
 name: purify
 description: Aggressively optimize code.
-skills: purify, vibe-check, vibe-learn, vibe-constitution
+skills: purify
 thinking: high
-tools: read, write, edit, bash, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index, mcp, mcp:exa
+tools: read, write, edit, bash
 ---
 
 # Role

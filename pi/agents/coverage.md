@@ -4,7 +4,7 @@ name: coverage
 description: Orchestrate test agents to fix gaps in code coverage.
 skills: coverage
 thinking: medium
-tools: read, bash, subagent, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index, mcp, mcp:exa
+tools: read, bash, subagent
 ---
 
 # Role

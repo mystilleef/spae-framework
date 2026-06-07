@@ -2,9 +2,9 @@
 # prettier-ignore
 name: verify
 description: Find gaps between implementation and specs
-skills: spae-verify, vibe-check, vibe-learn, vibe-constitution
+skills: spae-verify
 thinking: xhigh
-tools: read, edit, write, bash, ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_search, ctx_index, ctx_fetch_and_index, mcp, mcp:exa
+tools: read, edit, write, bash
 ---
 
 # Role
