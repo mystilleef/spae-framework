@@ -69,6 +69,13 @@ Determine input by one of the following:
 - No workarounds, hacks, or shortcuts.
 - Forbid laziness; fix issues properly, correctly, and idiomatically;
   for example, don't add lint ignore comments.
+- Never edit build or tool configuration files; for example,
+  `tsconfig.json`, `.eslintrc.*`, `webpack.config.*`, `vite.config.*`,
+  `jest.config.*`, `Makefile`, `pyproject.toml`, `Cargo.toml`.
+- Never suppress or disable compiler or linter diagnostics; for example,
+  `@ts-ignore`, `eslint-disable`, `@SuppressWarnings`, `# type: ignore`.
+- Never weaken type contracts to silence errors; for example, `as any`,
+  `!` non-null assertions, or broadening union types.
 
 ## Verification
 

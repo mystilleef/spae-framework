@@ -18,7 +18,7 @@ argument-hint: "[optional: file path, module, or focus area]"
 
 ## Goal
 
-- Eliminate `KISS`, `YAGNI`, `Idiomatic`, and `Hygiene` violations: dead
+- Remove `KISS`, `YAGNI`, `Idiomatic`, and `Hygiene` violations: dead
   code, redundant abstractions, over-engineering, non-idiomatic
   patterns, and hygiene debt.
 - Reduce code to the smallest clear, idiomatic, maintainable form.
@@ -82,7 +82,7 @@ project, abort with a clear message if none detected.
 
 ## Constraints
 
-- Never introduce `SOLID` or coupling violations; evaluate against the
+- Never introduce `SOLID` or coupling violations; check against the
   `SOLID` sections of `references/refactoring-guide.md`.
 - Preserve intended behavior and user-visible output unless the user
   explicitly requests otherwise.
@@ -92,6 +92,15 @@ project, abort with a clear message if none detected.
   suffice.
 - Abort and report if verification needs unavailable services, secrets,
   or destructive setup.
+- No hacks, workarounds, or shortcuts.
+- Forbid laziness; fix issues properly, correctly, and idiomatically.
+- Never edit build or tool configuration files; for example,
+  `tsconfig.json`, `.eslintrc.*`, `webpack.config.*`, `vite.config.*`,
+  `jest.config.*`, `Makefile`, `pyproject.toml`, `Cargo.toml`.
+- Never suppress or disable compiler or linter diagnostics; for example,
+  `@ts-ignore`, `eslint-disable`, `@SuppressWarnings`, `# type: ignore`.
+- Never weaken type contracts to silence errors; for example, `as any`,
+  `!` non-null assertions, or broadening union types.
 
 ## Verification
 

@@ -50,7 +50,7 @@ project. Abort with a clear message if none detected.
    violation catalog in `references/refactoring-guide.md`.
    - **Post-Smell Short-Circuit**: Exit immediately if smell detection
      finds zero instances of: duplicated logic, long methods, large
-     classes, primitive obsession, SOLID violations.
+     classes, `primitive` obsession, `SOLID` violations.
    - Skips steps 5–9 (dependency analysis, execution, verification).
      Steps 1–4 always run.
    - Emit `Result: No Changes` via the template below and halt.
@@ -80,6 +80,15 @@ project. Abort with a clear message if none detected.
 - **Inherit Baseline**: Treat the test suite as-found at refactor start
   as the authoritative baseline, regardless of prior tooling in the same
   session.
+- No hacks, workarounds, or shortcuts.
+- Forbid laziness; fix issues properly, correctly, and idiomatically.
+- Never edit build or tool configuration files; for example,
+  `tsconfig.json`, `.eslintrc.*`, `webpack.config.*`, `vite.config.*`,
+  `jest.config.*`, `Makefile`, `pyproject.toml`, `Cargo.toml`.
+- Never suppress or disable compiler or linter diagnostics; for example,
+  `@ts-ignore`, `eslint-disable`, `@SuppressWarnings`, `# type: ignore`.
+- Never weaken type contracts to silence errors; for example, `as any`,
+  `!` non-null assertions, or broadening union types.
 
 ## Verification
 
