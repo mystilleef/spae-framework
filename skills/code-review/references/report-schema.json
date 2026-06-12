@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CodeReviewReport",
+  "description": "Output contract for the code-review skill. Emitted as YAML. Use | block scalars for multi-line code in suggestion and excerpt fields.",
+  "type": "object",
+  "required": ["scope", "result", "findings"],
+  "additionalProperties": false,
+  "properties": {
+    "scope": {
+      "type": "string",
+      "description": "What was reviewed — file path, PR, commit, or diff description."
+    },
+    "result": {
+      "type": "string",
+      "enum": ["Issues Found", "LGTM", "Failed"],
+      "description": "Overall review outcome."
+    },
+    "impact": {
+      "type": "string",
+      "description": "One-sentence impact statement. Omit when result is LGTM."
+    },
+    "actions": {
+      "type": "array",
+      "description": "Terse list of review actions taken.",
+      "items": { "type": "string" }
+    },
+    "files": {
+      "type": "array",
+      "description": "Reviewed file paths.",
+      "items": { "type": "string" }
+    },
+    "findings": {
+      "type": "array",
+      "description": "Defects found, sorted by severity: Blocker → High → Medium → Nit.",
+      "items": {
+        "type": "object",
+        "required": ["severity", "path", "finding", "suggestion"],
+        "additionalProperties": false,
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": ["Blocker", "High", "Medium", "Nit"],
+            "description": "Severity ranked by user impact or exploitability."
+          },
+          "path": {
+            "type": "string",
+            "description": "File path of the finding."
+          },
+          "line": {
+            "type": "integer",
+            "description": "Line number of the finding."
+          },
+          "excerpt": {
+            "type": "string",
+            "description": "Quoted code excerpt supporting the finding."
+          },
+          "finding": {
+            "type": "string",
+            "description": "One sentence stating the defect."
+          },
+          "suggestion": {
+            "type": "string",
+            "description": "Concrete fix — not vague advice."
+          }
+        }
+      }
+    }
+  }
+}
