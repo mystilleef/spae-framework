@@ -43,35 +43,53 @@ Read:
 See `references/STATE.md` for the field reference, directives, and phase
 snapshots.
 
+## Testing
+
+See `references/testing-guide.md` for test structure, isolation,
+mocking, assertion, and performance standards.
+
 ## Workflow
 
-1. **Load Task**: Confirm `.spae/current/STATE.json` has `phase: build`
-   and an active task. Read the plan `## Goal` and the active task
-   section (including its `Intent`) from `.spae/current/PLAN.md`. Read
-   dependent and forward task titles plus acceptance to map seams, not
-   to build them. Verify every task ID in the active task's
-   `Dependencies` field carries `task_status: done` in `STATE.json`;
-   halt with a blocker if any dependency is incomplete.
-2. **Mark In Progress**: Set `cursor.task_status` and
-   `tasks[active_task_id]` to `"in_progress"` in
-   `.spae/current/STATE.json`.
-3. **Plan Slice**: Identify the smallest implementation path that meets
-   the active task acceptance criteria, advances the task `Intent` and
-   plan `## Goal`, and leaves the seams forward tasks need. Map the test
-   surface: identify expected behaviors, failure modes, and edge cases
-   requiring tests before any production code exists. Choose among valid
-   implementations by goal fit, not local convenience.
-4. **Implement**: Write exhaustive tests first: expected behavior,
-   failure modes, and edge cases; then write the minimal code that
-   satisfies them. Never write production code before its tests exist.
-   Edit only source, tests, docs, or configuration files required by the
-   task. Run every verification command listed for the active task.
-5. **Finalize State**: Mark the active task `done` in
+1. **GATE**—Confirm `.spae/current/STATE.json` has `phase: build` and an
+   active task. Read the plan `## Goal` and active task section —
+   including its `Intent` — from `.spae/current/PLAN.md`. Read dependent
+   and forward task titles plus acceptance criteria to map seams, not
+   build them. Verify every task ID in the active task's `Dependencies`
+   field carries `task_status: done` in `STATE.json`; halt with a
+   blocker for any incomplete dependency.
+2. **ORIENT**—State the goal in one sentence: execute the active task
+   and advance the cursor. Name what won't change: `PLAN.md`, `SPEC.md`,
+   and forward-task seams. **Cursor exception**: set
+   `cursor.task_status` and `tasks[active_task_id]` to `"in_progress"`
+   in `.spae/current/STATE.json`.
+3. **PLAN**—Declare the full implementation path that satisfies every
+   acceptance criterion, advances the task `Intent` and plan `## Goal`,
+   and leaves seams for forward tasks. Read
+   `references/testing-guide.md`. Map the test surface per criterion:
+   expected behaviors, failure modes, and edge cases. Choose
+   among valid implementations by goal fit, not local convenience.
+4. **ACT**—Iterate over every acceptance criterion:
+   - Write a failing test: expected behavior, failure modes, and edge
+     cases.
+   - Write minimal code to pass it.
+   - Drive green; repeat `test→implement` until the criterion passes.
+
+   Stop when all criteria have exhaustive passing test coverage. Never
+   write production code before its test exists. Edit only source,
+   tests, docs, or configuration files required by the task.
+
+5. **VERIFY**—Loop over every acceptance criterion and verification
+   command listed for the active task:
+   - For each unmet criterion or failing command: return to `ACT`,
+     execute, then re-enter `VERIFY`.
+   - Exit only when all criteria pass and all commands succeed.
+   - Halt only for out-of-scope blockers: infeasible acceptance
+     criterion, plan/spec defect, or broken external dependency.
+6. **PERSIST**—Mark the active task `done` in
    `.spae/current/STATE.json`, increment completion metrics, and advance
    the cursor to the next task. If no next task remains, set
    `phase: verify`.
-6. **Report**: Emit the standardized execution summary and framework
-   status block.
+7. **REPORT**—Emit result using the Result template.
 
 ## Directives
 
@@ -92,14 +110,14 @@ snapshots.
   invalidates to the new contract; never weaken, skip, or delete a test
   to force green.
 - Run task verification before changing `.spae/current/STATE.json`.
-- Drive verification green: iterate test→build; treat red as ordinary
-  build work. Halt with a blocker only when verification can't pass
-  within task scope: infeasible acceptance criterion, plan/spec defect,
-  or broken external dependency; never to escape fixing your own code,
-  never by gaming a test or editing the plan.
+- Drive verification green; treat red as ordinary build work. Halt with
+  a blocker only when verification can't pass within task scope:
+  infeasible acceptance criterion, plan/spec defect, or broken external
+  dependency; never to escape fixing your own code, never by gaming a
+  test or editing the plan.
 - Halt with a blocker when the task as written logically contradicts the
-  plan `## Goal`, the task `Intent`, or a downstream task — an
-  undeniable conflict, not a subjective doubt. Record it in
+  plan `## Goal`, the task `Intent`, or a downstream task—an undeniable
+  conflict, not a subjective doubt. Record it in
   `.spae/current/STATE.json`. Leave ambiguous interpretation to
   `/verify`; never ship a locally correct, globally wrong
   implementation.

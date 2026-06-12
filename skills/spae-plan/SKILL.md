@@ -12,7 +12,8 @@ user-invocable: true
 
 - `SPEC.md` exists and needs an execution plan.
 - `STATE.json` reports `phase: plan`.
-- A revision cycle re-enters planning after `/spec` reprocesses findings.
+- A revision cycle re-enters planning after `/spec` reprocesses
+  findings.
 
 ## Goal
 
@@ -30,6 +31,9 @@ Use only relevant context from:
 - `.spae/current/STATE.json`.
 - Repository source patterns, read only for codebase fit.
 
+**Never read `.spae/current/VERIFY.md`**—not an input to this phase.
+Reading qualifies as content-blocking.
+
 ## `STATE.json`
 
 See `references/STATE.md` for the field reference, directives, and phase
@@ -37,39 +41,36 @@ snapshots.
 
 ## Workflow
 
-1. **Validate state**: Confirm `.spae/current/SPEC.md` exists and
-   `.spae/current/STATE.json` can advance from `phase: plan`; stop early
-   with a clear result if blocked.
-2. **Reset prior cycle**: Always delete `.spae/current/PLAN.md` (ignore
-   if absent) and clear the `tasks` registry in
-   `.spae/current/STATE.json` to empty. Run unconditionally.
-3. **Analyze spec**: Extract goal, requirements, testing strategy,
-   out-of-scope items, and assumptions. Capture every requirement into
-   an in-memory coverage checklist, keyed by `R-NNN` ID.
-4. **Gather context**: Inspect only the source patterns needed to fit
-   existing architecture; never edit repository files.
-5. **Draft plan**: Read the template from `references/PLAN.md`.
-   Decompose work into atomic tasks numbered from `T-001`. Structure
-   `PLAN.md` following this template exactly. Set each task's `Satisfies`
-   to the requirement IDs
-   it implements, and its `Intent` to a one-line distillation of the
-   goal those requirements serve — or, for an enabling task, the
-   structural purpose it serves toward the plan `## Goal`.
-6. **Reconcile coverage**: Confirm every requirement maps to at least
-   one task via `Satisfies`; for any requirement without a task, return
-   to drafting and add one. Treat `Satisfies: none` as an intentional
-   exemption; note a task with empty or missing `Satisfies` as a
-   possible scope-creep observation.
-7. **Order graph**: Sort tasks by dependency, risk, and vertical value;
-   each task must leave the system working. Enforce before writing:
-   **(1) no cycles** — no task transitively depends on itself;
-   **(2) forward order** — every `Dependencies` ID numerically precedes
-   the declaring task. Detect and correct both before finalizing.
-8. **Finalize**: Write `.spae/current/PLAN.md`. Initialize all new task
-   IDs as `todo` in `.spae/current/STATE.json`. Update metrics and set
-   `phase: inspect`.
-9. **Report**: Emit the standard result with `SPAE` phase transition
-    feedback.
+1. **GATE**—Confirm `.spae/current/SPEC.md` exists and
+   `.spae/current/STATE.json` reports `phase: plan`. Halt immediately
+   with a clear result on failure. Make no changes.
+2. **ORIENT**—Extract goal, requirements, testing strategy, out-of-scope
+   items, and assumptions from `SPEC.md`. Capture every `R-NNN` item
+   into an in-memory coverage checklist. Gather only the source patterns
+   needed for codebase fit; never edit repository files.
+3. **PLAN**—Confirm the decomposition covers the spec without over-splitting.
+4. **ACT**—Delete `.spae/current/PLAN.md` (ignore if absent) and clear
+   the `tasks` registry in `.spae/current/STATE.json` to empty —
+   unconditionally. Read the template from `references/PLAN.md`.
+   Decompose work into atomic tasks numbered from `T-001`. Set each
+   task's `Satisfies` to the `R-NNN` IDs it implements and its `Intent`
+   to a one-line distillation of the goal those requirements serve—or,
+   for an enabling task, the structural purpose it serves toward the
+   plan `## Goal`. Sort tasks by dependency, risk, and vertical value;
+   each task must leave the system working.
+5. **VERIFY**—Loop over every plan validity criterion:
+   - For any `R-NNN` gap: return to `ACT`, add the missing task, then
+     re-enter `VERIFY`. Treat `Satisfies: none` as intentional; flag
+     empty or missing `Satisfies` as a scope-creep observation.
+   - For any graph violation—cycle or forward-order failure: return to
+     `ACT`, correct it, then re-enter `VERIFY`.
+   - Exit only when all `R-NNN` items map to tasks and the graph has no
+     violations.
+   - Halt only for out-of-scope blockers.
+6. **PERSIST**—Write `.spae/current/PLAN.md`. Initialize all task IDs as
+   `todo` in `.spae/current/STATE.json`. Update metrics. Set
+   `phase: inspect`. Write once, atomically.
+7. **REPORT**—Emit result using the Result template.
 
 ## Directives
 
@@ -102,7 +103,7 @@ snapshots.
 ## Verification
 
 - `.spae/current/PLAN.md` contains atomic, acyclic, dependency-ordered
-  tasks — no cycles; every `Dependencies` ID numerically precedes its
+  tasks—no cycles; every `Dependencies` ID numerically precedes its
   declaring task.
 - Every task includes dependencies, acceptance criteria, and
   verification steps.
@@ -110,12 +111,12 @@ snapshots.
   and edge cases tests must cover.
 - Every task's Verification section includes test execution commands.
 - Every task includes an `Intent` line distilled from the requirements
-  it satisfies, or — for an enabling task — its structural purpose
-  toward the plan `## Goal`.
+  it satisfies, or—for an enabling task—its structural purpose toward
+  the plan `## Goal`.
 - `.spae/current/PLAN.md` structures tasks and metadata matching
   `references/PLAN.md` exactly.
 - Every `T-NNN` reference in `PLAN.md` — `Task graph` edges, the
-  dependency overview list, and `Dependencies` fields — resolves to a
+  dependency overview list, and `Dependencies` fields—resolves to a
   defined task.
 - `.spae/current/STATE.json` task registry matches `PLAN.md` task IDs.
 - Every `SPEC.md` requirement maps to at least one task's `Satisfies`.

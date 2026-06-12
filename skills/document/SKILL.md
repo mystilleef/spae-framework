@@ -37,22 +37,27 @@ Abort if no scope exists.
 
 _Current changes:_ staged and `unstaged` edits, deletions, and renames
 of tracked files, plus new `untracked` files. Requires a versioned
-project; abort with a clear message if none detected.
+project. Abort with a clear message if none detected.
 
 ## Workflow
 
-1. **Resolve Scope**: Identify target files, exported interfaces,
-   modules, commands, and changed behavior.
-2. **Inspect Behavior**: Read code and tests before writing
-   documentation.
-3. **Identify Gaps**: Find missing, stale, redundant, or misleading
-   documentation.
-4. **Document Contracts**: Add or update concise docs for purpose,
-   parameters, returns, errors, side effects, invariants, and examples.
-5. **Remove Noise**: Delete stale, speculative, duplicate, or
-   implementation-repeating prose.
-6. **Verify Accuracy**: Compare every documentation claim against code,
-   tests, and project conventions.
+1. **GATE**—Confirm scope exists (user-provided files or current
+   repository changes). Abort immediately if none.
+2. **ORIENT**—State target scope and documentation goal in one sentence.
+   Runtime behavior stays unchanged.
+3. **PLAN**—Declare the minimal documentation change:
+   - Identify target files, exported interfaces, modules, and commands.
+   - Find missing, stale, redundant, or misleading documentation.
+4. **ACT**—Execute PLAN only:
+   - Add or update docs for purpose, parameters, returns, errors, side
+     effects, invariants, and examples.
+   - Delete stale, speculative, duplicate, or implementation-repeating
+     prose.
+5. **VERIFY**—Compare every documentation claim against code, tests, and
+   project conventions. Iterate on failures.
+6. **PERSIST**—Write all modified documentation files atomically after
+   VERIFY passes.
+7. **REPORT**—Emit result using the Result template.
 
 ## Directives
 

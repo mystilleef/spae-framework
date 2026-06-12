@@ -38,33 +38,39 @@ _Current changes:_ staged and `unstaged` edits, deletions, and renames
 of tracked files, plus new `untracked` files. Requires a versioned
 project. Abort with a clear message if none detected.
 
+## Testing
+
+See `references/testing-guide.md` for test structure, isolation,
+mocking, assertion, and performance standards.
+
 ## Workflow
 
-1. **Scope Target**: Identify the smallest production area worth
-   refactoring.
-2. **Inspect Context**: Read only relevant production code, adjacent
-   tests, and existing test or coverage commands.
-3. **Verify Tests**: Confirm a solid, automated, self-checking suite
-   exists before touching code.
-4. **Identify Smells**: Analyze for target `antipatterns` using the
-   violation catalog in `references/refactoring-guide.md`.
-   - **Post-Smell Short-Circuit**: Exit immediately if smell detection
-     finds zero instances of: duplicated logic, long methods, large
-     classes, `primitive` obsession, `SOLID` violations.
-   - Skips steps 5–9 (dependency analysis, execution, verification).
-     Steps 1–4 always run.
-   - Emit `Result: No Changes` via the template below and halt.
-5. **Analyze Dependencies**: Check package, module, or class boundaries
-   for cyclic imports or unresolved downstream consumers before
-   restructuring.
-6. **Select Mechanism**: Choose the appropriate move from the fix
-   playbook; resolve compound violations using the triage rules in
-   `references/refactoring-guide.md`.
-7. **Execute in Micro-Steps**: Apply one transformation at a time.
-8. **Test After Each Step**: Compile and run the full suite after every
-   change.
-9. **Backtrack on Failure**: Revert to last known-good state; retry with
-   smaller steps.
+1. **GATE**—Precondition guard. Halt immediately on failure.
+   - Abort if no scope exists.
+   - Read `references/testing-guide.md`.
+   - Read relevant production code, adjacent tests, and test commands.
+   - Confirm automated test suite passes before touching code.
+   - Detect `antipatterns` using the violation catalog in
+     `references/refactoring-guide.md`.
+   - **Short-circuit**: halt and emit `Result: No Changes` if none
+     detected: duplicated logic, long methods, large classes,
+     `primitive` obsession, `SOLID` violations.
+2. **ORIENT**—Name the smallest production area worth refactoring and
+   what won't change.
+3. **PLAN**—Declare the minimal change and rationale.
+   - Analyze package, module, or class boundaries for cyclic imports and
+     unresolved downstream consumers.
+   - Select the fix from the playbook; resolve compound violations using
+     the triage rules in `references/refactoring-guide.md`.
+4. **ACT**—Apply one transformation at a time. Execute only what PLAN
+   declared.
+5. **VERIFY**—Loop over every criterion declared in PLAN:
+   - Run the full suite after each `ACT` step.
+   - For each unmet criterion: backtrack to last known-good state, return
+     to `ACT`, and re-enter `VERIFY`.
+   - Exit only when all criteria pass.
+   - Halt only for out-of-scope blockers.
+6. **REPORT**—Emit result using the Result template.
 
 ## Directives
 

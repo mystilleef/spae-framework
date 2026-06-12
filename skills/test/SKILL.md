@@ -31,6 +31,11 @@ _Current changes:_ staged and `unstaged` edits, deletions, and renames
 of tracked files, plus new `untracked` files. Requires a versioned
 project. Abort with a clear message if none detected.
 
+## Testing
+
+See `references/testing-guide.md` for test structure, isolation,
+mocking, assertion, and performance standards.
+
 ## Behavioral surface
 
 Target only methods and functions with business logic, state
@@ -42,28 +47,25 @@ decision.
 
 ## Workflow
 
-1. **Scope**: Identify the target scope and their relevant context.
-2. **Inspect**: Read relevant production code, adjacent tests, and
-   test/coverage commands. Run the coverage tool if available to collect
-   metrics and identify uncovered lines and branches.
-3. **Enumerate gaps**: For each target on the behavioral surface, audit
-   all four categories and document every gap:
-   - **Happy path**—expected inputs yield expected outputs
-   - **Error / failure**—malformed inputs, exceptions, and error returns
-   - **Boundary / edge**—null, empty, zero, min, max, overflow,
-     off-by-one
-   - **State transitions**—valid and malformed state changes and side
-     effects
-   - **Post-Audit Short-Circuit**: Exit immediately if the audit finds
-     zero behavioral gaps (all categories already exhaustively covered).
-     Skips steps 4–5. Emit `Result: No Gaps` via the template below and
+1. **GATE**—Confirm scope: user-provided files or current repository
+   changes. Abort immediately if none.
+2. **ORIENT**—Goal: cover all behavioral gaps in scope. Production code
+   unchanged.
+3. **PLAN**—Read `references/testing-guide.md`. Inspect production code,
+   adjacent tests, and coverage commands. List every gap across all four categories per
+   behavioral-surface target.
+   - **Short-circuit**: zero gaps found → emit `Result: No Gaps` and
      halt.
-4. **Write tests**: Cover every gap from the enumeration. All four
-   categories must cover each target before declaring it complete.
-5. **Run checks**: Run targeted tests; run broader suite or coverage
-   tool when needed to confirm completeness and catch regressions.
-6. **Report**: Summarize scope, files, commands, coverage added, and any
-   remaining gaps with justification.
+4. **ACT**—Write tests for every enumerated gap. Cover all four
+   categories per target before declaring it complete.
+5. **VERIFY**—Loop over every criterion declared in PLAN:
+   - Run targeted tests; run broader suite or coverage tool.
+   - For each unmet criterion: return to `ACT`, execute, then re-enter
+     `VERIFY`.
+   - Exit only when all pass and no regressions remain.
+   - Halt only for out-of-scope blockers.
+6. **PERSIST**—Confirm all test files written; no partial writes.
+7. **REPORT**—Emit result using the Result template.
 
 ## Directives
 

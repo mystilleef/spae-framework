@@ -32,6 +32,9 @@ Read only what the inspection requires:
 - `.spae/current/STATE.json`
 - Relevant source files for context only.
 
+**Never read `.spae/current/VERIFY.md`**—not an input to this phase.
+Reading qualifies as content-blocking.
+
 ## `STATE.json`
 
 See `references/STATE.md` for the field reference, directives, and phase
@@ -39,50 +42,63 @@ snapshots.
 
 ## Workflow
 
-1. **Load Artifacts**: Read `.spae/current/STATE.json`,
-   `.spae/current/SPEC.md`, and `.spae/current/PLAN.md`. Continue only
-   when the state expects `phase: inspect`.
-2. **Inspect Fit**: Compare requirements, plan tasks, acceptance
-   criteria, verification steps, dependencies, and codebase patterns.
-   Re-check the `Satisfies` map; flag any `SPEC.md` requirement absent
-   from every task as `Must fix`. Flag any task missing an `Intent` as
-   `Must fix`, or a vague, non-actionable `Intent` as `Should fix`;
-   backfill or sharpen it from `SPEC.md` (or, for an enabling task, from
-   its `Context` and the plan `## Goal`) during refinement. Flag any
-   task whose Acceptance section omits test requirements — expected
-   behavior, failure modes, and edge cases — as `Should fix`. Flag any
-   Verification section lacking test execution commands as `Should fix`.
-   Flag any task whose `Dependencies` list references a `T-NNN` ID
-   numerically greater than or equal to the task's own ID as `Must fix`
-   (topological violation). Flag any cycle — a task transitively
-   depending on itself — as `Must fix`. Flag any `Dependencies` entry
-   referencing a `T-NNN` absent from `PLAN.md` as `Must fix` (dangling
-   reference). Flag any mismatch between `Task graph` mermaid edges and
-   per-task `Dependencies` fields as `Should fix`. Flag any task with
-   `Satisfies: none` lacking a credible enabling-task rationale in its
-   `Context` as `Should fix` (orphan task — likely scope creep).
-3. **Classify Findings**:
-   - `Must fix`: gaps that would break requirements, contracts, safety,
-     or verification.
-   - `Should fix`: refinements that reduce risk or simplify execution.
-   - `Observations`: useful notes that shouldn't expand scope.
-4. **Refine Plan**: Rewrite whatever a `Must fix` or `Should fix`
-   finding demands — re-split, reorder, add, or remove tasks. Make no
-   change absent a classified finding. Preserve atomic, independently
-   verifiable tasks and contiguous sequential `T-NNN` IDs.
-   - **Renumber atomically**: when adding, removing, or reordering
-     tasks, update every `T-NNN` reference in lockstep — task headers,
-     the `Task graph` mermaid edges, the dependency overview list, and
-     each `Dependencies` field. Leave no dangling or stale ID.
-   - **Topological correction**: when fixing a topological violation,
-     reorder tasks so every dependency precedes its dependent by ID,
-     then apply atomic renumbering.
-5. **Advance State**: Update `.spae/current/STATE.json`: set
-   `phase: build`, set the cursor to `T-001` with `task_status: todo`.
-   Rebuild the `tasks` registry to mirror the refined `PLAN.md` IDs
-   exactly, each mapped to `"todo"` (plan already reset prior progress).
-   Set `metrics.tasks_total` to the refined task count — it may rise or
-   fall — and `metrics.tasks_completed` to `0`.
+1. **GATE**—Read `.spae/current/STATE.json`, `.spae/current/SPEC.md`,
+   and `.spae/current/PLAN.md`. Halt when `phase ≠ inspect`.
+2. **ORIENT**—Goal: tighten the task graph for execution readiness.
+   Source stays read-only; `SPEC.md` unchanged.
+3. **PLAN**—Classify each gap before editing `PLAN.md`. Declare the
+   minimal refinements the findings demand.
+4. **ACT**—Apply classified findings only. Compare requirements, plan
+   tasks, acceptance criteria, verification steps, dependencies, and
+   codebase patterns.
+   - Flag any `SPEC.md` requirement absent from every task as
+     `Must fix`.
+   - Flag any task missing an `Intent` as `Must fix`; flag a vague or
+     non-actionable `Intent` as `Should fix`; backfill or sharpen it
+     from `SPEC.md` (or, for enabling tasks, from `Context` and the plan
+     `## Goal`) during refinement.
+   - Flag any Acceptance section omitting test requirements—expected
+     behavior, failure modes, and edge cases—as `Should fix`.
+   - Flag any Verification section lacking test execution commands as
+     `Should fix`.
+   - Flag any `Dependencies` entry with a `T-NNN` ID ≥ the declaring
+     task's own ID as `Must fix` (topological violation).
+   - Flag any cycle—a task transitively depending on itself—as
+     `Must fix`.
+   - Flag any `Dependencies` entry referencing a `T-NNN` absent from
+     `PLAN.md` as `Must fix` (dangling reference).
+   - Flag any mismatch between `Task graph` mermaid edges and per-task
+     `Dependencies` fields as `Should fix`.
+   - Flag any task with `Satisfies: none` lacking a credible
+     enabling-task rationale in its `Context` as `Should fix` (orphan
+     task—likely scope creep).
+   - **Classify findings**:
+     - `Must fix`: gaps breaking requirements, contracts, safety, or
+       verification.
+     - `Should fix`: refinements reducing risk or simplifying execution.
+     - `Observations`: useful notes that shouldn't expand scope.
+   - **Refine `PLAN.md`**: Rewrite what each `Must fix` or `Should fix`
+     demands—re-split, reorder, add, or remove tasks. Make no change
+     absent a classified finding. Preserve atomic, independently
+     verifiable tasks and contiguous sequential `T-NNN` IDs.
+     - **Renumber atomically**: when adding, removing, or reordering,
+       update every `T-NNN` reference in lockstep—task headers,
+       `Task graph` mermaid edges, the dependency overview list, and
+       each `Dependencies` field. Leave no dangling or stale ID.
+     - **Topological correction**: when fixing a topological violation,
+       reorder tasks so every dependency precedes its dependent by ID,
+       then renumber atomically.
+5. **VERIFY**—Loop over every item in `## Verification`:
+   - For each failing item: return to `ACT`, address it, then re-enter
+     `VERIFY`.
+   - Exit only when all items pass.
+   - Halt only for out-of-scope blockers.
+6. **PERSIST**—Write `.spae/current/STATE.json` once, atomically: set
+   `phase: build`; set cursor to `T-001` with `task_status: todo`;
+   rebuild the `tasks` registry to mirror the refined `PLAN.md` IDs,
+   each mapped to **todo**; set `metrics.tasks_total` to the refined
+   task count and `metrics.tasks_completed` to `0`.
+7. **REPORT**—Emit result using the Result template.
 
 ## Directives
 
@@ -118,7 +134,7 @@ snapshots.
 - `.spae/current/PLAN.md` satisfies `.spae/current/SPEC.md` and reflects
   required refinements.
 - Each task remains atomic, independently verifiable, and topologically
-  ordered — every `Dependencies` ID numerically precedes the declaring
+  ordered—every `Dependencies` ID numerically precedes the declaring
   task; no cycles survive.
 - Every task's Acceptance section names testable behaviors, failure
   modes, and edge cases; tasks lacking these flagged as `Should fix`.
@@ -158,7 +174,7 @@ snapshots.
 > **Phase Complete**: `/inspect`
 > **Next Phase**: `/build`, `/tdd`, or `/execute`
 > **Result**: [Ready | Revised | Failed]
-> **Impact**: [Terse execution-readiness statement]
+> **Impact**: [Terse impact statement]
 >
 > _Run `/build`, `/tdd`, or `/execute` next. Keep one execution mode for this workstream._
 ```

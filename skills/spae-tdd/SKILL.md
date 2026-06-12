@@ -46,39 +46,53 @@ Read:
 See `references/STATE.md` for the field reference, directives, and phase
 snapshots.
 
+## Testing
+
+See `references/testing-guide.md` for test structure, isolation,
+mocking, assertion, and performance standards.
+
 ## Workflow
 
-1. **Load Task**: Confirm `.spae/current/STATE.json` has `phase: build`,
-   the `/tdd` path remains selected, and an active task exists. Read the
-   plan `## Goal` and the active task section (including its `Intent`)
-   from `.spae/current/PLAN.md`. Read dependent and forward task titles
-   plus acceptance to map seams, not to build them. Verify every task ID
-   in the active task's `Dependencies` field carries `task_status: done`
-   in `STATE.json`; halt with a blocker if any dependency is incomplete.
-2. **Mark In Progress**: Set `cursor.task_status` and
-   `tasks[active_task_id]` to `"in_progress"` in
-   `.spae/current/STATE.json`.
-3. **Classify Task**: Label the task `behavioral`, `refactor`, or
-   `non-testable` before editing.
-4. **Red**: For behavioral tasks, write exhaustive failing tests:
-   expected behavior, failure modes, and edge cases. Run them and
-   confirm each fails for the expected reason.
-5. **Green**: Write the minimal implementation needed to pass the new
-   test and active-task verification.
-6. **Refactor**: Simplify code while keeping the new test and relevant
-   suite green. Avoid behavior expansion.
-7. **Handle Non-Behavioral Tasks**: For refactor tasks, prove a green
-   baseline first, refactor in micro-steps, and keep tests green. For
-   non-testable tasks, run the strongest available static or manual
-   verification from the task.
-8. **Test**: Run every verification command listed for the active task
-   plus relevant regression tests.
-9. **Finalize State**: Mark the active task `done` in
-    `.spae/current/STATE.json`, increment completion metrics, and
-    advance the cursor to the next task. If no next task remains, set
-    `phase: verify`.
-10. **Report**: Emit the standardized execution summary and framework
-    status block.
+1. **GATE**—Confirm `STATE.json` has `phase: build` and `/tdd` path
+   selected; confirm an active task exists; verify every task ID in the
+   active task's `Dependencies` field carries `task_status: done` in
+   `STATE.json`. Halt with a blocker on any failure; make no changes.
+2. **ORIENT**—Read the plan `## Goal` and the active task section
+   (including `Intent`, acceptance criteria, and verification steps)
+   from `PLAN.md`. Read dependent and forward task titles plus
+   acceptance to map seams, not to build them. Sub-step (mark in
+   progress): set `cursor.task_status` and `tasks[active_task_id]` to
+   `"in_progress"` in `STATE.json`.
+3. **PLAN**—Classify the task as `behavioral`, `refactor`, or
+   `non-testable`. Read `references/testing-guide.md`. Declare the full
+   implementation path that satisfies
+   every acceptance criterion, advances the task `Intent` and plan
+   `## Goal`, and leaves seams for forward tasks. Confirm the planned
+   change advances the task `Intent` and plan `## Goal`, not merely
+   literal acceptance criteria.
+4. **ACT**—Execute:
+   - **Behavioral**: iterate over every acceptance criterion:
+     - Write a failing test: expected behavior, failure modes, and edge
+       cases; confirm it fails for the expected reason.
+     - Write minimal code to pass it.
+     - Simplify while keeping the new test and relevant suite green.
+     - Repeat until every criterion has exhaustive passing test
+       coverage.
+   - **Refactor**: prove a green baseline first; refactor in
+     micro-steps; keep tests green throughout.
+   - **Non-testable**: run the strongest available static or manual
+     verification from the task.
+5. **VERIFY**—Loop over every verification command and regression test
+   for the active task:
+   - For each failure: return to `ACT`, fix, then re-enter `VERIFY`.
+   - Exit only when all commands and tests pass.
+   - Halt only for out-of-scope blockers: infeasible criterion,
+     plan/spec defect, or broken external dependency; never by gaming a
+     test or editing the plan.
+6. **PERSIST**—Mark the active task `done` in `STATE.json`; increment
+   completion metrics; advance the cursor to the next task. Set
+   `phase: verify` when no next task remains.
+7. **REPORT**—Emit result using the Result template.
 
 ## Directives
 
@@ -108,8 +122,8 @@ snapshots.
   or broken external dependency; never to escape fixing your own code,
   never by gaming a test or editing the plan.
 - Halt with a blocker when the task as written logically contradicts the
-  plan `## Goal`, the task `Intent`, or a downstream task — an
-  undeniable conflict, not a subjective doubt. Record it in
+  plan `## Goal`, the task `Intent`, or a downstream task; treat it as
+  an undeniable conflict, not a subjective doubt. Record it in
   `.spae/current/STATE.json`. Leave ambiguous interpretation to
   `/verify`; never ship a locally correct, globally wrong
   implementation.

@@ -1,8 +1,6 @@
 ---
 name: code-review
-description:
-  Review code for correctness, security, maintainability, and project
-  fit.
+description: Find bugs and potential issues in code changes.
 user-invocable: false
 argument-hint: "[optional: diff, commit, PR, file, or focus area]"
 ---
@@ -13,15 +11,12 @@ argument-hint: "[optional: diff, commit, PR, file, or focus area]"
 
 - Reviewing diffs, commits, PRs, or changed files before merge.
 - Auditing generated code or refactors for regressions.
-- Checking changes for correctness, security, maintainability, and
-  style.
 
 ## Goal
 
 - Conduct skeptical, evidence-based reviews to find material issues
   only, citing code for every finding.
-- Identify defects that could break behavior, weaken security, degrade
-  performance, or increase maintenance cost.
+- Identify defects that could break behavior or compromise security.
 - Return prioritized, actionable findings tied to exact code excerpts.
 - Avoid praise, generic summaries, and preference-only comments.
 
@@ -36,31 +31,35 @@ Abort if no scope exists.
 
 _Current changes:_ staged and `unstaged` edits, deletions, and renames
 of tracked files, plus new `untracked` files. Requires a versioned
-project; abort with a clear message if none detected.
+project. Abort with a clear message if none detected.
 
 ## Workflow
 
-1. **Scope**: Identify changed files, diff boundaries, and review
-   intent.
-2. **Context**: Read relevant `AGENTS.md`, descriptions, nearby code,
-   and tests.
-3. **Pre-flight**: Detect configured linters, type checkers, and static
-   analysis. Run safe checks when practical. Treat tool errors as
-   confirmed findings.
-4. **Review passes**:
-   - **Intent**: Compare implementation against stated goal.
-   - **Correctness**: Check logic, state, edge cases, errors, and tests.
-   - **Security**: Check auth, input validation, injection, secrets,
-     `deserialization`, and data exposure.
-   - **Performance**: Check complexity, `N+1` patterns, leaks, and
-     wasteful I/O.
-   - **Design**: Check coupling, duplication, one-use abstraction, and
-     `API` fit.
-   - **Style**: Check surrounding-code consistency on diff lines only.
-5. **Verify**: Prove each finding against code and project mandates;
-   drop speculative or low-value comments.
-6. **Report**: Sort by severity and impact; group when findings exceed
-   seven.
+1. **GATE**—Identify changed files and diff boundaries; abort if no
+   scope exists.
+2. **ORIENT**—Read `references/report-schema.json` as the output contract. Anchor to review goal; name what the review won't change.
+3. **ACT**—Execute:
+   - Read relevant `AGENTS.md`, descriptions, nearby code, and tests.
+   - Detect configured linters, type checkers, and static analysis; run
+     safe checks when practical; treat tool errors as confirmed
+     findings.
+   - Review passes:
+     - **Intent**: Compare implementation against stated goal.
+     - **Correctness**: Check logic, state, edge cases, errors, and
+       tests.
+     - **Security**: Check auth, input validation, injection, secrets,
+       `deserialization`, and data exposure.
+     - **Performance**: Check for leaks, races, deadlocks, and unbounded
+       growth.
+4. **VERIFY**—Prove each finding against code and project mandates; drop
+   speculative or low-value comments.
+5. **PERSIST**—Skip if no findings. Otherwise write
+   `code-review-report.yaml` to the project root, conforming to
+   `references/report-schema.json`. Write once, after VERIFY passes.
+   Use `|` block scalars for multi-line code in `suggestion` and
+   `excerpt` fields.
+6. **REPORT**—Sort findings by severity; group when count exceeds seven.
+   Emit result using the Result template.
 
 ## Directives
 
@@ -71,25 +70,24 @@ project; abort with a clear message if none detected.
 - Mark uncertainty explicitly: _"Context may change this finding, but…"_
 - Suggest targeted fixes; don't rewrite the patch.
 - Omit empty categories and "none found" sections.
-- Ignore personal preference unless a project style guide, linter, or
-  surrounding pattern supports it.
 - Verify findings against `AGENTS.md` before reporting.
 
 ## Constraints
 
 - No finding without direct code evidence.
-- No style comments outside the diff.
 - No praise, broad commentary, or unrelated cleanup requests.
 - No large raw tool output in the review; summarize diagnostics.
-- Don't change project files during review.
+- Don't change project source files during review.
 
 ## Verification
 
 - Static analysis output checked when available and practical.
 - Findings map to diff or file excerpts and line references.
-- Severity reflects user impact, `exploitability`, or maintenance risk.
+- Severity reflects user impact or `exploitability`.
 - Suggestions describe concrete changes.
 - Report matches workspace mandates.
+- If findings exist: `code-review-report.yaml` written to project root
+  and conforms to `references/report-schema.json`.
 
 ## Result
 
@@ -116,7 +114,7 @@ project; abort with a clear message if none detected.
 - **Summary**:
   - [Blocker/High first; terse overall outcome]
 
-> **Code Review Status** • `[Scope]`
+> **Code Review Status** • `[scope]`
 > **Result**: [Issues Found | LGTM | Failed]
 > **Impact**: [Terse impact statement]
 ```

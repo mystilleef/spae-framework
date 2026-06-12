@@ -13,7 +13,7 @@ argument-hint: "[optional-workstream-name] [optional-task]"
 
 - Initialize a new `SPAE workstream`.
 - Resume interrupted spec work (`phase: spec`, `status: active`).
-- Revise requirements after a failed `/verify`
+- Rewrite requirements from scratch after a failed `/verify`
   (`status: revision_required`).
 
 ## Goal
@@ -29,8 +29,7 @@ argument-hint: "[optional-workstream-name] [optional-task]"
 Determine scope by the first available source:
 
 - proposal or task from user
-- Existing `STATE.json`, `SPEC.md`, and `VERIFY.md` in `.spae/current`
-  when present.
+- Existing `STATE.json` and `VERIFY.md` in `.spae/current` when present.
 
 ## `STATE.json`
 
@@ -39,51 +38,59 @@ snapshots.
 
 ## Workflow
 
-Follow the appropriate sub-workflow depending on the existence of
-`.spae/current` symlink:
+Select sub-workflow by `.spae/current` symlink state:
 
-- **New Workstream** (symlink absent): follow the
-  [New spec workflow](#new-spec-workflow).
-- **Existing Workstream** (symlink present): follow the
-  [Revision spec workflow](#revision-spec-workflow).
+- **New** (absent): [New spec workflow](#new-spec-workflow)
+- **Revision** (present):
+  [Revision spec workflow](#revision-spec-workflow)
 
 ### New spec workflow
 
-1. **Initialize Directory**:
-   - Create `.spae/[workstream]/`.
-   - Point `.spae/current` to `.spae/[workstream]/`.
-   - Create `STATE.json` with `phase: spec` and `status: active`.
-2. **Gather Context**:
-   - Read codebase sections enough to ground requirements in existing
-     patterns; read narrowly, widen on uncertainty.
-3. **Formulate Spec**:
+1. **GATE**—`.spae/current` absent. Halt if symlink exists (revision
+   path).
+2. **ORIENT**—Produce `SPEC.md` and `STATE.json` for `[workstream]`.
+   Codebase unmodified.
+3. **PLAN**—Derive `[workstream]` slug from `args` or auto-generate.
+   Identify codebase sections to read.
+4. **ACT**—Execute:
+   - Initialize `.spae/[workstream]/`; point `.spae/current` symlink;
+     create `STATE.json` (`phase: spec`, `status: active`).
+   - Read codebase sections narrowly; widen only on uncertainty.
    - Derive goal, requirements, testing strategy, out-of-scope
      boundaries, and assumptions.
-4. **Finalize**:
-   - Write `SPEC.md`, using `references/SPEC.md` as a template.
-   - Update `STATE.json` (`phase: plan`, `status: active`).
-   - Output the execution summary.
+5. **VERIFY**—Loop over spec completeness criteria:
+   - For each failure: return to `ACT`, fix, then re-enter `VERIFY`.
+   - Exit only when spec complete and structure matches
+     `references/SPEC.md`.
+   - Halt only for out-of-scope blockers.
+6. **PERSIST**—Write `SPEC.md`. Update `STATE.json` (`phase: plan`,
+   `status: active`).
+7. **REPORT**—Emit result using the Result template.
 
 ### Revision spec workflow
 
-1. **Validate State**:
-   - Confirm `VERIFY.md` exists and `STATE.json` status equals
-     `revision_required`.
-   - Abort immediately if either condition fails.
-2. **Gather Context**:
-   - Read the existing `SPEC.md` in full.
-   - Read `VERIFY.md` in full.
-   - Inspect source files to resolve findings.
-3. **Formulate Spec**:
-   - Rewrite `SPEC.md` to address all findings and gaps from
-     `VERIFY.md`.
-   - Preserve existing `R-NNN` IDs; append new IDs only; never renumber
-     or reuse a retired ID.
-4. **Finalize**:
-   - Overwrite `SPEC.md` with the revised version, using
-     `references/SPEC.md` as a template.
-   - Update `STATE.json` (`phase: plan`, `status: active`).
-   - Output the execution summary.
+1. **GATE**—`.spae/current` present. `VERIFY.md` exists. `STATE.json`
+   `status: revision_required`. Halt immediately on any failure.
+2. **ORIENT**—Rewrite `SPEC.md` from scratch to address all `VERIFY.md`
+   findings. Source code unmodified.
+3. **PLAN**—Survey `VERIFY.md` findings; identify source files to
+   inspect and requirements to derive.
+4. **ACT**—Execute:
+   - Read `VERIFY.md` in full; treat all findings as primary
+     requirements input.
+   - Delete `SPEC.md`.
+   - Inspect source files to ground new requirements.
+   - Write new `SPEC.md` from scratch; assign fresh `R-NNN` identifiers;
+     address all `VERIFY.md` findings.
+5. **VERIFY**—Loop over all `VERIFY.md` findings:
+   - For each unaddressed finding: return to `ACT`, address it, then
+     re-enter `VERIFY`.
+   - Exit only when all findings addressed and spec well-formed against
+     `references/SPEC.md`.
+   - Halt only for out-of-scope blockers.
+6. **PERSIST**—Write `SPEC.md`. Update `STATE.json` (`phase: plan`,
+   `status: active`).
+7. **REPORT**—Emit result using the Result template.
 
 ## Directives
 
@@ -92,7 +99,7 @@ Follow the appropriate sub-workflow depending on the existence of
 - Write observable, testable, and implementation-neutral requirements.
 - Write a testing strategy covering expected behavior, failure modes,
   and edge cases; name all applicable test categories.
-- Assign each requirement a unique, stable `R-NNN` identifier.
+- Tag each item with a unique, stable `R-NNN` identifier.
 - Document assumptions explicitly instead of guessing scope.
 - Match level of detail to task size; avoid process bloat.
 - Never stage or commit the `.spae/` directory.
@@ -112,12 +119,11 @@ Follow the appropriate sub-workflow depending on the existence of
   insufficient; record under **Assumptions** in `SPEC.md`.
 - Never introduce fields to `STATE.json` outside the schema reference.
 
-
 ## Verification
 
 - Ensure `.spae/[workstream]/SPEC.md` contains distilled requirements
   and structure matching `references/SPEC.md` exactly.
-- Confirm each requirement carries a unique `R-NNN` identifier.
+- Confirm each item carries a unique `R-NNN` identifier.
 - Confirm the testing strategy covers expected behavior, failure modes,
   and edge cases; no generic or single-target statements.
 - Ensure `.spae/[workstream]/STATE.json` specifies `phase: "plan"` and
@@ -152,7 +158,7 @@ Follow the appropriate sub-workflow depending on the existence of
 - **Summary**:
   - [Terse summary of spec changes]
 
-> **SPAE Status** • `[workstream-name]`
+> **`SPAE` Status** • `[workstream-name]`
 > **Result**: [Spec Complete | Revision Complete | Failed]
 > **Phase Complete**: `/spec`
 > **Next Phase**: `/plan`

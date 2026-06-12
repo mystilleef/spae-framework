@@ -41,29 +41,47 @@ Read:
 See `references/STATE.md` for the field reference, directives, and phase
 snapshots.
 
+## Testing
+
+See `references/testing-guide.md` for test structure, isolation,
+mocking, assertion, and performance standards.
+
 ## Workflow
 
-1. **Load**: Read `.spae/current/STATE.json`, the plan `## Goal`, and
-   the tasks (including each `Intent`) in `.spae/current/PLAN.md`.
-   Confirm `phase: build`.
-2. **Select**: Reset any `in_progress` task to `todo` in `STATE.json`
-   (prior run interrupted before completion). Identify all `todo` tasks
-   in plan order; skip tasks marked `done`.
-3. **Execute**: For each remaining task in plan order: verify every task
-   ID in its `Dependencies` field carries `task_status: done` in
-   `STATE.json` — halt with a blocker if any dependency is incomplete.
-   Then set `cursor.task_status` and `tasks[task_id]` to `"in_progress"`
-   in `.spae/current/STATE.json`, map the test surface (expected
-   behavior, failure modes, edge cases), write exhaustive failing tests,
-   and write the minimal code that satisfies them. Never write production
-   code before its tests exist. Keep later tasks' seams open; never
-   merge, reorder, or skip ahead.
-4. **Advance**: After each successful task, mark it `done`, update the
-   cursor, task registry, blockers, and metrics in
-   `.spae/current/STATE.json`.
-5. **Finalize**: After the final task passes verification, set
-   `phase: verify` in `.spae/current/STATE.json` and emit the required
-   result.
+Repeat `ACT → VERIFY → PERSIST` for each task in plan order.
+
+1. **GATE**—Read `STATE.json`; confirm `phase: build`; reset any
+   `in_progress` task to `todo` (prior interrupted run); identify all
+   **todo** tasks in plan order. Halt on phase mismatch.
+2. **ORIENT**—Read the plan `## Goal` and all remaining tasks (including
+   each `Intent`, acceptance criteria, and verification steps) from
+   `PLAN.md`.
+3. **PLAN**—Confirm the plan advances the `## Goal`, not merely literal acceptance criteria.
+4. **ACT** (per task)—Verify all task `Dependencies` carry `done` in
+   `STATE.json`; halt with a blocker on any incomplete dependency. Set
+   `cursor.task_status` and `tasks[task_id]` to `"in_progress"` in
+   `STATE.json`. Read `references/testing-guide.md`. Iterate over every
+   acceptance criterion:
+   - Write a failing test: expected behavior, failure modes, and edge
+     cases.
+   - Write minimal code to pass it.
+   - Drive green; repeat `test→implement` until the criterion passes.
+
+   Stop when all criteria have exhaustive passing test coverage. Keep
+   later tasks' seams open. Never merge, reorder, or skip ahead.
+
+5. **VERIFY** (per task)—Loop over every verification step for the
+   active task:
+   - For each failure: return to `ACT`, fix, then re-enter `VERIFY`.
+   - Exit only when all steps pass.
+   - Halt only for out-of-scope blockers: infeasible criterion,
+     plan/spec defect, or broken external dependency; never by gaming a
+     test or editing the plan. Record the blocker in `STATE.json`, leave
+     remaining tasks `todo`, and halt.
+6. **PERSIST** (per task)—Mark the task `done`; update cursor, task
+   registry, blockers, and metrics in `STATE.json`.
+7. **REPORT**—Set `phase: verify` in `STATE.json`; emit result using the
+   Result template.
 
 ## Directives
 
@@ -157,7 +175,7 @@ snapshots.
 > **Progress**: All [X] tasks completed
 > **Completed**: [`T-001` through `T-XXX`]
 > **Next Phase**: `/verify`
-> **Impact**: [Terse implementation impact]
+> **Impact**: [Terse impact statement]
 >
 > _Run `/verify` to validate the implementation against the specification._
 ```

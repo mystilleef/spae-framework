@@ -39,48 +39,48 @@ snapshots.
 
 ## Workflow
 
-1. **Initialize**: Check `.spae/current/STATE.json`, confirm
-   `phase: verify`, and cross-check that every `.spae/current/PLAN.md`
-   task reports `done`. On failure: halt, report which check failed and
-   why, make no state changes.
-2. **Check**: Run all relevant project checks. If no automated checks
-   exist, manually verify observable behavior against each
-   `.spae/current/SPEC.md` spec item. Record all results; any check
-   failure mapping to a `.spae/current/SPEC.md` spec item classifies as
-   a hard block in Step 3.
-3. **Inspect**: Compare implementation against each
-   `.spae/current/SPEC.md` item using check results as evidence.
-   Reference each finding by the `SPEC.md` **requirement** ID it maps
-   to.
+1. **GATE**—Read `.spae/current/STATE.json`; confirm `phase: verify`;
+   confirm every `.spae/current/PLAN.md` task reports `done`. Halt
+   immediately on failure; report which check failed; make no changes.
+2. **ORIENT**—Goal: compare implemented repository state against each
+   `.spae/current/SPEC.md` spec item; determine pass, no-pass, or
+   blocked verdict.
+3. **PLAN**—List `SPEC.md` spec item IDs and source files modified by
+   this `workstream` (scoped from `PLAN.md` tasks).
+4. **ACT**—Execute:
+   - Run all relevant project checks. When no automated checks exist,
+     manually verify observable behavior against each `SPEC.md` item.
+     Record all results; any check failure mapping to a `SPEC.md` item
+     classifies as a hard block.
+   - Compare implementation against each `SPEC.md` item using check
+     results as evidence. Reference each finding by spec item ID.
    - When `.spae/current/VERIFY.md` exists: treat each prior finding as
-     an explicit re-check item; confirm each addressed before moving on.
+     an explicit re-check item; confirm each addressed before
+     proceeding.
    - Classify each finding:
      - **Hard block**: regression, contract break, missing or incorrect
-       required behavior, check failure mapping to a
-       `.spae/current/SPEC.md` spec item—always drives verdict to
-       no-pass.
-     - **Soft finding**: missing or thin tests — absent coverage of
-       required behavior, failure modes, or edge cases; unsafe
-       optimization—document in `.spae/current/VERIFY.md`; drives
-       verdict to no-pass.
+       required behavior, check failure mapping to a `SPEC.md` item;
+       drives verdict to no-pass.
+     - **Soft finding**: absent or thin test coverage of required
+       behavior, failure modes, or edge cases; unsafe optimization;
+       drives verdict to no-pass.
      - **Observation**: ambiguous or untestable spec item, minor
-       deviation outside SPEC scope—note only; no verdict impact.
-4. **Finalize**:
-   - **Pass**: set `.spae/current/STATE.json` to `status: completed`,
-     `phase: done`; remove `.spae/current/VERIFY.md` when present;
-     remove `.spae/current` symlink. Surface observations, if any, in
-     the result output under Findings as informational notes.
+       deviation outside SPEC scope; note only; no verdict impact.
+5. **VERIFY**—Sanity-check the verdict without ceding the arbiter role.
+6. **PERSIST**—Apply verdict:
+   - **Pass**: set `STATE.json` to `status: completed`, `phase: done`;
+     remove `.spae/current/VERIFY.md` when present; remove
+     `.spae/current` symlink.
    - **No pass**: create or overwrite `.spae/current/VERIFY.md` with
      hard blocks and soft findings from the current run only, followed
-     by observations as informational notes; set
-     `.spae/current/STATE.json` to `status: revision_required`,
-     `phase: spec`, `cursor: {}`.
-   - **Blocked**: when checks can't run due to broken build, missing
-     tooling, or environment failure—write blocker details only to
-     `.spae/current/VERIFY.md` (omit observations); set
-     `.spae/current/STATE.json` to `status: revision_required`,
-     `phase: spec`, `cursor: {}`; emit the Blocked result block.
-   - **Result**: emit the required result block.
+     by observations as informational notes; set `STATE.json` to
+     `status: revision_required`, `phase: spec`, `cursor: {}`.
+   - **Blocked**: write blocker details only to
+     `.spae/current/VERIFY.md` (omit observations); set `STATE.json` to
+     `status: revision_required`, `phase: spec`, `cursor: {}`.
+7. **REPORT**—Emit result using the Result template. On pass, surface
+   observations under Findings. On blocked, emit the Blocked result
+   block.
 
 ## Directives
 
@@ -93,8 +93,8 @@ snapshots.
 - Prefer existing project verification commands and patterns.
 - Keep `.spae/current/VERIFY.md` findings concrete, reproducible, and
   tied to `.spae/current/SPEC.md` spec items.
-- Include enough detail for `/spec` to revise spec items without
-  repeating the full investigation.
+- Include enough detail for `/spec` to rewrite `SPEC.md` from scratch
+  without repeating the full investigation.
 
 ## Constraints
 
@@ -138,9 +138,9 @@ snapshots.
 - **Summary**:
   - [Terse list of result summaries]
 
-> **SPAE Status** • `workstream-name`
+> **`SPAE` Status** • `[workstream-name]`
 > **Phase Complete**: `/verify` ([Pass | Fail | Blocked])
-> **Reason**: [one-line blocker description]  _(if blocked)_
+> **Reason**: [Terse blocker description]  _(if blocked)_
 > **Next Phase**: `/spec`  _(if fail or blocked)_
 ```
 <!-- prettier-ignore-end -->

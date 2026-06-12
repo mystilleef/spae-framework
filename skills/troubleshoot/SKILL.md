@@ -31,20 +31,34 @@ Determine input by one of the following:
 - Current repository state and failing verification when the user gives
   only a broad troubleshooting request.
 
+## Testing
+
+See `references/testing-guide.md` for test structure, isolation,
+mocking, assertion, and performance standards.
+
 ## Workflow
 
-1. **Clarify**: If no actionable symptom exists, ask for one. Don't
-   proceed without it.
-1. **Observe**: Reproduce the problem and inspect the real error,
-   failing output, or incorrect behavior.
-1. **Hypothesize**: State one likely root cause.
-1. **Diagnose**: Run one targeted check that confirms or rejects the
-   hypothesis. If rejected, return to step 2.
-1. **Prove**: Write a failing test reproducing the root cause, when
-   practical.
-1. **Fix**: Apply only after evidence confirms the hypothesis and the
-   failing test exists.
-1. **Verify**: Run the strongest relevant verification before finishing.
+1. **GATE**—Require an actionable symptom: error, failure, trace, or
+   incorrect output. Halt and ask if none exists.
+2. **ORIENT**—Name the failure and scope in one sentence. State what
+   won't change.
+3. **PLAN**—State one likely root cause and one targeted check to
+   confirm or reject it.
+4. **ACT**—Execute:
+   - Reproduce the failure.
+   - Run the targeted check; on rejection, return to **PLAN**.
+   - After 3 rejections, trace data flow from entry point.
+   - Read `references/testing-guide.md`. Write a failing test
+     reproducing the root cause, when practical.
+   - Apply the smallest safe fix after evidence confirms.
+5. **VERIFY**—Loop over every criterion declared in PLAN:
+   - For each unmet criterion: revert the fix, return to **ACT**,
+     execute, then re-enter **VERIFY**.
+   - Exit only when all criteria pass.
+   - Halt only for out-of-scope blockers.
+6. **PERSIST**—Write all fix artifacts once, atomically, after
+   **VERIFY** passes. Never precedes **VERIFY**. Never partial.
+7. **REPORT**—Emit result using the Result template.
 
 ## Directives
 

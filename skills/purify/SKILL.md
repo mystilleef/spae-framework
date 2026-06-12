@@ -39,31 +39,53 @@ _Current changes:_ staged and `unstaged` edits, deletions, and renames
 of tracked files, plus new `untracked` files. Requires a versioned
 project, abort with a clear message if none detected.
 
+## Testing
+
+See `references/testing-guide.md` for test structure, isolation,
+mocking, assertion, and performance standards.
+
 ## Workflow
 
-1. **Survey Scope**: Inspect target code, tests, build commands, and
-   recent changes. Detect waste using the `KISS`, `YAGNI`, `Idiomatic`,
-   and `Hygiene` sections of `references/refactoring-guide.md`.
-   - **Post-Survey Short-Circuit**: Exit immediately if the survey finds
-     none of: dead code, redundant abstractions, unused helpers,
-     over-engineered constructs, non-idiomatic patterns, or hygiene debt
-     (cryptic names, debug artifacts, "what" comments).
-   - Skips steps 2–7 (baseline, test runs, multi-pass analysis). Survey
-     always runs.
-   - Emit `Result: No Changes` via the template below and halt.
-2. **Establish Baseline**: Run relevant tests or identify why
-   verification can't run.
-3. **Remove Waste**: Delete dead code, unused branches, redundant state,
-   obsolete helpers, and needless comments.
-4. **Collapse Complexity**: Inline thin wrappers, merge duplicate paths,
-   simplify conditions, reduce parameters, and replace overbuilt
-   abstractions.
-5. **Optimize Safely**: Improve hot or wasteful paths only when output
-   and intended behavior stay unchanged.
-6. **Patch Coverage**: Add or update tests only when needed to lock
-   behavior around modified code.
-7. **Verify**: Run targeted and broad test suites appropriate to the
-   change.
+1. **GATE**—Survey scope and establish baseline. Inspect target code,
+   tests, build commands, and recent changes. Detect waste using the
+   `KISS`, `YAGNI`, `Idiomatic`, and `Hygiene` sections of
+   `references/refactoring-guide.md`. Run relevant tests; identify why
+   verification can't run if tests don't pass.
+   - If scope resolves to current changes, the project contains
+     TypeScript or JavaScript sources, and `fallow` resolves
+     (`fallow --version`): run
+     `git diff HEAD | fallow audit -f json -q --diff-stdin` and treat
+     confirmed findings as additional dead-code signal. Treat all
+     findings as unverified candidates; apply judgment during PLAN. Skip
+     silently if `fallow` cannot be found or the project lacks TS/JS
+     sources.
+   - Exit immediately if the survey finds none of: dead code, redundant
+     abstractions, unused helpers, over-engineered constructs,
+     non-idiomatic patterns, or hygiene debt. Emit `Result: No Changes`
+     via the template below and halt.
+2. **ORIENT**—State goal and scope in one sentence. Name what won't
+   change: behavior, public interfaces, and feature scope.
+3. **PLAN**—Read `references/testing-guide.md`. Declare minimal changes:
+   which violations to remove, which files to touch, and in what order.
+   Check ambiguous or risky slices before acting.
+4. **ACT**—Execute only what PLAN declared. Nothing more.
+   - Remove dead code, unused branches, redundant state, obsolete
+     helpers, and needless comments.
+   - Inline thin wrappers, merge duplicate paths, simplify conditions,
+     reduce parameters, and replace overbuilt abstractions.
+   - Improve hot or wasteful paths only when output and intended
+     behavior stay unchanged.
+   - Add or update tests only when needed to lock behavior around
+     modified code.
+5. **VERIFY**—Loop over every criterion in `Verification`:
+   - For each unmet criterion: return to `ACT`, execute, then re-enter
+     `VERIFY`.
+   - Exit only when all criteria pass.
+   - Halt only for out-of-scope blockers.
+6. **PERSIST**—Confirm all edits written. Run final compilation or
+   type-check where applicable.
+7. **REPORT**—Emit result using the Result template. Confirm what
+   changed matches ORIENT.
 
 ## Directives
 

@@ -37,25 +37,25 @@ Determine input from the current repository state:
 
 ## Workflow
 
-1. **Inspect Status**: Run `git status --porcelain=v2 --branch`.
-2. **Plan Groups**: Group files into logical commits. Keep `.gitignore`
-   changes in their own commit.
-3. **Use Shortcut**: If exactly one tracked `unstaged` file exists,
-   scan, stage, message, commit, and verify that file immediately.
-4. **Pre-stage Secret Scan**: Scan only candidate paths and content for
-   the active group.
-5. **Analyze Group**: Run
-   `git --no-pager diff --no-ext-diff --stat --minimal --patience --histogram --find-renames --summary --no-color -U10 <file_group>`.
-6. **Stage Group**: Run `git add <file1> <file2> ...` only after the
-   pre-stage scan passes.
-7. **Pre-commit Secret Scan**: Scan the staged diff for the active
-   group.
-8. **Message Group**: Generate a conventional commit message.
-9. **Commit Group**: Run `git commit -m "<message>"`.
-10. **Verify Group**: Confirm commit success. Halt on error.
-11. **Repeat**: Continue until no eligible changes remain.
-12. **Report Final Status**: Summarize created commits and working tree
-    state.
+1. **GATE**—Run `git status --porcelain=v2 --branch`. Halt on no
+   changes or git error.
+2. **ORIENT**—Goal: commit all eligible changes as atomic commits.
+   Scope: current project. No changes outside git state.
+3. **PLAN**—Group files into logical commits. Isolate `.gitignore`
+   changes. Apply fast path for a single unstaged file.
+4. **ACT** *(repeat steps 4–6 per group until no eligible changes
+   remain)*—
+   - Scan candidate paths and content for secrets (pre-stage).
+   - Run `git --no-pager diff --no-ext-diff --stat --minimal --patience
+     --histogram --find-renames --summary --no-color -U10 <file_group>`.
+   - Run `git add <file1> <file2> ...`.
+   - Scan staged diff for secrets (pre-commit).
+   - Generate conventional commit message.
+5. **VERIFY**—Confirm staged diff matches intent and all secret checks
+   pass. On failure: unstage, halt, report.
+6. **PERSIST**—Run `git commit -m "<message>"`. Confirm commit
+   success.
+7. **REPORT**—Emit result using the Result template.
 
 ## Directives
 
@@ -123,9 +123,9 @@ secret types or placeholder examples.
 - **Commits**:
   - [Commit hash and subject per created commit]
 
-> **Commit Status** • `[Scope]`
+> **Commit Status** • `[scope]`
 > **Result**: [Committed | Clean Tree | Failed]
-> **Impact**: [Terse working-tree and commit outcome]
+> **Impact**: [Terse impact statement]
 >
 > _[Working tree summary]_
 ```
