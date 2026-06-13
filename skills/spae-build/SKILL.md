@@ -66,8 +66,8 @@ mocking, assertion, and performance standards.
    acceptance criterion, advances the task `Intent` and plan `## Goal`,
    and leaves seams for forward tasks. Read
    `references/testing-guide.md`. Map the test surface per criterion:
-   expected behaviors, failure modes, and edge cases. Choose
-   among valid implementations by goal fit, not local convenience.
+   expected behaviors, failure modes, and edge cases. Choose among valid
+   implementations by goal fit, not local convenience.
 4. **ACT**—Iterate over every acceptance criterion:
    - Write a failing test: expected behavior, failure modes, and edge
      cases.
@@ -80,6 +80,8 @@ mocking, assertion, and performance standards.
 
 5. **VERIFY**—Loop over every acceptance criterion and verification
    command listed for the active task:
+   - Audit every new test file against CI Parity rules in
+     `references/testing-guide.md`; fix any violation before proceeding.
    - For each unmet criterion or failing command: return to `ACT`,
      execute, then re-enter `VERIFY`.
    - Exit only when all criteria pass and all commands succeed.
@@ -158,6 +160,7 @@ mocking, assertion, and performance standards.
 - Relevant project tests pass with no new failures.
 - Task tests cover expected behavior, failure modes, and edge cases
   exhaustively; no thin-coverage shortcuts.
+- All new tests pass CI Parity audit in `references/testing-guide.md`.
 - Implementation advances the task `Intent` and plan `## Goal`; no
   forward-task work performed.
 - `.spae/current/STATE.json` task registry, metrics, cursor, and phase

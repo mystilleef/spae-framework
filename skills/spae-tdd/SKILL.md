@@ -65,11 +65,9 @@ mocking, assertion, and performance standards.
    `"in_progress"` in `STATE.json`.
 3. **PLAN**—Classify the task as `behavioral`, `refactor`, or
    `non-testable`. Read `references/testing-guide.md`. Declare the full
-   implementation path that satisfies
-   every acceptance criterion, advances the task `Intent` and plan
-   `## Goal`, and leaves seams for forward tasks. Confirm the planned
-   change advances the task `Intent` and plan `## Goal`, not merely
-   literal acceptance criteria.
+   implementation path that satisfies every acceptance criterion,
+   advances the task `Intent` and plan `## Goal`, and leaves seams for
+   forward tasks.
 4. **ACT**—Execute:
    - **Behavioral**: iterate over every acceptance criterion:
      - Write a failing test: expected behavior, failure modes, and edge
@@ -84,6 +82,8 @@ mocking, assertion, and performance standards.
      verification from the task.
 5. **VERIFY**—Loop over every verification command and regression test
    for the active task:
+   - Audit every new test file against CI Parity rules in
+     `references/testing-guide.md`; fix any violation before proceeding.
    - For each failure: return to `ACT`, fix, then re-enter `VERIFY`.
    - Exit only when all commands and tests pass.
    - Halt only for out-of-scope blockers: infeasible criterion,
@@ -169,6 +169,7 @@ mocking, assertion, and performance standards.
 - Relevant project tests pass with no new failures.
 - Task tests cover expected behavior, failure modes, and edge cases
   exhaustively; no thin-coverage shortcuts.
+- All new tests pass CI Parity audit in `references/testing-guide.md`.
 - Implementation advances the task `Intent` and plan `## Goal`; no
   forward-task work performed.
 - `.spae/current/STATE.json` task registry, metrics, cursor, and phase

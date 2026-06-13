@@ -52,14 +52,16 @@ decision.
 2. **ORIENT**—Goal: cover all behavioral gaps in scope. Production code
    unchanged.
 3. **PLAN**—Read `references/testing-guide.md`. Inspect production code,
-   adjacent tests, and coverage commands. List every gap across all four categories per
-   behavioral-surface target.
+   adjacent tests, and coverage commands. List every gap across all four
+   categories per behavioral-surface target.
    - **Short-circuit**: zero gaps found → emit `Result: No Gaps` and
      halt.
 4. **ACT**—Write tests for every enumerated gap. Cover all four
    categories per target before declaring it complete.
 5. **VERIFY**—Loop over every criterion declared in PLAN:
    - Run targeted tests; run broader suite or coverage tool.
+   - Audit every new test file against CI Parity rules in
+     `references/testing-guide.md`; fix any violation before proceeding.
    - For each unmet criterion: return to `ACT`, execute, then re-enter
      `VERIFY`.
    - Exit only when all pass and no regressions remain.
@@ -103,6 +105,7 @@ decision.
   remain; if absent: all five categories manually confirmed, no critical
   gaps.
 - Tests cover real behavioral risk, not vanity coverage.
+- All new tests pass CI Parity audit in `references/testing-guide.md`.
 
 ## Result
 
