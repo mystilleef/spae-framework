@@ -48,7 +48,7 @@ snapshots.
    items, and assumptions from `SPEC.md`. Capture every `R-NNN` item
    into an in-memory coverage checklist. Gather only the source patterns
    needed for codebase fit; never edit repository files.
-3. **PLAN**—Confirm the decomposition covers the spec without over-splitting.
+3. **PLAN**—Confirm it covers the spec without over-splitting.
 4. **ACT**—Delete `.spae/current/PLAN.md` (ignore if absent) and clear
    the `tasks` registry in `.spae/current/STATE.json` to empty —
    unconditionally. Read the template from `references/PLAN.md`.

@@ -36,7 +36,8 @@ project. Abort with a clear message if none detected.
 ## Workflow
 
 1. **GATE**—Identify changed files and diff boundaries; abort if no
-   scope exists.
+   scope exists. Delete `code-review-report.yaml` from the project root
+   if present.
 2. **ORIENT**—Read `references/report-schema.json` as the output contract. Anchor to review goal; name what the review won't change.
 3. **ACT**—Execute:
    - Read relevant `AGENTS.md`, descriptions, nearby code, and tests.

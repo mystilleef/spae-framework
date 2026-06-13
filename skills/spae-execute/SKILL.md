@@ -56,7 +56,8 @@ Repeat `ACT → VERIFY → PERSIST` for each task in plan order.
 2. **ORIENT**—Read the plan `## Goal` and all remaining tasks (including
    each `Intent`, acceptance criteria, and verification steps) from
    `PLAN.md`.
-3. **PLAN**—Confirm the plan advances the `## Goal`, not merely literal acceptance criteria.
+3. **PLAN**—Confirm the plan advances the `## Goal`, not merely
+   literal acceptance criteria.
 4. **ACT** (per task)—Verify all task `Dependencies` carry `done` in
    `STATE.json`; halt with a blocker on any incomplete dependency. Set
    `cursor.task_status` and `tasks[task_id]` to `"in_progress"` in

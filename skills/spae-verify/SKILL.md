@@ -66,7 +66,7 @@ snapshots.
        drives verdict to no-pass.
      - **Observation**: ambiguous or untestable spec item, minor
        deviation outside SPEC scope; note only; no verdict impact.
-5. **VERIFY**—Sanity-check the verdict without ceding the arbiter role.
+5. **VERIFY**—Sanity-check the verdict under material uncertainty without ceding arbiter role.
 6. **PERSIST**—Apply verdict:
    - **Pass**: set `STATE.json` to `status: completed`, `phase: done`;
      remove `.spae/current/VERIFY.md` when present; remove
