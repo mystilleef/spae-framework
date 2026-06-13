@@ -54,13 +54,13 @@ invocation for its arguments.
 Run phases in order. Each agent reads only its designated inputs and
 writes only its designated outputs.
 
-| Phase | Agent                  | Purpose                                       |
-| ----- | ---------------------- | --------------------------------------------- |
-| 1     | `/run spec <proposal>` | Distill requirements into `SPEC.md`           |
-| 2     | `/run plan`            | Decompose `SPEC.md` into an atomic task graph |
-| 3     | `/run inspect`         | Perform gap analysis and optimize `PLAN.md`   |
-| 4     | `/run build`           | Carry out tasks from `PLAN.md`                |
-| 5     | `/run verify`          | Verify implementation against `SPEC.md`       |
+| Phase | Agent                  | Purpose                             |
+| ----- | ---------------------- | ----------------------------------- |
+| 1     | `/run spec <proposal>` | Distill requirements to `SPEC.md`   |
+| 2     | `/run plan`            | Decompose `SPEC.md` to atomic tasks |
+| 3     | `/run inspect`         | Optimize `PLAN.md` via gap analysis |
+| 4     | `/run build`           | Execute tasks from `PLAN.md`        |
+| 5     | `/run verify`          | Verify code against `SPEC.md`       |
 
 Choose one execution mode per `workstream` after `/run inspect`:
 
@@ -75,10 +75,10 @@ to `/run spec`. Repeat until `/run verify` passes.
 
 ## Orchestration (`Pi` only)
 
-> **Orchestration agents and skills are currently only supported in the
-> Pi harness.** Orchestration requires nested subagent support; testing
+> **Only the Pi harness currently supports orchestration agents and
+> skills.** Orchestration requires nested subagent support; testing
 > covered Pi only. Pi users must install
-> [mystilleef/pi-subagent](https://github.com/mystilleef/pi-subagent).
+> [`mystilleef/pi-subagent`](https://github.com/mystilleef/pi-subagent).
 
 Orchestration agents spawn and drive nested `subagents` autonomously,
 completing multi-agent workflows without human intervention at each
@@ -88,11 +88,11 @@ step.
 
 ### **SPAE** orchestrators
 
-| Agent         | Invocation                      | Purpose                                               |
-| ------------- | ------------------------------- | ----------------------------------------------------- |
-| `orchestrate` | `/run orchestrate [<proposal>]` | Run all `SPAE` phases autonomously from current state |
-| `prepare`     | `/run prepare [<proposal>]`     | Run preparatory phases only—run spec, plan, inspect   |
-| `spawn`       | `/run spawn`                    | Run the build phase only—loops all remaining tasks    |
+| Agent         | Invocation                      | Purpose               |
+| ------------- | ------------------------------- | --------------------- |
+| `orchestrate` | `/run orchestrate [<proposal>]` | Run all phases        |
+| `prepare`     | `/run prepare [<proposal>]`     | Run prep phases (1-3) |
+| `spawn`       | `/run spawn`                    | Loop all build tasks  |
 
 **`orchestrate`** reads `STATE.json`, determines the current phase, and
 spawns the appropriate `SPAE` agent sequentially until the workflow
@@ -111,10 +111,13 @@ tasks and spawns a `build` agent per task until the phase advances to
 
 ### Non-**SPAE** orchestrators
 
-| Agent      | Invocation      | Purpose                                          |
-| ---------- | --------------- | ------------------------------------------------ |
-| `coverage` | `/run coverage` | Spawn test agents to address code coverage gaps  |
-| `clean`    | `/run clean`    | Run `purify` then `refactor` agents sequentially |
+| Agent      | Invocation      | Purpose                              |
+| ---------- | --------------- | ------------------------------------ |
+| `coverage` | `/run coverage` | Spawn test agents for gaps           |
+| `clean`    | `/run clean`    | Run purify and refactor sequentially |
+
+The `coverage` and `clean` agents execute phases of their subagents
+repeatedly until they achieve the desired outcome.
 
 ---
 
@@ -123,17 +126,19 @@ tasks and spawns a `build` agent per task until the phase advances to
 After `/run verify` passes, run these agents to refine and ship the
 implementation. Follow the order below for best results.
 
-| Order | Agent           | Purpose                             |
-| ----- | --------------- | ----------------------------------- |
-| 1     | `/run test`     | Fill test coverage gaps             |
-| 2     | `/run purify`   | Simplify and optimize code          |
-| 3     | `/run refactor` | Improve structure and clarity       |
-| 4     | `/run review`   | Review for correctness and style    |
-| 5     | `/run commit`   | Stage and commit the implementation |
+| Order | Agent           | Purpose                          |
+| ----- | --------------- | -------------------------------- |
+| 1     | `/run test`     | Fill test coverage gaps          |
+| 2     | `/run purify`   | Simplify and optimize code       |
+| 3     | `/run refactor` | Improve structure and clarity    |
+| 4     | `/run review`   | Review for correctness and style |
+| 5     | `/run commit`   | Stage and commit implementation  |
 
-**Pi only.** `/run test` and `/run clean` are orchestration agents and
-require Pi. `/run clean` replaces steps 2–3 by running `purify` then
-`refactor` automatically.
+**Pi only.** `/run coverage` and `/run clean` operate as orchestration
+agents and require Pi. `/run clean` replaces steps 2–3 by running
+`purify` then `refactor` automatically. The `coverage` and `clean`
+agents execute phases of their subagents repeatedly until they achieve
+the desired outcome.
 
 ---
 
@@ -201,10 +206,10 @@ agent files.
 The `/run` command orchestrates subagent invocation. Invoke agents as
 `/run <agent> [argument]`. Format varies by harness.
 
-| Harness  | Notes                                                                     |
-| -------- | ------------------------------------------------------------------------- |
-| Claude   | Copy `claude/commands/` to `~/.claude/commands/`                          |
-| Gemini   | Copy `gemini/commands/` to `~/.gemini/commands/`                          |
-| Pi       | Install `mystilleef/pi-subagent`; includes a built-in `/run` command      |
-| OpenCode | Copy `opencode/commands/` to `~/.config/opencode/commands/`               |
-| Codex    | Copy `codex/skills/` to `~/.codex/skills/`; use `$run` in place of `/run` |
+| Harness  | Notes                                                             |
+| -------- | ----------------------------------------------------------------- |
+| Claude   | Copy `claude/commands/` to `~/.claude/commands/`                  |
+| Gemini   | Copy `gemini/commands/` to `~/.gemini/commands/`                  |
+| Pi       | Requires `mystilleef/pi-subagent` for built-in `/run`             |
+| OpenCode | Copy `opencode/commands/` to `~/.config/opencode/commands/`       |
+| Codex    | Copy `codex/skills/` to `~/.codex/skills/`; use `$run` for `/run` |
