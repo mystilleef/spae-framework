@@ -50,7 +50,7 @@ These agents require nested subagent support via
 | Agent         | Purpose                                               |
 | ------------- | ----------------------------------------------------- |
 | `orchestrate` | Run all `SPAE` phases autonomously from current state |
-| `prepare`     | Run preparatory phases only—loops spec, plan, inspect |
+| `prepare`     | Run preparatory phases only—run spec, plan, inspect |
 | `spawn`       | Run the build phase only—loops all remaining tasks    |
 | `coverage`    | Spawn test agents to address code coverage gaps       |
 | `clean`       | Run `purify` then `refactor` agents sequentially      |
