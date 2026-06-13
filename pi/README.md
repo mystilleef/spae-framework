@@ -1,4 +1,4 @@
-# SPAE — Pi
+# `SPAE`: Pi
 
 Agent definitions for the [Pi](https://github.com/mystilleef/pi)
 harness.
@@ -47,11 +47,12 @@ for the built-in `/run` command.
 These agents require nested subagent support via
 [`mystilleef/pi-subagent`](https://github.com/mystilleef/pi-subagent).
 
-| Agent         | Purpose                                             |
-| ------------- | --------------------------------------------------- |
+| Agent         | Purpose                                               |
+| ------------- | ----------------------------------------------------- |
 | `orchestrate` | Run all `SPAE` phases autonomously from current state |
-| `spawn`       | Run the build phase only—loops all remaining tasks  |
-| `coverage`    | Spawn test agents to address code coverage gaps     |
-| `clean`       | Run `purify` then `refactor` agents sequentially    |
+| `prepare`     | Run preparatory phases only—loops spec, plan, inspect |
+| `spawn`       | Run the build phase only—loops all remaining tasks    |
+| `coverage`    | Spawn test agents to address code coverage gaps       |
+| `clean`       | Run `purify` then `refactor` agents sequentially      |
 
 See the [top-level README](../README.md) for the full workflow.

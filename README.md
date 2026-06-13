@@ -39,13 +39,13 @@ Invoke any agent with `/run <agent> [argument]` (or `$run` in Codex).
 Agents encapsulate skills and carry out each phase. See each agent's
 invocation for its arguments.
 
-| Agent     | Invocation                |
-| --------- | ------------------------- |
+| Agent     | Invocation             |
+| --------- | ---------------------- |
 | `spec`    | `/run spec <proposal>` |
-| `plan`    | `/run plan`               |
-| `inspect` | `/run inspect`            |
-| `build`   | `/run build`              |
-| `verify`  | `/run verify`             |
+| `plan`    | `/run plan`            |
+| `inspect` | `/run inspect`         |
+| `build`   | `/run build`           |
+| `verify`  | `/run verify`          |
 
 ---
 
@@ -54,13 +54,13 @@ invocation for its arguments.
 Run phases in order. Each agent reads only its designated inputs and
 writes only its designated outputs.
 
-| Phase | Agent                     | Purpose                                       |
-| ----- | ------------------------- | --------------------------------------------- |
+| Phase | Agent                  | Purpose                                       |
+| ----- | ---------------------- | --------------------------------------------- |
 | 1     | `/run spec <proposal>` | Distill requirements into `SPEC.md`           |
-| 2     | `/run plan`               | Decompose `SPEC.md` into an atomic task graph |
-| 3     | `/run inspect`            | Perform gap analysis and optimize `PLAN.md`   |
-| 4     | `/run build`              | Carry out tasks from `PLAN.md`                |
-| 5     | `/run verify`             | Verify implementation against `SPEC.md`       |
+| 2     | `/run plan`            | Decompose `SPEC.md` into an atomic task graph |
+| 3     | `/run inspect`         | Perform gap analysis and optimize `PLAN.md`   |
+| 4     | `/run build`           | Carry out tasks from `PLAN.md`                |
+| 5     | `/run verify`          | Verify implementation against `SPEC.md`       |
 
 Choose one execution mode per `workstream` after `/run inspect`:
 
@@ -91,12 +91,17 @@ step.
 | Agent         | Invocation                      | Purpose                                               |
 | ------------- | ------------------------------- | ----------------------------------------------------- |
 | `orchestrate` | `/run orchestrate [<proposal>]` | Run all `SPAE` phases autonomously from current state |
+| `prepare`     | `/run prepare [<proposal>]`     | Run preparatory phases only—loops spec, plan, inspect |
 | `spawn`       | `/run spawn`                    | Run the build phase only—loops all remaining tasks    |
 
 **`orchestrate`** reads `STATE.json`, determines the current phase, and
 spawns the appropriate `SPAE` agent sequentially until the workflow
 completes or the agent surfaces a blocker. Pass a proposal on first run
 to seed the `spec` phase.
+
+**`prepare`** runs the preparatory phases—spec, plan, and
+inspect—autonomously until the workflow reaches the `build` phase. Pass
+a proposal on first run to seed the `spec` phase.
 
 **`spawn`** targets the build phase exclusively—iterates all remaining
 tasks and spawns a `build` agent per task until the phase advances to
