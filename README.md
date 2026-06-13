@@ -174,7 +174,7 @@ directory—add `.spae/` to `.gitignore`.
 - Harness must support the
   [Agent Skills specification](https://agentskills.io/home)
 - Subagent support recommended for all harnesses
-- Nested subagent support required for orchestration (Pi only)
+- Nested subagent support required for orchestration
 - Custom commands, skills, or prompts recommended
 - Pi users must install
   [mystilleef/pi-subagent](https://github.com/mystilleef/pi-subagent)
