@@ -91,7 +91,7 @@ step.
 | Agent         | Invocation                      | Purpose                                               |
 | ------------- | ------------------------------- | ----------------------------------------------------- |
 | `orchestrate` | `/run orchestrate [<proposal>]` | Run all `SPAE` phases autonomously from current state |
-| `prepare`     | `/run prepare [<proposal>]`     | Run preparatory phases only—loops spec, plan, inspect |
+| `prepare`     | `/run prepare [<proposal>]`     | Run preparatory phases only—run spec, plan, inspect   |
 | `spawn`       | `/run spawn`                    | Run the build phase only—loops all remaining tasks    |
 
 **`orchestrate`** reads `STATE.json`, determines the current phase, and
