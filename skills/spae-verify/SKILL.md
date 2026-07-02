@@ -66,7 +66,9 @@ snapshots.
        drives verdict to no-pass.
      - **Observation**: ambiguous or untestable spec item, minor
        deviation outside SPEC scope; note only; no verdict impact.
-5. **VERIFY**—Sanity-check the verdict under material uncertainty without ceding arbiter role.
+5. **VERIFY**—Run `vibe-check` on a **PASS** verdict or a verdict held
+   under material uncertainty; sanity-check without ceding arbiter role.
+   Skip on a clear no-pass. Don't surface its exchange to the user.
 6. **PERSIST**—Apply verdict:
    - **Pass**: set `STATE.json` to `status: completed`, `phase: done`;
      remove `.spae/current/VERIFY.md` when present; remove
@@ -78,9 +80,9 @@ snapshots.
    - **Blocked**: write blocker details only to
      `.spae/current/VERIFY.md` (omit observations); set `STATE.json` to
      `status: revision_required`, `phase: spec`, `cursor: {}`.
-7. **REPORT**—Emit result using the Result template. On pass, surface
-   observations under Findings. On blocked, emit the Blocked result
-   block.
+7. **REPORT**—Emit the result following the result directives and using
+   the result template. On pass, surface observations under Findings. On
+   blocked, emit the Blocked result block.
 
 ## Directives
 
@@ -117,26 +119,29 @@ snapshots.
   `.spae/current/SPEC.md` **requirement** IDs or blocker details.
 - Required project checks pass or documented blockers explain failures.
 
-## Result
+## Result directives
 
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
 - Split actions, findings, and summaries into terse bullet points.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
-- Strictly follow the result template below.
+- Use lists and sub-lists over paragraphs and long sentences.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md
 ### Execution Summary
 
 - **Actions**:
-  - [Terse list of verification actions]
+  - [Terse list of actions taken]
 - **Files**:
-  - [Terse list of examined files]
+  - [Terse list of affected files]
 - **Findings**:
-  - [Terse list of gaps, blockers, or pass confirmation]
+  - [Terse list of notable findings]
 - **Summary**:
-  - [Terse list of result summaries]
+  - [Terse list of summary of changes]
 
 > **`SPAE` Status** • `[workstream-name]`
 > **Phase Complete**: `/verify` ([Pass | Fail | Blocked])
