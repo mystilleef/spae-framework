@@ -98,7 +98,8 @@ snapshots.
    rebuild the `tasks` registry to mirror the refined `PLAN.md` IDs,
    each mapped to **todo**; set `metrics.tasks_total` to the refined
    task count and `metrics.tasks_completed` to `0`.
-7. **REPORT**—Emit result using the Result template.
+7. **REPORT**—Emit the result following the result directives and using
+   the result template.
 
 ## Directives
 
@@ -149,13 +150,16 @@ snapshots.
   refined `PLAN.md` task count.
 - No forbidden files changed.
 
-## Result
+## Result directives
 
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
 - Split actions, findings, and summaries into terse bullet points.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
-- Strictly follow the result template below.
+- Use lists and sub-lists over paragraphs and long sentences.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md
@@ -164,11 +168,11 @@ snapshots.
 - **Actions**:
   - [Terse list of actions taken]
 - **Files**:
-  - [List of modified or created files]
+  - [Terse list of affected files]
 - **Findings**:
-  - [Key gaps, risks, or notable observations]
+  - [Terse list of notable findings]
 - **Summary**:
-  - [List of summary of changes]
+  - [Terse list of summary of changes]
 
 > **`SPAE` Status** • `[workstream-name]`
 > **Phase Complete**: `/inspect`
