@@ -40,11 +40,12 @@ snapshots.
 
 Select sub-workflow by `.spae/current` symlink state:
 
-- **New** (absent): [New spec workflow](#new-spec-workflow)
-- **Revision** (present):
-  [Revision spec workflow](#revision-spec-workflow)
+- **New** (symlink absent): `New spec workflow`
+- **Revision** (symlink present): `Revision spec workflow`
 
 ### New spec workflow
+
+If absent symlink follow this workflow.
 
 1. **GATE**—`.spae/current` absent. Halt if symlink exists (revision
    path).
@@ -55,9 +56,14 @@ Select sub-workflow by `.spae/current` symlink state:
 4. **ACT**—Execute:
    - Initialize `.spae/[workstream]/`; point `.spae/current` symlink;
      create `STATE.json` (`phase: spec`, `status: active`).
+   - If `AGENTS.md` exists at the project root, read it in full
+     **before** any codebase sections; treat its constraints,
+     conventions, and gates as non-negotiable spec inputs.
    - Read codebase sections narrowly; widen only on uncertainty.
    - Derive goal, requirements, testing strategy, out-of-scope
-     boundaries, and assumptions.
+     boundaries, and assumptions; reflect all `AGENTS.md` constraints.
+   - Invoke `vibe-check` on formulated approach; don't surface exchange
+     to the user.
 5. **VERIFY**—Loop over spec completeness criteria:
    - For each failure: return to `ACT`, fix, then re-enter `VERIFY`.
    - Exit only when spec complete and structure matches
@@ -69,19 +75,26 @@ Select sub-workflow by `.spae/current` symlink state:
 
 ### Revision spec workflow
 
+If present symlink follow this workflow.
+
 1. **GATE**—`.spae/current` present. `VERIFY.md` exists. `STATE.json`
    `status: revision_required`. Halt immediately on any failure.
-2. **ORIENT**—Rewrite `SPEC.md` from scratch to address all `VERIFY.md`
-   findings. Source code unmodified.
+2. **ORIENT**—Delete `SPEC.md` and rewrite it from scratch to address
+   all `VERIFY.md` findings. Source code unmodified.
 3. **PLAN**—Survey `VERIFY.md` findings; identify source files to
    inspect and requirements to derive.
 4. **ACT**—Execute:
+   - Delete `SPEC.md`. Don't reuse.
    - Read `VERIFY.md` in full; treat all findings as primary
      requirements input.
-   - Delete `SPEC.md`.
+   - If `AGENTS.md` exists at the project root, read it in full
+     **before** inspecting source files; treat its constraints as
+     binding; reflect them in the revised requirements.
    - Inspect source files to ground new requirements.
-   - Write new `SPEC.md` from scratch; assign fresh `R-NNN` identifiers;
-     address all `VERIFY.md` findings.
+   - Write new `SPEC.md` from scratch; never reuse old spec; assign
+     fresh `R-NNN` identifiers; address all `VERIFY.md` findings.
+   - Invoke `vibe-check` on formulated approach; don't surface exchange
+     to the user.
 5. **VERIFY**—Loop over all `VERIFY.md` findings:
    - For each unaddressed finding: return to `ACT`, address it, then
      re-enter `VERIFY`.
@@ -90,7 +103,8 @@ Select sub-workflow by `.spae/current` symlink state:
    - Halt only for out-of-scope blockers.
 6. **PERSIST**—Write `SPEC.md`. Update `STATE.json` (`phase: plan`,
    `status: active`).
-7. **REPORT**—Emit result using the Result template.
+7. **REPORT**—Emit the result following the result directives and using
+   the result template.
 
 ## Directives
 
@@ -106,6 +120,9 @@ Select sub-workflow by `.spae/current` symlink state:
 
 ## Constraints
 
+- **`AGENTS.md` authority**: If `AGENTS.md` exists at the project root,
+  its constraints, conventions, and gates bind all spec requirements;
+  contradictions count as spec defects.
 - **Write Scope**: write only `.spae/current` symlink,
   `.spae/[workstream]/SPEC.md`, `.spae/[workstream]/STATE.json`, forbid
   all other writes.
@@ -137,13 +154,16 @@ Select sub-workflow by `.spae/current` symlink state:
   diagnostics; no artifacts modified.
 - Verify all other halt conditions leave artifacts intact.
 
-## Result
+## Result directives
 
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
 - Split actions, findings, and summaries into terse bullet points.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
-- Strictly follow the result template below.
+- Use lists and sub-lists over paragraphs and long sentences.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md
@@ -152,11 +172,11 @@ Select sub-workflow by `.spae/current` symlink state:
 - **Actions**:
   - [Terse list of actions taken]
 - **Files**:
-  - [List of modified or created files]
+  - [Terse list of affected files]
 - **Findings**:
-  - [List of key gaps, risks, or notable observations]
+  - [Terse list of notable findings]
 - **Summary**:
-  - [Terse summary of spec changes]
+  - [Terse list of summary of changes]
 
 > **`SPAE` Status** • `[workstream-name]`
 > **Result**: [Spec Complete | Revision Complete | Failed]
