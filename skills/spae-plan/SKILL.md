@@ -48,7 +48,11 @@ snapshots.
    items, and assumptions from `SPEC.md`. Capture every `R-NNN` item
    into an in-memory coverage checklist. Gather only the source patterns
    needed for codebase fit; never edit repository files.
-3. **PLAN**—Confirm it covers the spec without over-splitting.
+3. **PLAN**—Run `vibe-check` when decomposition carries ambiguity,
+   complexity, or risk—many tasks, tricky dependencies, or high-risk
+   sequencing; confirm it covers the spec without over-splitting. Skip
+   small, low-risk plans; when unsure, run it. Don't surface its
+   exchange to the user.
 4. **ACT**—Delete `.spae/current/PLAN.md` (ignore if absent) and clear
    the `tasks` registry in `.spae/current/STATE.json` to empty —
    unconditionally. Read the template from `references/PLAN.md`.
@@ -70,7 +74,8 @@ snapshots.
 6. **PERSIST**—Write `.spae/current/PLAN.md`. Initialize all task IDs as
    `todo` in `.spae/current/STATE.json`. Update metrics. Set
    `phase: inspect`. Write once, atomically.
-7. **REPORT**—Emit result using the Result template.
+7. **REPORT**—Emit the result following the result directives and using
+   the result template.
 
 ## Directives
 
@@ -85,7 +90,7 @@ snapshots.
 - Preserve execution-mode neutrality for `/build`, `/tdd`, and
   `/execute`.
 - Never add `SPAE` artifacts beyond core files and ephemeral
-  `VERIFY.md`.
+  `VERIFY.md`. Don't surface the `vibe-check` exchange to the user.
 - Never stage or commit `.spae/`.
 
 ## Constraints
@@ -124,13 +129,16 @@ snapshots.
   metrics.
 - No files outside the allowed `SPAE` write scope changed.
 
-## Result
+## Result directives
 
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
 - Split actions, findings, and summaries into terse bullet points.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
-- Strictly follow the result template below.
+- Use lists and sub-lists over paragraphs and long sentences.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md
@@ -139,11 +147,11 @@ snapshots.
 - **Actions**:
   - [Terse list of actions taken]
 - **Files**:
-  - [List of modified or created files]
+  - [Terse list of affected files]
 - **Findings**:
-  - [List of key gaps, risks, or notable observations]
+  - [Terse list of notable findings]
 - **Summary**:
-  - [List of summary of changes]
+  - [Terse list of summary of changes]
 
 > **`SPAE` Status** • `[workstream-name]`
 > **Result**: [Plan Complete | Blocked | Failed]
