@@ -29,8 +29,8 @@ argument-hint: "[optional: files or focus area]"
      (pass optional arguments).
    - Await test result.
    - If `subagent` returns `No Gaps` status, exit loop and finish.
-   - If `subagent` returns `Failed` status, halt immediately and surface
-     the error.
+   - On `Failed` status or any process failure, halt immediately and
+     surface the error.
    - Loop back to spawn another `test` `subagent` if the previous pass
      returns `Improved`.
 2. **Report**: Emit execution summary.
@@ -38,9 +38,11 @@ argument-hint: "[optional: files or focus area]"
 ## Directives
 
 - Always use the subagent tool for subagent invocation.
-- Pass the optional files argument directly to the `test` `subagent`.
+- Pass the optional argument verbatim to the `test` subagent; never read
+  or expand file-path arguments.
 - Rely on `subagent` status blocks to direct the loop.
-- Halt immediately upon `subagent` timeout, crash, or error status.
+- Halt immediately on subagent `Failed` status or any process failure
+  (crash, timeout, `AgentError`).
 - List of agents permitted to invoke:
   - `test`
 
@@ -58,6 +60,8 @@ argument-hint: "[optional: files or focus area]"
 - Never invoke agents outside the permitted list.
 - Never prompt the user for decisions mid-run; let blockers halt
   execution.
+- Never perform activities beyond subagent invocation, state tracking,
+  and reporting.
 
 ## Verification
 
@@ -66,27 +70,30 @@ argument-hint: "[optional: files or focus area]"
 - Confirm immediate halt when a `subagent` returns `Failed`.
 - Confirm zero writes from the orchestration agent itself.
 
-## Result
+## Result directives
 
 - Return the final execution status block.
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
 - Split actions, findings, and summaries into terse bullet points.
-- Strictly follow the result template below.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
+- Use lists and sub-lists over paragraphs and long sentences.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md
 ### Execution Summary
 
 - **Actions**:
-  - [Terse list of actions taken]
+  - [Terse list of actions from spawned subagents]
 - **Files**:
-  - [Terse list of files read]
+  - [Terse list of files affected by spawned subagents]
 - **Findings**:
-  - [Terse list of `subagent` outcomes or errors]
+  - [Terse list of findings from spawned subagents]
 - **Summary**:
-  - [Terse summary of the coverage process]
+  - [Terse list of summary from spawned subagents]
 
 > **Coverage Status** • `[scope]`
 > **Result**: [Completed | Halted | Failed]
