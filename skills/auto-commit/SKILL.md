@@ -37,25 +37,25 @@ Determine input from the current repository state:
 
 ## Workflow
 
-1. **GATE**—Run `git status --porcelain=v2 --branch`. Halt on no
-   changes or git error.
+1. **GATE**—Run `git status --porcelain=v2 --branch`. Halt on no changes
+   or git error.
 2. **ORIENT**—Goal: commit all eligible changes as atomic commits.
    Scope: current project. No changes outside git state.
 3. **PLAN**—Group files into logical commits. Isolate `.gitignore`
    changes. Apply fast path for a single unstaged file.
-4. **ACT** *(repeat steps 4–6 per group until no eligible changes
-   remain)*—
+4. **ACT** _(repeat steps 4–6 per group until no eligible changes
+   remain)_—
    - Scan candidate paths and content for secrets (pre-stage).
-   - Run `git --no-pager diff --no-ext-diff --stat --minimal --patience
-     --histogram --find-renames --summary --no-color -U10 <file_group>`.
+   - Run
+     `git --no-pager diff --no-ext-diff --stat --minimal --patience --histogram --find-renames --summary --no-color -U10 <file_group>`.
    - Run `git add <file1> <file2> ...`.
    - Scan staged diff for secrets (pre-commit).
    - Generate conventional commit message.
 5. **VERIFY**—Confirm staged diff matches intent and all secret checks
    pass. On failure: unstage, halt, report.
-6. **PERSIST**—Run `git commit -m "<message>"`. Confirm commit
-   success.
-7. **REPORT**—Emit result using the Result template.
+6. **PERSIST**—Run `git commit -m "<message>"`. Confirm commit success.
+7. **REPORT**—Emit the result following the result directives and using
+   the result template.
 
 ## Directives
 
@@ -63,15 +63,19 @@ Determine input from the current repository state:
   together, such as implementation plus matching tests.
 - **Gitignore Isolation**: Commit `.gitignore` changes separately.
 - **Sensitive Path Rules**: Hard-block `.env*` except `.env.example`,
-`*.key`, `*.pem`, `*.p12`, `*.pfx`, `*_rsa`, `*_dsa`, `id_*`,
-`secrets.*`, `credentials.*`, `.aws/`, `.ssh/`, and `.gnupg/`.
+  `*.key`, `*.pem`, `*.p12`, `*.pfx`, `*_rsa`, `*_dsa`, `id_*`,
+  `secrets.*`, `credentials.*`, `.aws/`, `.ssh/`, and `.gnupg/`.
+
 <!-- vale off -->
+
 - **Sensitive Content Rules**: Hard-block real credential indicators:
-`password=...`, `token: ...`, `api_key = ...`, `Bearer <value>`,
-cloud/GitHub/Slack/OpenAI token prefixes with non-placeholder values,
-and private key blocks. Do not block policy text that merely names
-secret types or placeholder examples.
+  `password=...`, `token: ...`, `api_key = ...`, `Bearer <value>`,
+  cloud/GitHub/Slack/OpenAI token prefixes with non-placeholder values,
+  and private key blocks. Do not block policy text that merely names
+  secret types or placeholder examples.
+
 <!-- vale on -->
+
 - **On Secret Match**: Run `git restore --staged -- <files>`, halt, and
   report only file paths plus matched rule names. Never print secret
   values, request overrides, or commit flagged files.
@@ -102,13 +106,16 @@ secret types or placeholder examples.
 - Commits exclude sensitive and inappropriate build-related files.
 - Final report lists commit hashes and subjects or explains failure.
 
-## Result
+## Result directives
 
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
 - Split actions, findings, and summaries into terse bullet points.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
-- Strictly follow the result template below.
+- Use lists and sub-lists over paragraphs and long sentences.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md
@@ -117,9 +124,9 @@ secret types or placeholder examples.
 - **Actions**:
   - [Terse list of actions taken]
 - **Files**:
-  - [Files staged or committed]
+  - [Terse list of affected files]
 - **Findings**:
-  - [Safety blocks, skipped files, git errors, or notable observations]
+  - [Terse list of notable findings]
 - **Commits**:
   - [Commit hash and subject per created commit]
 
@@ -127,6 +134,6 @@ secret types or placeholder examples.
 > **Result**: [Committed | Clean Tree | Failed]
 > **Impact**: [Terse impact statement]
 >
-> _[Working tree summary]_
+> _[Terse working tree summary]_
 ```
 <!-- prettier-ignore-end -->
