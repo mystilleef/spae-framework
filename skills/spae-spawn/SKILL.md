@@ -40,7 +40,7 @@ snapshots.
    - d. **Verify**: Re-read `STATE.json`. Confirm the task from step 2a
      shows `done` in the registry. If it remains `todo` or
      `in_progress`, halt immediately.
-   - e. **Blocker**: If the subagent reports a blocker or fails, halt
+   - e. **Blocker**: On `Failed` status or any process failure, halt
      immediately and surface the error.
 3. **Finalize Phase**: Confirm `STATE.json` shows `phase: verify`. Emit
    the final completion feedback.
@@ -51,8 +51,8 @@ snapshots.
 - Always use the subagent tool for subagent invocation.
 - Spawn a new `build` agent for each task.
 - Trust `STATE.json` over subagent result.
-- Halt execution immediately on any timeout, crash, state mismatch, or
-  explicit blocker.
+- Halt immediately on subagent `Failed` status or any process failure
+  (crash, timeout, `AgentError`).
 - List of agents permitted to invoke:
   - `build`
 
@@ -68,6 +68,8 @@ snapshots.
 - Never run `subagents` in parallel or concurrently.
 - Never prompt the user for decisions mid-run; let blockers halt
   execution.
+- Never perform activities beyond subagent invocation, state tracking,
+  and reporting.
 
 ## Verification
 
@@ -75,26 +77,29 @@ snapshots.
 - Confirm the `workstream` advanced to `phase: verify`.
 - Confirm immediate halt when a `subagent` reports a blocker or fails.
 
-## Result
+## Result directives
 
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
 - Split actions, findings, and summaries into terse bullet points.
-- Strictly follow the result template below.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
+- Use lists and sub-lists over paragraphs and long sentences.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md
 ### Execution Summary
 
 - **Actions**:
-  - [Terse list of actions taken]
+  - [Terse list of actions from spawned subagents]
 - **Files**:
-  - [Terse list of files read]
+  - [Terse list of files affected by spawned subagents]
 - **Findings**:
-  - [Terse list of key gaps, risks, blockers, or notable observations]
+  - [Terse list of findings from spawned subagent]
 - **Summary**:
-  - [Terse summary of the execution outcome]
+  - [Terse list of summary from spawned subagents]
 
 > **`SPAE` Spawn** • `[workstream]`
 > **Result**: [Completed | Halted | Failed]
