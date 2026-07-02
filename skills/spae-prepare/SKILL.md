@@ -60,12 +60,16 @@ snapshots.
      - `plan`: spawn `plan` agent without arguments.
      - `inspect`: spawn `inspect` agent without arguments.
    - Await each agent's completion before proceeding.
+   - On `Failed` status or any process failure, halt immediately and
+     surface the error.
    - Re-read `STATE.json` after each agent and loop to the next phase.
    - Stop looping when `STATE.json` shows `phase: build`.
 5. **VERIFY**:
    - After each agent completes, confirm `STATE.json` phase advanced.
    - After `inspect` agent completes, confirm `phase: build`.
-   - Halt immediately on any timeout, crash, or phase mismatch.
+   - Halt immediately on phase mismatch.
+   - On `Failed` status or any process failure, halt immediately and
+     surface the error.
 6. **PERSIST**:
    - No state writes; orchestration operates in read-only mode.
 7. **REPORT**:
@@ -77,6 +81,10 @@ snapshots.
 - Rely only on `STATE.json` for all orchestration decisions.
 - Operate strictly in read-only mode; make no file writes.
 - Trust the machine-readable state file over subagent output text.
+- Pass the proposal argument verbatim to the `spec` subagent; never read
+  or expand file-path arguments.
+- Halt immediately on subagent `Failed` status or any process failure
+  (crash, timeout, `AgentError`).
 - List of agents permitted to invoke:
   - `spec`
   - `plan`
@@ -94,6 +102,8 @@ snapshots.
 - Never invoke agents outside the permitted list.
 - Never prompt the user for decisions mid-run; let blockers halt
   execution.
+- Never perform activities beyond subagent invocation, state tracking,
+  and reporting.
 
 ## Verification
 
@@ -101,26 +111,29 @@ snapshots.
 - Confirm the `workstream` reaches `phase: build` upon completion.
 - Confirm zero project writes from the orchestration agent itself.
 
-## Result
+## Result directives
 
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
 - Split actions, findings, and summaries into terse bullet points.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
-- Strictly follow the result template below.
+- Use lists and sub-lists over paragraphs and long sentences.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md
 ### Execution Summary
 
 - **Actions**:
-  - [Terse list of orchestration actions taken]
+  - [Terse list of actions from spawned subagents]
 - **Files**:
-  - [Terse list of files read]
+  - [Terse list of files affected by spawned subagents]
 - **Findings**:
-  - [Terse list of observations, blockers, or failures]
+  - [Terse list of findings from spawned subagent]
 - **Summary**:
-  - [Terse summary of the workstream outcome]
+  - [Terse list of summary from spawned subagents]
 
 > **`SPAE` Prepare** • `[workstream]`
 > **Result**: [Completed | Halted | Failed]
