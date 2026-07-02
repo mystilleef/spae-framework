@@ -43,11 +43,17 @@ project. Abort with a clear message if none detected.
 See `references/testing-guide.md` for test structure, isolation,
 mocking, assertion, and performance standards.
 
+## Shell Commands
+
+See `references/shell-command-guide.md` for command safety, timeouts,
+redirects, and non-interactive environment directives.
+
 ## Workflow
 
 1. **GATE**—Precondition guard. Halt immediately on failure.
    - Abort if no scope exists.
    - Read `references/testing-guide.md`.
+   - Read `references/shell-command-guide.md`.
    - Read relevant production code, adjacent tests, and test commands.
    - Confirm automated test suite passes before touching code.
    - Detect `antipatterns` using the violation catalog in
@@ -66,11 +72,12 @@ mocking, assertion, and performance standards.
    declared.
 5. **VERIFY**—Loop over every criterion declared in PLAN:
    - Run the full suite after each `ACT` step.
-   - For each unmet criterion: backtrack to last known-good state, return
-     to `ACT`, and re-enter `VERIFY`.
+   - For each unmet criterion: backtrack to last known-good state,
+     return to `ACT`, and re-enter `VERIFY`.
    - Exit only when all criteria pass.
    - Halt only for out-of-scope blockers.
-6. **REPORT**—Emit result using the Result template.
+6. **REPORT**—Emit the result following the result directives and using
+   the result template.
 
 ## Directives
 
@@ -106,12 +113,15 @@ mocking, assertion, and performance standards.
 - Re-run smell detection against the violation catalog to confirm no new
   violations introduced.
 
-## Result
+## Result directives
 
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
-- Strictly follow the result template below.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
+- Use lists and sub-lists over paragraphs and long sentences.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md
@@ -120,9 +130,9 @@ mocking, assertion, and performance standards.
 - **Actions**:
   - [Terse list of actions taken]
 - **Files**:
-  - [Terse list of modified or created files]
+  - [Terse list of affected files]
 - **Findings**:
-  - [Terse list of key gaps, risks, or notable observations]
+  - [Terse list of notable findings]
 - **Summary**:
   - [Terse list of summary of changes]
 

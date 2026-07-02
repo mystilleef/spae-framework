@@ -44,12 +44,18 @@ project, abort with a clear message if none detected.
 See `references/testing-guide.md` for test structure, isolation,
 mocking, assertion, and performance standards.
 
+## Shell Commands
+
+See `references/shell-command-guide.md` for command safety, timeouts,
+redirects, and non-interactive environment directives.
+
 ## Workflow
 
 1. **GATE**—Survey scope and establish baseline. Inspect target code,
    tests, build commands, and recent changes. Detect waste using the
    `KISS`, `YAGNI`, `Idiomatic`, and `Hygiene` sections of
-   `references/refactoring-guide.md`. Run relevant tests; identify why
+   `references/refactoring-guide.md`. Read
+   `references/shell-command-guide.md`. Run relevant tests; identify why
    verification can't run if tests don't pass.
    - If scope resolves to current changes, the project contains
      TypeScript or JavaScript sources, and `fallow` resolves
@@ -84,8 +90,8 @@ mocking, assertion, and performance standards.
    - Halt only for out-of-scope blockers.
 6. **PERSIST**—Confirm all edits written. Run final compilation or
    type-check where applicable.
-7. **REPORT**—Emit result using the Result template. Confirm what
-   changed matches ORIENT.
+7. **REPORT**—Emit the result following the result directives and using
+   the result template. Confirm what changed matches ORIENT.
 
 ## Directives
 
@@ -132,12 +138,15 @@ mocking, assertion, and performance standards.
 - Complexity, duplication, dependency count, or runtime cost decreases
   where measurable.
 
-## Result
+## Result directives
 
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
-- Strictly follow the result template below.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
+- Use lists and sub-lists over paragraphs and long sentences.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md
@@ -146,9 +155,9 @@ mocking, assertion, and performance standards.
 - **Actions**:
   - [Terse list of actions taken]
 - **Files**:
-  - [Terse list of modified or created files]
+  - [Terse list of affected files]
 - **Findings**:
-  - [Terse list of key gaps, risks, or notable observations]
+  - [Terse list of notable findings]
 - **Summary**:
   - [Terse list of summary of changes]
 

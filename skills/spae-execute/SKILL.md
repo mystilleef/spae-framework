@@ -46,6 +46,11 @@ snapshots.
 See `references/testing-guide.md` for test structure, isolation,
 mocking, assertion, and performance standards.
 
+## Shell Commands
+
+See `references/shell-command-guide.md` for command safety, timeouts,
+redirects, and non-interactive environment directives.
+
 ## Workflow
 
 Repeat `ACT → VERIFY → PERSIST` for each task in plan order.
@@ -56,13 +61,17 @@ Repeat `ACT → VERIFY → PERSIST` for each task in plan order.
 2. **ORIENT**—Read the plan `## Goal` and all remaining tasks (including
    each `Intent`, acceptance criteria, and verification steps) from
    `PLAN.md`.
-3. **PLAN**—Confirm the plan advances the `## Goal`, not merely
-   literal acceptance criteria.
+3. **PLAN**—Run `vibe-check` when execution carries ambiguity,
+   complexity, or risk: many tasks, tricky dependencies, or high-risk
+   sequencing; confirm the plan advances the `## Goal`, not merely
+   literal acceptance criteria. Skip low-risk, straightforward plans;
+   when unsure, run it. Don't surface its exchange to the user.
 4. **ACT** (per task)—Verify all task `Dependencies` carry `done` in
    `STATE.json`; halt with a blocker on any incomplete dependency. Set
    `cursor.task_status` and `tasks[task_id]` to `"in_progress"` in
-   `STATE.json`. Read `references/testing-guide.md`. Iterate over every
-   acceptance criterion:
+   `STATE.json`. Read `references/testing-guide.md` and
+   `references/shell-command-guide.md`. Iterate over every acceptance
+   criterion:
    - Write a failing test: expected behavior, failure modes, and edge
      cases.
    - Write minimal code to pass it.
@@ -81,8 +90,8 @@ Repeat `ACT → VERIFY → PERSIST` for each task in plan order.
      remaining tasks `todo`, and halt.
 6. **PERSIST** (per task)—Mark the task `done`; update cursor, task
    registry, blockers, and metrics in `STATE.json`.
-7. **REPORT**—Set `phase: verify` in `STATE.json`; emit result using the
-   Result template.
+7. **REPORT**—Set `phase: verify` in `STATE.json`; emit the result
+   following the result directives and using the result template.
 
 ## Directives
 
@@ -105,6 +114,11 @@ Repeat `ACT → VERIFY → PERSIST` for each task in plan order.
   doubt; record the blocker, leave remaining tasks `todo`, and stop.
   Leave ambiguous interpretation to `/verify`.
 - Follow existing codebase patterns over speculative design.
+- **Vibe Check**: Run `vibe-check` only when the task or slice carries
+  ambiguity, complexity, risk, or irreversibility; verify the slice
+  advances `Intent` and plan `## Goal`, not merely literal acceptance
+  criteria. Skip trivial, reversible, single-step tasks; when unsure,
+  run it. Don't surface its exchange to the user.
 - Preserve the selected execution mode for the `workstream`; don't mix
   `/build`, `/tdd`, and `/execute`.
 - Report SUCCESS only after every remaining task passes verification.
@@ -147,13 +161,16 @@ Repeat `ACT → VERIFY → PERSIST` for each task in plan order.
   metrics, cursor, blockers, and `phase: verify` after full completion.
 - `.spae/current/PLAN.md` and `.spae/current/SPEC.md` remain unchanged.
 
-## Result
+## Result directives
 
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
 - Split actions, findings, and summaries into terse bullet points.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
-- Strictly follow the result template below.
+- Use lists and sub-lists over paragraphs and long sentences.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md
@@ -161,14 +178,14 @@ Repeat `ACT → VERIFY → PERSIST` for each task in plan order.
 
 - **Actions**:
   - [Terse list of actions taken]
+- **Files**:
+  - [Terse list of affected files]
 - **Tests**:
   - [Terse list of tests written — behaviors, failure modes, and edge cases covered]
-- **Files**:
-  - [List of modified or created files]
 - **Findings**:
-  - [Key gaps, risks, blockers, or notable observations]
+  - [Terse list of notable findings]
 - **Summary**:
-  - [Summary of implementation changes]
+  - [Terse list of summary of changes]
 
 > **`SPAE` Status** • `[workstream-name]`
 > **Result**: [Complete | Blocked | Failed]

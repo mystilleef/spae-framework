@@ -51,6 +51,11 @@ snapshots.
 See `references/testing-guide.md` for test structure, isolation,
 mocking, assertion, and performance standards.
 
+## Shell Commands
+
+See `references/shell-command-guide.md` for command safety, timeouts,
+redirects, and non-interactive environment directives.
+
 ## Workflow
 
 1. **GATE**—Confirm `STATE.json` has `phase: build` and `/tdd` path
@@ -64,10 +69,15 @@ mocking, assertion, and performance standards.
    progress): set `cursor.task_status` and `tasks[active_task_id]` to
    `"in_progress"` in `STATE.json`.
 3. **PLAN**—Classify the task as `behavioral`, `refactor`, or
-   `non-testable`. Read `references/testing-guide.md`. Declare the full
-   implementation path that satisfies every acceptance criterion,
-   advances the task `Intent` and plan `## Goal`, and leaves seams for
-   forward tasks.
+   `non-testable`. Read `references/testing-guide.md` and
+   `references/shell-command-guide.md`. Declare the full implementation
+   path that satisfies every acceptance criterion, advances the task
+   `Intent` and plan `## Goal`, and leaves seams for forward tasks. Run
+   `vibe-check` when the task carries ambiguity, complexity, risk, or
+   irreversibility; confirm the planned change advances the task
+   `Intent` and plan `## Goal`, not merely literal acceptance criteria.
+   Skip trivial, reversible work; when unsure, run it. Don't surface its
+   exchange to the user.
 4. **ACT**—Execute:
    - **Behavioral**: iterate over every acceptance criterion:
      - Write a failing test: expected behavior, failure modes, and edge
@@ -92,7 +102,8 @@ mocking, assertion, and performance standards.
 6. **PERSIST**—Mark the active task `done` in `STATE.json`; increment
    completion metrics; advance the cursor to the next task. Set
    `phase: verify` when no next task remains.
-7. **REPORT**—Emit result using the Result template.
+7. **REPORT**—Emit the result following the result directives and using
+   the result template.
 
 ## Directives
 
@@ -176,15 +187,18 @@ mocking, assertion, and performance standards.
   reflect the completed task.
 - `.spae/current/PLAN.md` and `.spae/current/SPEC.md` remain unchanged.
 
-## Result
+## Result directives
 
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
 - Split actions, findings, and summaries into terse bullet points.
-- Strictly follow the result template below.
 - Emit task execution feedback after completing a task.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
+- Use lists and sub-lists over paragraphs and long sentences.
 - Emit phase transition feedback when the plan concludes.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md
@@ -192,14 +206,14 @@ mocking, assertion, and performance standards.
 
 - **Actions**:
   - [Terse list of actions taken]
+- **Files**:
+  - [Terse list of affected files]
 - **Tests**:
   - [Terse list of tests written — behaviors, failure modes, and edge cases covered]
-- **Files**:
-  - [List of modified or created files]
 - **Findings**:
-  - [List of key gaps, risks, blockers, or notable observations]
+  - [Terse list of notable findings]
 - **Summary**:
-  - [List of summary of changes]
+  - [Terse list of summary of changes]
 
 > **`SPAE` Status** • `[workstream-name]`
 > **Progress**: Task [X] of [Y] ([Z] remaining)

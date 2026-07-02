@@ -36,6 +36,11 @@ project. Abort with a clear message if none detected.
 See `references/testing-guide.md` for test structure, isolation,
 mocking, assertion, and performance standards.
 
+## Shell Commands
+
+See `references/shell-command-guide.md` for command safety, timeouts,
+redirects, and non-interactive environment directives.
+
 ## Behavioral surface
 
 Target only methods and functions with business logic, state
@@ -51,7 +56,8 @@ decision.
    changes. Abort immediately if none.
 2. **ORIENT**—Goal: cover all behavioral gaps in scope. Production code
    unchanged.
-3. **PLAN**—Read `references/testing-guide.md`. Inspect production code,
+3. **PLAN**—Read `references/testing-guide.md` and
+   `references/shell-command-guide.md`. Inspect production code,
    adjacent tests, and coverage commands. List every gap across all four
    categories per behavioral-surface target.
    - **Short-circuit**: zero gaps found → emit `Result: No Gaps` and
@@ -67,7 +73,8 @@ decision.
    - Exit only when all pass and no regressions remain.
    - Halt only for out-of-scope blockers.
 6. **PERSIST**—Confirm all test files written; no partial writes.
-7. **REPORT**—Emit result using the Result template.
+7. **REPORT**—Emit the result following the result directives and using
+   the result template.
 
 ## Directives
 
@@ -107,13 +114,16 @@ decision.
 - Tests cover real behavioral risk, not vanity coverage.
 - All new tests pass CI Parity audit in `references/testing-guide.md`.
 
-## Result
+## Result directives
 
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
 - Split actions, findings, and summaries into terse bullet points.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
-- Strictly follow the result template below.
+- Use lists and sub-lists over paragraphs and long sentences.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md

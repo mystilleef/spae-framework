@@ -36,14 +36,19 @@ Determine input by one of the following:
 See `references/testing-guide.md` for test structure, isolation,
 mocking, assertion, and performance standards.
 
+## Shell Commands
+
+See `references/shell-command-guide.md` for command safety, timeouts,
+redirects, and non-interactive environment directives.
+
 ## Workflow
 
 1. **GATE**—Require an actionable symptom: error, failure, trace, or
    incorrect output. Halt and ask if none exists.
 2. **ORIENT**—Name the failure and scope in one sentence. State what
    won't change.
-3. **PLAN**—State one likely root cause and one targeted check to
-   confirm or reject it.
+3. **PLAN**—Read `references/shell-command-guide.md`. State one likely
+   root cause and one targeted check to confirm or reject it.
 4. **ACT**—Execute:
    - Reproduce the failure.
    - Run the targeted check; on rejection, return to **PLAN**.
@@ -58,7 +63,8 @@ mocking, assertion, and performance standards.
    - Halt only for out-of-scope blockers.
 6. **PERSIST**—Write all fix artifacts once, atomically, after
    **VERIFY** passes. Never precedes **VERIFY**. Never partial.
-7. **REPORT**—Emit result using the Result template.
+7. **REPORT**—Emit the result following the result directives and using
+   the result template.
 
 ## Directives
 
@@ -101,13 +107,16 @@ mocking, assertion, and performance standards.
 - If verification fails, revert the fix and return to step 2.
 - Report remaining risks or skipped checks plainly.
 
-## Result
+## Result directives
 
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
 - Split actions, findings, and summaries into terse bullet points.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
-- Strictly follow the result template below.
+- Use lists and sub-lists over paragraphs and long sentences.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md
@@ -116,11 +125,11 @@ mocking, assertion, and performance standards.
 - **Actions**:
   - [Terse list of actions taken]
 - **Files**:
-  - [List of modified or created files]
+  - [Terse list of affected files]
 - **Findings**:
-  - [List of key gaps, risks, or notable observations]
+  - [Terse list of notable findings]
 - **Summary**:
-  - [List of summary of changes]
+  - [Terse list of summary of changes]
 
 > **Troubleshoot Status** • `[scope]`
 > **Result**: [Fixed | No Action | Failed]
