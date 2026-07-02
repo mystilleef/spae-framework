@@ -55,8 +55,9 @@ snapshots.
        - Immediately spawn `build` agent without arguments for the
          active task.
        - Re-read `STATE.json` after each task finishes.
-       - Halt if the task fails, remains unfinished, or reports a
-         blocker.
+       - Halt if the task remains unfinished or reports a blocker.
+       - On `Failed` status or any process failure, halt immediately and
+         surface the error.
      - `verify`:
        - Immediately spawn `verify` agent without arguments.
        - Re-read `STATE.json` after completion.
@@ -66,14 +67,14 @@ snapshots.
          - Unsuccessful or blocked (`phase: spec` and
            `status: revision_required`): Restart the cycle by spawning
            `spec` agent without arguments.
-         - Failed (agent crash, timeout, or explicit `Failed` status):
-           Halt immediately and surface the error.
+         - On `Failed` status or any process failure, halt immediately
+           and surface the error.
 3. **Wait & Resume**:
    - Await each spawned `subagent`'s result.
    - Proceed sequentially; run no phases or tasks in parallel.
 4. **Exceptional Conditions**:
-   - Halt immediately on any `subagent` timeout, crash, or explicit
-     blocker.
+   - Halt immediately on any subagent process failure (crash, timeout,
+     `AgentError`) or `Failed` status.
 5. **Finalize**:
    - Emit execution summary upon workflow completion or halt.
 
@@ -83,7 +84,10 @@ snapshots.
 - Rely only on `STATE.json` for all orchestration decisions.
 - Operate strictly in read-only mode; make no file writes.
 - Trust the machine-readable state file over subagent output text.
-- When verify routes back to spec, continue the loop by spawning `spec` agent without arguments.
+- Pass the proposal argument verbatim to the `spec` subagent; never read
+  or expand file-path arguments.
+- When verify routes back to spec, continue the loop by spawning `spec`
+  agent without arguments.
 - List of agents permitted to invoke:
   - `spec`
   - `plan`
@@ -104,6 +108,8 @@ snapshots.
 - Never invoke agents outside the permitted list.
 - Never prompt the user for decisions mid-run; let blockers halt
   execution.
+- Never perform activities beyond subagent invocation, state tracking,
+  and reporting.
 
 ## Verification
 
@@ -111,26 +117,29 @@ snapshots.
 - Confirm automatic recovery/restart when verification fails.
 - Confirm zero project writes from the orchestration agent itself.
 
-## Result
+## Result directives
 
-- Keep result prose terse, concise, and precise.
-- Optimize result for agent, token, and context efficiency.
+- Optimize result for agent, token, and context efficiency: terse,
+  concise, precise.
 - Split actions, findings, and summaries into terse bullet points.
-- Prefer lists, and sub-lists, over long paragraphs and sentences.
-- Strictly follow the result template below.
+- Use lists and sub-lists over paragraphs and long sentences.
+- Emit the result template as live markdown—never in a code fence.
+- Output nothing outside the template.
+
+### Result template
 
 <!-- prettier-ignore-start -->
 ```md
 ### Execution Summary
 
 - **Actions**:
-  - [Terse list of orchestration actions taken]
+  - [Terse list of actions from spawned subagents]
 - **Files**:
-  - [Terse list of files read]
+  - [Terse list of files affected by spawned subagents]
 - **Findings**:
-  - [Terse list of observations, blockers, or failures]
+  - [Terse list of findings from spawned subagent]
 - **Summary**:
-  - [Terse summary of the workstream outcome]
+  - [Terse list of summary from spawned subagents]
 
 > **`SPAE` Orchestrate** • `[workstream]`
 > **Result**: [Completed | Halted | Failed]
