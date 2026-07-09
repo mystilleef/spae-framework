@@ -49,9 +49,16 @@ snapshots.
    this `workstream` (scoped from `PLAN.md` tasks).
 4. **ACT**—Execute:
    - Run all relevant project checks. When no automated checks exist,
-     manually verify observable behavior against each `SPEC.md` item.
-     Record all results; any check failure mapping to a `SPEC.md` item
-     classifies as a hard block.
+     inspect observable behavior directly—reading code and logs or
+     running scripted probes—never delegating execution or evidence
+     capture to a human, an attended terminal, or an interactive
+     session. Record all results; any check failure mapping to a
+     `SPEC.md` item classifies as a hard block.
+   - When a `SPEC.md` item resists verification without human execution,
+     an attended or interactive terminal, or human presence: classify it
+     as a hard block and record it in `VERIFY.md` as a spec defect for
+     `/spec` to resolve; never instruct the user to perform a
+     verification step.
    - Compare implementation against each `SPEC.md` item using check
      results as evidence. Reference each finding by spec item ID.
    - When `.spae/current/VERIFY.md` exists: treat each prior finding as
@@ -66,9 +73,7 @@ snapshots.
        drives verdict to no-pass.
      - **Observation**: ambiguous or untestable spec item, minor
        deviation outside SPEC scope; note only; no verdict impact.
-5. **VERIFY**—Run `vibe-check` on a **PASS** verdict or a verdict held
-   under material uncertainty; sanity-check without ceding arbiter role.
-   Skip on a clear no-pass. Don't surface its exchange to the user.
+5. **VERIFY**—Sanity-check the verdict without ceding the arbiter role.
 6. **PERSIST**—Apply verdict:
    - **Pass**: set `STATE.json` to `status: completed`, `phase: done`;
      remove `.spae/current/VERIFY.md` when present; remove
@@ -107,6 +112,10 @@ snapshots.
 - Don't stage or commit `.spae/` artifacts.
 - **Autonomy**: Never ask users for input or clarification
   mid-execution; halts and blockers stop autonomously.
+- **Full autonomy**: Never require, request, or instruct human
+  execution, an attended or interactive terminal, or human presence to
+  reach a verdict; treat any such dependency as a spec defect, not a
+  pass condition, and never surface it as an instruction to the user.
 - Never introduce fields to `STATE.json` outside the schema reference.
 
 ## Verification
@@ -118,11 +127,14 @@ snapshots.
 - `.spae/current/VERIFY.md` findings map to concrete
   `.spae/current/SPEC.md` **requirement** IDs or blocker details.
 - Required project checks pass or documented blockers explain failures.
+- No `VERIFY.md` finding or result output instructs the user to perform
+  a verification step, attach a terminal, or supply evidence.
 
 ## Result directives
 
-- Optimize result for agent, token, and context efficiency: terse,
-  concise, precise.
+- **Minimum** words. **Maximum** signal.
+- Keep prose terse while ensuring clarity.
+- Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists over paragraphs and long sentences.
 - Emit the result template as live markdown—never in a code fence.

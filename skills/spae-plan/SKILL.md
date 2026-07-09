@@ -48,11 +48,8 @@ snapshots.
    items, and assumptions from `SPEC.md`. Capture every `R-NNN` item
    into an in-memory coverage checklist. Gather only the source patterns
    needed for codebase fit; never edit repository files.
-3. **PLAN**—Run `vibe-check` when decomposition carries ambiguity,
-   complexity, or risk—many tasks, tricky dependencies, or high-risk
-   sequencing; confirm it covers the spec without over-splitting. Skip
-   small, low-risk plans; when unsure, run it. Don't surface its
-   exchange to the user.
+3. **PLAN**—Decompose requirements into tasks; confirm it covers the
+   spec without over-splitting.
 4. **ACT**—Delete `.spae/current/PLAN.md` (ignore if absent) and clear
    the `tasks` registry in `.spae/current/STATE.json` to empty —
    unconditionally. Read the template from `references/PLAN.md`.
@@ -87,10 +84,13 @@ snapshots.
   failure modes, and edge cases tests must cover.
 - Write verification as concrete test commands and deterministic checks;
   every task's Verification section must include test execution.
+- Reject verification steps that presume human execution, an attended or
+  interactive terminal, or human presence; flag as a spec defect instead
+  of encoding them in `PLAN.md`.
 - Preserve execution-mode neutrality for `/build`, `/tdd`, and
   `/execute`.
 - Never add `SPAE` artifacts beyond core files and ephemeral
-  `VERIFY.md`. Don't surface the `vibe-check` exchange to the user.
+  `VERIFY.md`.
 - Never stage or commit `.spae/`.
 
 ## Constraints
@@ -103,6 +103,9 @@ snapshots.
 - **Phase boundary**: hand off to `/inspect`; don't execute tasks.
 - **Autonomy**: Never ask users for input or clarification
   mid-execution; halts and blockers stop autonomously.
+- **Full autonomy**: Never write a task whose Verification section
+  depends on human execution, an attended or interactive terminal, or
+  human presence.
 - Never introduce fields to `STATE.json` outside the schema reference.
 
 ## Verification
@@ -115,6 +118,8 @@ snapshots.
 - Every task's Acceptance section names the behaviors, failure modes,
   and edge cases tests must cover.
 - Every task's Verification section includes test execution commands.
+- No task's Verification section depends on human execution, an attended
+  or interactive terminal, or human presence.
 - Every task includes an `Intent` line distilled from the requirements
   it satisfies, or—for an enabling task—its structural purpose toward
   the plan `## Goal`.
@@ -131,8 +136,9 @@ snapshots.
 
 ## Result directives
 
-- Optimize result for agent, token, and context efficiency: terse,
-  concise, precise.
+- **Minimum** words. **Maximum** signal.
+- Keep prose terse while ensuring clarity.
+- Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists over paragraphs and long sentences.
 - Emit the result template as live markdown—never in a code fence.

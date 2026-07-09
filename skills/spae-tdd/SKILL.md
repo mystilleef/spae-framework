@@ -51,7 +51,7 @@ snapshots.
 See `references/testing-guide.md` for test structure, isolation,
 mocking, assertion, and performance standards.
 
-## Shell Commands
+## Shell commands
 
 See `references/shell-command-guide.md` for command safety, timeouts,
 redirects, and non-interactive environment directives.
@@ -72,12 +72,9 @@ redirects, and non-interactive environment directives.
    `non-testable`. Read `references/testing-guide.md` and
    `references/shell-command-guide.md`. Declare the full implementation
    path that satisfies every acceptance criterion, advances the task
-   `Intent` and plan `## Goal`, and leaves seams for forward tasks. Run
-   `vibe-check` when the task carries ambiguity, complexity, risk, or
-   irreversibility; confirm the planned change advances the task
-   `Intent` and plan `## Goal`, not merely literal acceptance criteria.
-   Skip trivial, reversible work; when unsure, run it. Don't surface its
-   exchange to the user.
+   `Intent` and plan `## Goal`, and leaves seams for forward tasks.
+   Confirm the planned change advances the task `Intent` and plan `## Goal`,
+   not merely literal acceptance criteria.
 4. **ACT**—Execute:
    - **Behavioral**: iterate over every acceptance criterion:
      - Write a failing test: expected behavior, failure modes, and edge
@@ -88,8 +85,9 @@ redirects, and non-interactive environment directives.
        coverage.
    - **Refactor**: prove a green baseline first; refactor in
      micro-steps; keep tests green throughout.
-   - **Non-testable**: run the strongest available static or manual
-     verification from the task.
+   - **Non-testable**: run the strongest available static or
+     agent-executed inspection from the task; never delegate execution
+     or evidence capture to a human or an attended terminal.
 5. **VERIFY**—Loop over every verification command and regression test
    for the active task:
    - Audit every new test file against CI Parity rules in
@@ -158,6 +156,9 @@ redirects, and non-interactive environment directives.
   outside the active task.
 - **Autonomy**: Never ask users for input or clarification
   mid-execution; halts and blockers stop autonomously.
+- **Full autonomy**: Never perform or request human execution, an
+  attended or interactive terminal, or human presence; treat any such
+  dependency as an out-of-scope blocker.
 - Never introduce fields to `STATE.json` outside the schema reference.
 - No hacks, workarounds, or shortcuts.
 - Forbid laziness; fix issues properly, correctly, and idiomatically.
@@ -189,8 +190,9 @@ redirects, and non-interactive environment directives.
 
 ## Result directives
 
-- Optimize result for agent, token, and context efficiency: terse,
-  concise, precise.
+- **Minimum** words. **Maximum** signal.
+- Keep prose terse while ensuring clarity.
+- Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Emit task execution feedback after completing a task.
 - Use lists and sub-lists over paragraphs and long sentences.

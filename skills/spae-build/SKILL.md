@@ -73,10 +73,7 @@ redirects, and non-interactive environment directives.
    `references/testing-guide.md` and
    `references/shell-command-guide.md`. Map the test surface per
    criterion: expected behaviors, failure modes, and edge cases. Choose
-   among valid implementations by goal fit, not local convenience. Run
-   `vibe-check` only when the slice carries ambiguity, complexity, risk,
-   or irreversibility; skip trivial, reversible, single-step work; when
-   unsure, run it. Don't surface its exchange to the user.
+   among valid implementations by goal fit, not local convenience.
 4. **ACT**—Iterate over every acceptance criterion:
    - Write a failing test: expected behavior, failure modes, and edge
      cases.
@@ -152,6 +149,10 @@ redirects, and non-interactive environment directives.
   outside the active task.
 - **Autonomy**: Never ask users for input or clarification
   mid-execution; halts and blockers stop autonomously.
+- **Full autonomy**: Never perform or request human execution, an
+  attended or interactive terminal, or human presence to satisfy a
+  verification step; treat any such dependency as an out-of-scope
+  blocker (plan/spec defect).
 - Never introduce fields to `STATE.json` outside the schema reference.
 - No hacks, workarounds, or shortcuts.
 - Forbid laziness; fix issues properly, correctly, and idiomatically.
@@ -179,8 +180,9 @@ redirects, and non-interactive environment directives.
 
 ## Result directives
 
-- Optimize result for agent, token, and context efficiency: terse,
-  concise, precise.
+- **Minimum** words. **Maximum** signal.
+- Keep prose terse while ensuring clarity.
+- Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Emit task execution feedback after completing a task.
 - Use lists and sub-lists over paragraphs and long sentences.

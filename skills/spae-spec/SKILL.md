@@ -62,8 +62,6 @@ If absent symlink follow this workflow.
    - Read codebase sections narrowly; widen only on uncertainty.
    - Derive goal, requirements, testing strategy, out-of-scope
      boundaries, and assumptions; reflect all `AGENTS.md` constraints.
-   - Invoke `vibe-check` on formulated approach; don't surface exchange
-     to the user.
 5. **VERIFY**—Loop over spec completeness criteria:
    - For each failure: return to `ACT`, fix, then re-enter `VERIFY`.
    - Exit only when spec complete and structure matches
@@ -93,8 +91,6 @@ If present symlink follow this workflow.
    - Inspect source files to ground new requirements.
    - Write new `SPEC.md` from scratch; never reuse old spec; assign
      fresh `R-NNN` identifiers; address all `VERIFY.md` findings.
-   - Invoke `vibe-check` on formulated approach; don't surface exchange
-     to the user.
 5. **VERIFY**—Loop over all `VERIFY.md` findings:
    - For each unaddressed finding: return to `ACT`, address it, then
      re-enter `VERIFY`.
@@ -113,6 +109,10 @@ If present symlink follow this workflow.
 - Write observable, testable, and implementation-neutral requirements.
 - Write a testing strategy covering expected behavior, failure modes,
   and edge cases; name all applicable test categories.
+- Treat `manual` testing strategy as agent-executed, unattended
+  inspection only; never encode a requirement, approach, or assumption
+  that presumes human execution, an attended or interactive terminal, or
+  human presence.
 - Tag each item with a unique, stable `R-NNN` identifier.
 - Document assumptions explicitly instead of guessing scope.
 - Match level of detail to task size; avoid process bloat.
@@ -131,6 +131,10 @@ If present symlink follow this workflow.
 - **Phase boundary**: hand off work to `/plan`; don't decompose tasks.
 - **Autonomy**: Never ask users for input or clarification
   mid-execution; halts and blockers stop autonomously.
+- **Full autonomy**: Never author a requirement, testing strategy, or
+  assumption that presumes human execution, an attended or interactive
+  terminal, or human presence; treat such a need as a scope defect and
+  resolve it before writing `SPEC.md`.
 - **Ambiguity**: resolve from codebase evidence first; fall back to a
   documented conservative assumption only when evidence proves
   insufficient; record under **Assumptions** in `SPEC.md`.
@@ -141,6 +145,9 @@ If present symlink follow this workflow.
 - Ensure `.spae/[workstream]/SPEC.md` contains distilled requirements
   and structure matching `references/SPEC.md` exactly.
 - Confirm each item carries a unique `R-NNN` identifier.
+- Confirm no requirement, testing strategy, or assumption in `SPEC.md`
+  presumes human execution, an attended or interactive terminal, or
+  human presence.
 - Confirm the testing strategy covers expected behavior, failure modes,
   and edge cases; no generic or single-target statements.
 - Ensure `.spae/[workstream]/STATE.json` specifies `phase: "plan"` and
@@ -156,8 +163,9 @@ If present symlink follow this workflow.
 
 ## Result directives
 
-- Optimize result for agent, token, and context efficiency: terse,
-  concise, precise.
+- **Minimum** words. **Maximum** signal.
+- Keep prose terse while ensuring clarity.
+- Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists over paragraphs and long sentences.
 - Emit the result template as live markdown—never in a code fence.

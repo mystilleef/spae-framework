@@ -15,8 +15,9 @@
 
 ## Testing strategy
 
-- **Approach**: [unit | integration | e2e | manual — list all that
-  apply]
+- **Approach**: [unit | integration | e2e | manual—list all that apply;
+  manual means agent-executed, unattended inspection, never human
+  execution or an interactive terminal]
 - **Expected behavior**: [What succeeds under valid inputs]
 - **Failure modes**: [What fails, errors, or rejects under invalid
   inputs or dependency failures]
