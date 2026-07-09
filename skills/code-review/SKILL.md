@@ -136,8 +136,9 @@ Abort with a clear message if no scope detected.
 
 ## Result directives
 
-- Optimize result for agent, token, and context efficiency: terse,
-  concise, precise.
+- **Minimum** words. **Maximum** signal.
+- Keep prose terse while ensuring clarity.
+- Optimize prose for agent, token, and context efficiency.
 - Split actions and summaries into terse bullet points.
 - Use lists and sub-lists over paragraphs and long sentences.
 - Omit inapplicable fields.

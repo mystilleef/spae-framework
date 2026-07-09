@@ -22,6 +22,7 @@ Deliver one `transformative` life perspective shift and one
 
 ## Result directives
 
+- **Minimum** words. **Maximum** signal.
 - Emit both outputs as live markdown—never in a code fence.
 - Keep prose vivid, terse, and direct.
 - No copular verb forms.

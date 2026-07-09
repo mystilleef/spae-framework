@@ -108,8 +108,9 @@ Determine input from the current repository state:
 
 ## Result directives
 
-- Optimize result for agent, token, and context efficiency: terse,
-  concise, precise.
+- **Minimum** words. **Maximum** signal.
+- Keep prose terse while ensuring clarity.
+- Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists over paragraphs and long sentences.
 - Emit the result template as live markdown—never in a code fence.

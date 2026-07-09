@@ -82,9 +82,10 @@ argument-hint: "[optional: files or focus area]"
 
 ## Result directives
 
+- **Minimum** words. **Maximum** signal.
 - Return the final execution status block.
-- Optimize result for agent, token, and context efficiency: terse,
-  concise, precise.
+- Keep prose terse while ensuring clarity.
+- Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists over paragraphs and long sentences.
 - Emit the result template as live markdown—never in a code fence.

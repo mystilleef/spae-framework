@@ -36,7 +36,7 @@ project. Abort with a clear message if none detected.
 See `references/testing-guide.md` for test structure, isolation,
 mocking, assertion, and performance standards.
 
-## Shell Commands
+## Shell commands
 
 See `references/shell-command-guide.md` for command safety, timeouts,
 redirects, and non-interactive environment directives.
@@ -102,6 +102,9 @@ decision.
   `@ts-ignore`, `eslint-disable`, `@SuppressWarnings`, `# type: ignore`.
 - Never weaken type contracts to silence errors; for example, `as any`,
   `!` non-null assertions, or broadening union types.
+- **Full autonomy**: Never perform or request human execution, an
+  attended or interactive terminal, or human presence to confirm
+  coverage; use direct, agent-executed inspection instead.
 
 ## Verification
 
@@ -109,15 +112,16 @@ decision.
 - Entire test suite passes with no failures.
 - All four categories audited per target on the behavioral surface.
 - If coverage tool present: no meaningful uncovered lines or branches
-  remain; if absent: all five categories manually confirmed, no critical
-  gaps.
+  remain; if absent: all five categories confirmed through direct,
+  agent-executed inspection, no critical gaps.
 - Tests cover real behavioral risk, not vanity coverage.
 - All new tests pass CI Parity audit in `references/testing-guide.md`.
 
 ## Result directives
 
-- Optimize result for agent, token, and context efficiency: terse,
-  concise, precise.
+- **Minimum** words. **Maximum** signal.
+- Keep prose terse while ensuring clarity.
+- Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists over paragraphs and long sentences.
 - Emit the result template as live markdown—never in a code fence.
