@@ -35,8 +35,8 @@ flowchart TD
   - [Atomic change 2]
 - **Acceptance**:
   - [Expected behavior — outcome when inputs are valid]
-  - [Failure mode — outcome when inputs are invalid or dependency fails]
-  - [Edge case — outcome at boundary or with empty/nil input]
+  - [Failure mode / Edge case — if specified in SPEC.md or required by
+    task logic]
 - **Verification**:
   - `[test command covering acceptance criteria above]`
   - `[build or lint command]`
