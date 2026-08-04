@@ -29,16 +29,12 @@ Read only what the inspection requires:
 
 - `.spae/current/SPEC.md`
 - `.spae/current/PLAN.md`
-- `.spae/current/STATE.json`
+- `.spae/current/STATE.json` (consult `references/STATE.md` for field
+  reference, directives, and phase snapshots)
 - Relevant source files for context only.
 
 **Never read `.spae/current/VERIFY.md`**—not an input to this phase.
 Reading qualifies as content-blocking.
-
-## `STATE.json`
-
-See `references/STATE.md` for the field reference, directives, and phase
-snapshots.
 
 ## Workflow
 
@@ -57,8 +53,9 @@ snapshots.
      non-actionable `Intent` as `Should fix`; backfill or sharpen it
      from `SPEC.md` (or, for enabling tasks, from `Context` and the plan
      `## Goal`) during refinement.
-   - Flag any Acceptance section omitting test requirements—expected
-     behavior, failure modes, and edge cases—as `Should fix`.
+   - Flag any `Satisfies`-bearing task's Acceptance section omitting
+     test requirements specified in `SPEC.md` or required by task logic
+     as `Should fix`.
    - Flag any Verification section lacking test execution commands as
      `Should fix`.
    - Flag any `Dependencies` entry with a `T-NNN` ID ≥ the declaring
@@ -72,6 +69,9 @@ snapshots.
    - Flag any task with `Satisfies: none` lacking a credible
      enabling-task rationale in its `Context` as `Should fix` (orphan
      task—likely scope creep).
+   - Flag any ≥2 adjacent tasks sharing no independent acceptance value
+     and no dependency-ordering reason for separation as `Should fix`
+     (merge candidate).
    - **Classify findings**:
      - `Must fix`: gaps breaking requirements, contracts, safety, or
        verification.
@@ -80,7 +80,8 @@ snapshots.
    - **Refine `PLAN.md`**: Rewrite what each `Must fix` or `Should fix`
      demands—re-split, reorder, add, or remove tasks. Make no change
      absent a classified finding. Preserve atomic, independently
-     verifiable tasks and contiguous sequential `T-NNN` IDs.
+     verifiable tasks and contiguous sequential `T-NNN` IDs. Consult
+     `references/prose-protocol.md` before rewriting task prose.
      - **Renumber atomically**: when adding, removing, or reordering,
        update every `T-NNN` reference in lockstep—task headers,
        `Task graph` mermaid edges, the dependency overview list, and
@@ -92,12 +93,12 @@ snapshots.
    - For each failing item: return to `ACT`, address it, then re-enter
      `VERIFY`.
    - Exit only when all items pass.
-   - Halt only for out-of-scope blockers.
+   - Fail only for out-of-scope conditions.
 6. **PERSIST**—Write `.spae/current/STATE.json` once, atomically: set
-   `phase: build`; set cursor to `T-001` with `task_status: todo`;
-   rebuild the `tasks` registry to mirror the refined `PLAN.md` IDs,
-   each mapped to **todo**; set `metrics.tasks_total` to the refined
-   task count and `metrics.tasks_completed` to `0`.
+   `phase: build`; set cursor `active_task_id` to `T-001`; rebuild the
+   `tasks` registry to mirror the refined `PLAN.md` IDs, each mapped to
+   **todo**. Re-read `STATE.json` after writing; on a field mismatch,
+   rewrite and re-read before `REPORT`.
 7. **REPORT**—Emit the result following the result directives and using
    the result template.
 
@@ -109,10 +110,10 @@ snapshots.
   gates.
 - Strengthen verification steps with concrete test commands; test
   execution, not just build commands.
-- Preserve one execution choice per `workstream` after inspection:
-  `/build`, `/tdd`, or `/execute`.
+- Route every `workstream` to `/build` after inspection.
 - Ensure `.spae/` stays local execution state and never gets staged or
   committed.
+- Consult `references/prose-protocol.md` before editing `PLAN.md`.
 
 ## Constraints
 
@@ -127,7 +128,10 @@ snapshots.
 - **Status**: Report `SUCCESS` only after writing the optimized plan and
   advancing state.
 - **Autonomy**: Never ask users for input or clarification
-  mid-execution; halts and blockers stop autonomously.
+  mid-execution; halts and failures stop autonomously.
+- **Full autonomy**: Never leave or write a task whose Verification
+  section depends on human execution, an attended or interactive
+  terminal, or human presence; correct it during refinement.
 - Never introduce fields to `STATE.json` outside the schema reference.
 
 ## Verification
@@ -137,8 +141,10 @@ snapshots.
 - Each task remains atomic, independently verifiable, and topologically
   ordered—every `Dependencies` ID numerically precedes the declaring
   task; no cycles survive.
-- Every task's Acceptance section names testable behaviors, failure
-  modes, and edge cases; tasks lacking these flagged as `Should fix`.
+- Every `Satisfies`-bearing task's Acceptance section names testable
+  behaviors matching `SPEC.md` requirements (flags missing failure modes
+  or edge cases as `Should fix` only when specified in `SPEC.md` or
+  required by task logic).
 - Every task's Verification section includes test execution commands.
 - Every task carries an actionable `Intent` line.
 - No dangling or stale `T-NNN` reference survives in
@@ -146,8 +152,8 @@ snapshots.
 - Findings use `Must fix`, `Should fix`, or `Observations`.
 - `.spae/current/STATE.json` has `phase: build` and cursor `T-001` ready
   for execution.
-- `.spae/current/STATE.json` `tasks` registry and `metrics` mirror the
-  refined `PLAN.md` task count.
+- `.spae/current/STATE.json` `tasks` registry mirrors the refined
+  `PLAN.md` task count and IDs.
 - No forbidden files changed.
 
 ## Result directives
@@ -159,6 +165,8 @@ snapshots.
 - Use lists and sub-lists over paragraphs and long sentences.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
+- Source every `SPAE Status` value from the confirmed re-read, never
+  from working memory of intent.
 
 ### Result template
 
@@ -177,10 +185,10 @@ snapshots.
 
 > **`SPAE` Status** • `[workstream-name]`
 > **Phase Complete**: `/inspect`
-> **Next Phase**: `/build`, `/tdd`, or `/execute`
+> **Next Phase**: `/build`
 > **Result**: [Ready | Revised | Failed]
 > **Impact**: [Terse impact statement]
 >
-> _Run `/build`, `/tdd`, or `/execute` next. Keep one execution mode for this workstream._
+> _Run `/build` next._
 ```
 <!-- prettier-ignore-end -->
