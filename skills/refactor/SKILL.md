@@ -43,10 +43,15 @@ project. Abort with a clear message if none detected.
 See `references/testing-guide.md` for test structure, isolation,
 mocking, assertion, and performance standards.
 
-## Shell Commands
+## Shell commands
 
 See `references/shell-command-guide.md` for command safety, timeouts,
 redirects, and non-interactive environment directives.
+
+## Cleanup
+
+See `references/cleanup-guide.md` for the self-introduced-artifact
+checklist and diff-only audit scope.
 
 ## Workflow
 
@@ -54,6 +59,7 @@ redirects, and non-interactive environment directives.
    - Abort if no scope exists.
    - Read `references/testing-guide.md`.
    - Read `references/shell-command-guide.md`.
+   - Read `references/cleanup-guide.md`.
    - Read relevant production code, adjacent tests, and test commands.
    - Confirm automated test suite passes before touching code.
    - Detect `antipatterns` using the violation catalog in
@@ -72,6 +78,9 @@ redirects, and non-interactive environment directives.
    declared.
 5. **VERIFY**—Loop over every criterion declared in PLAN:
    - Run the full suite after each `ACT` step.
+   - Audit the task's own `git diff`/`git status` against the
+     Self-cleanup checklist in `references/cleanup-guide.md`; remove
+     every self-introduced artifact before proceeding.
    - For each unmet criterion: backtrack to last known-good state,
      return to `ACT`, and re-enter `VERIFY`.
    - Exit only when all criteria pass.
@@ -93,6 +102,20 @@ redirects, and non-interactive environment directives.
 - **Inherit Baseline**: Treat the test suite as-found at refactor start
   as the authoritative baseline, regardless of prior tooling in the same
   session.
+- **Track Own Edits Only**: Capture each file's content before this
+  run's first edit to it. Revert means rewriting captured content back,
+  or deleting files this run created—never a git-level reset, stash,
+  checkout, or restore, which erases uncommitted work from earlier
+  phases in the same tree.
+- **Never Leave It Broken**: End every refactor with the suite green
+  again or the offending edits reverted, regardless of why VERIFY halts.
+- **Self-Inflicted Failures Stay In-Scope**: A failure this pass's own
+  edits cause never qualifies as an out-of-scope blocker; loop
+  `VERIFY`'s backtrack step instead of halting.
+- **Bug Found Mid-Refactor**: A pre-existing bug the refactor exposes
+  counts as out-of-scope. Revert the edits that surfaced it, then report
+  the bug as a separate finding. Never fix it in the same pass (Two
+  Hats).
 - No hacks, workarounds, or shortcuts.
 - Forbid laziness; fix issues properly, correctly, and idiomatically.
 - Never edit build or tool configuration files; for example,
@@ -112,6 +135,10 @@ redirects, and non-interactive environment directives.
 - No dangling references or unintended interface breaks.
 - Re-run smell detection against the violation catalog to confirm no new
   violations introduced.
+- No self-introduced cleanup violation remains per
+  `references/cleanup-guide.md`.
+- `Result: Failed` only follows a working tree the agent restores to the
+  pre-refactor baseline; never a suite left red.
 
 ## Result directives
 
