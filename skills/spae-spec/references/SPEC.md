@@ -10,8 +10,7 @@
 ## Requirements
 
 - **R-001**: [Required behavior]
-- **R-002**: [Performance | security | compatibility | reliability
-  constraint]
+- **R-002**: [Additional required behavior or constraint, if applicable]
 
 ## Testing strategy
 
@@ -19,10 +18,10 @@
   manual means agent-executed, unattended inspection, never human
   execution or an interactive terminal]
 - **Expected behavior**: [What succeeds under valid inputs]
-- **Failure modes**: [What fails, errors, or rejects under invalid
-  inputs or dependency failures]
-- **Edge cases**: [Boundary, empty, nil, or zero-value conditions]
-- **Exclusions**: [What to skip — why]
+- **Failure modes**: [What fails, errors, or rejects — if applicable]
+- **Edge cases**: [Boundary, empty, nil, or zero-value conditions — if
+  applicable]
+- **Exclusions**: [What to skip — if applicable]
 
 ## Out of scope
 

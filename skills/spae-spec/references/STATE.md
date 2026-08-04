@@ -2,18 +2,14 @@
 
 ## Field reference
 
-| Field                     | Type             | Valid values                                                               | Notes                                                        |
-| ------------------------- | ---------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `version`                 | string           | `"1.0"`                                                                    | Fixed                                                        |
-| `workstream`              | string           | kebab-case slug                                                            | Set on init; never mutated                                   |
-| `phase`                   | string           | `"spec"` \| `"plan"` \| `"inspect"` \| `"build"` \| `"verify"` \| `"done"` | Advances forward; verify no-pass routes backward to `"spec"` |
-| `status`                  | string           | `"active"` \| `"revision_required"` \| `"completed"`                       | `revision_required` and `completed` written only by verify   |
-| `cursor.active_task_id`   | string           | `"T-NNN"`                                                                  | `build` and `verify` phases only                             |
-| `cursor.task_status`      | string           | `"todo"` \| `"in_progress"` \| `"done"` \| `"blocked"`                     | `build` and `verify` phases only                             |
-| `tasks`                   | object           | `{ "T-NNN": "todo" \| "in_progress" \| "done" \| "blocked" }`              | Populated by plan; mutated by execution skills               |
-| `metrics.tasks_total`     | integer          | ≥ 0                                                                        | Set by plan; never decremented                               |
-| `metrics.tasks_completed` | integer          | ≥ 0                                                                        | Incremented per task completion                              |
-| `blockers`                | array of strings | —                                                                          | `[]` when clear; never null                                  |
+| Field                     | Type             | Valid values                                                                                       | Notes                                                        |
+| ------------------------- | ---------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `version`                 | string           | `"1.0"`                                                                                            | Fixed                                                        |
+| `workstream`              | string           | kebab-case slug                                                                                    | Set on init; never mutated                                   |
+| `phase`                   | string           | `"spec"` \| `"plan"` \| `"inspect"` \| `"build"` \| `"check"` \| `"fix"` \| `"verify"` \| `"done"` | Advances forward; verify no-pass routes backward to `"spec"` |
+| `status`                  | string           | `"active"` \| `"revision_required"` \| `"completed"`                                               | `revision_required` and `completed` written only by verify   |
+| `cursor.active_task_id`   | string           | `"T-NNN"`                                                                                          | `build`, `check`, `fix`, and `verify` phases only            |
+| `tasks`                   | object           | `{ "T-NNN": "todo" \| "in_progress" \| "done" }`                                                  | Populated by plan; mutated by execution skills               |
 
 ## Directives
 
@@ -26,11 +22,15 @@
   mutate it before writing STATE.json.
 - **Exit (both paths)**: write `phase: "plan"`, `status: "active"` to
   STATE.json.
-- **New workstream exit**: preserve `cursor: {}`, `tasks: {}`,
-  `metrics: {tasks_total: 0, tasks_completed: 0}`, `blockers: []`.
-- **Revision exit**: preserve existing `tasks`, `metrics`, and
-  `blockers` unchanged; set `cursor: {}`.
+- **New workstream exit**: preserve `cursor: {}` and `tasks: {}`.
+- **Revision exit**: clear `tasks` to `{}`; set `cursor: {}`.
 - Never mutate `workstream` or `version`.
+- Confirm every write with a fresh read before treating the write as
+  done; a field mismatch counts as an unmet `VERIFY` criterion, not a
+  finished write.
+- A forgotten or partial write—not a task failure—stalls orchestrator
+  dispatch and corrupts manual resumption; every write here gates
+  automation, not bookkeeping.
 
 ## Snapshots
 
@@ -45,9 +45,7 @@
   "phase": "spec",
   "status": "revision_required",
   "cursor": {},
-  "tasks": {"T-001": "done", "T-002": "done"},
-  "metrics": {"tasks_total": 2, "tasks_completed": 2},
-  "blockers": []
+  "tasks": {}
 }
 ```
 
@@ -60,9 +58,7 @@
   "phase": "plan",
   "status": "active",
   "cursor": {},
-  "tasks": {},
-  "metrics": {"tasks_total": 0, "tasks_completed": 0},
-  "blockers": []
+  "tasks": {}
 }
 ```
 
@@ -75,8 +71,6 @@
   "phase": "plan",
   "status": "active",
   "cursor": {},
-  "tasks": {"T-001": "done", "T-002": "done"},
-  "metrics": {"tasks_total": 2, "tasks_completed": 2},
-  "blockers": []
+  "tasks": {}
 }
 ```
