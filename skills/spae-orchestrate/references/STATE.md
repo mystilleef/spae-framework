@@ -1,19 +1,15 @@
-# `STATE.json` Reference
+# `STATE.json`
 
-## Fields
+## Field reference
 
-| Field                     | Type             | Valid values                                                               | Notes                                                      |
-| ------------------------- | ---------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `version`                 | string           | `"1.0"`                                                                    | Constant value                                             |
-| `workstream`              | string           | kebab-case slug                                                            | Set on init; remains constant                              |
-| `phase`                   | string           | `"spec"` \| `"plan"` \| `"inspect"` \| `"build"` \| `"verify"` \| `"done"` | Advances forward; verify failure reverts phase to `"spec"` |
-| `status`                  | string           | `"active"` \| `"revision_required"` \| `"completed"`                       | Set only by verify                                         |
-| `cursor.active_task_id`   | string           | `"T-NNN"`                                                                  | Exists during build and verify phases                      |
-| `cursor.task_status`      | string           | `"todo"` \| `"in_progress"` \| `"done"` \| `"blocked"`                     | Exists during build and verify phases                      |
-| `tasks`                   | object           | `{ "T-NNN": "todo" \| "in_progress" \| "done" \| "blocked" }`              | Set by plan; updated by execution agents                   |
-| `metrics.tasks_total`     | integer          | ≥ 0                                                                        | Set by plan; remains constant                              |
-| `metrics.tasks_completed` | integer          | ≥ 0                                                                        | Increments per task completion                             |
-| `blockers`                | array of strings | —                                                                          | Empty array when clear                                     |
+| Field                     | Type             | Valid values                                                               | Notes                                                        |
+| ------------------------- | ---------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `version`                 | string           | `"1.0"`                                                                    | Fixed                                                        |
+| `workstream`              | string           | kebab-case slug                                                            | Set on init; never mutated                                   |
+| `phase`                   | string           | `"spec"` \| `"plan"` \| `"inspect"` \| `"build"` \| `"check"` \| `"fix"` \| `"verify"` \| `"done"` | Advances forward; verify no-pass routes backward to `"spec"` |
+| `status`                  | string           | `"active"` \| `"revision_required"` \| `"completed"`                       | `revision_required` and `completed` written only by verify   |
+| `cursor.active_task_id`   | string           | `"T-NNN"`                                                                  | `build`, `check`, `fix`, and `verify` phases only            |
+| `tasks`                   | object           | `{ "T-NNN": "todo" \| "in_progress" \| "done" }`                          | Populated by plan; mutated by execution skills               |
 
 ## Directives
 
@@ -21,12 +17,13 @@
   updates.
 - **Read at start**: resolve the current phase to identify the next
   `subagent`.
-- **Read after each task**: verify that the registry marks the active
-  task as `"done"`.
+- **Read after every spawn**: confirm `phase` differs from the value
+  recorded at the start of the iteration.
 - **Halt immediately** under these conditions:
-  - Task shows `"todo"`, `"in_progress"`, or `"blocked"` after
-    `subagent` returns.
-  - `subagent` reports a crash, timeout, or blocker.
+  - `phase` matches the value recorded at the start of the iteration.
+  - `phase` matches none of `spec`, `plan`, `inspect`, `build`, `check`,
+    `fix`, `verify`, `done`.
+  - `subagent` reports `Failed` status, crashes, or times out.
 - Trust STATE.json over `subagent` text.
 
 ## Snapshots
@@ -40,13 +37,11 @@
   "phase": "spec",
   "status": "active",
   "cursor": {},
-  "tasks": {},
-  "metrics": {"tasks_total": 0, "tasks_completed": 0},
-  "blockers": []
+  "tasks": {}
 }
 ```
 
-**Build Phase Entry State**:
+**Build Phase Mid-execution**:
 
 ```json
 {
@@ -54,10 +49,21 @@
   "workstream": "example-workstream",
   "phase": "build",
   "status": "active",
-  "cursor": {"active_task_id": "T-001", "task_status": "todo"},
-  "tasks": {"T-001": "todo", "T-002": "todo", "T-003": "todo"},
-  "metrics": {"tasks_total": 3, "tasks_completed": 0},
-  "blockers": []
+  "cursor": {"active_task_id": "T-001"},
+  "tasks": {"T-001": "todo", "T-002": "todo", "T-003": "todo"}
+}
+```
+
+**Verify Phase State**:
+
+```json
+{
+  "version": "1.0",
+  "workstream": "example-workstream",
+  "phase": "verify",
+  "status": "active",
+  "cursor": {"active_task_id": "T-003"},
+  "tasks": {"T-001": "done", "T-002": "done", "T-003": "done"}
 }
 ```
 
@@ -69,9 +75,7 @@
   "workstream": "example-workstream",
   "phase": "done",
   "status": "completed",
-  "cursor": {"active_task_id": "T-003", "task_status": "done"},
-  "tasks": {"T-001": "done", "T-002": "done", "T-003": "done"},
-  "metrics": {"tasks_total": 3, "tasks_completed": 3},
-  "blockers": []
+  "cursor": {"active_task_id": "T-003"},
+  "tasks": {"T-001": "done", "T-002": "done", "T-003": "done"}
 }
 ```

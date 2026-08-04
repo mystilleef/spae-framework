@@ -16,67 +16,58 @@ argument-hint: "[optional-proposal]"
 
 ## Goal
 
-- Spawn appropriate `subagents` sequentially based on `STATE.json`
-  status and phase.
-- Stop the workflow successfully upon completion, or halt immediately on
-  errors.
+- Spawn the subagent matching the current `STATE.json` phase, looped
+  until the workstream completes.
+- Halt immediately on any subagent failure.
 
 ## Input
 
-Read `.spae/current/STATE.json` to resolve the current execution phase
-and cursor. Accept an optional argument, the proposal, during initial
+Read `.spae/current/STATE.json` to resolve the current phase and
+cursor. Accept an optional argument, the proposal, during initial
 execution.
 
 ## `STATE.json`
 
-See `references/STATE.md` for field reference, directives, and
-snapshots.
+See `references/STATE.md` for the field reference, directives, and
+phase snapshots.
+
+## Phase-agent map
+
+Every phase maps to exactly one subagent, spawned the same way
+regardless of phase:
+
+| `phase`   | Subagent  |
+| --------- | --------- |
+| `spec`    | `spec`    |
+| `plan`    | `plan`    |
+| `inspect` | `inspect` |
+| `build`   | `build`   |
+| `check`   | `check`   |
+| `fix`     | `fix`     |
+| `verify`  | `verify`  |
 
 ## Workflow
 
 1. **Resolve Workstream**:
    - Locate `.spae/current/STATE.json`.
-   - If missing:
-     - Halt if the user provided no proposal argument.
-     - If provided, immediately spawn `spec` agent passing the proposal.
-   - If present, proceed to step 2.
-2. **Orchestrate Phase**:
-   - Re-read `.spae/current/STATE.json` before each step.
-   - Match `phase` to select the subagent:
-     - `spec`:
-       - First run with a command-line proposal argument: Immediately
-         spawn `spec` agent with the proposal.
-       - Otherwise (for example, revision cycles): Immediately spawn
-         `spec` agent without arguments.
-     - `plan`: Immediately spawn `plan` agent without arguments.
-     - `inspect`: Immediately spawn `inspect` agent without arguments.
-     - `build`:
-       - Loop through remaining tasks in registry order.
-       - Immediately spawn `build` agent without arguments for the
-         active task.
-       - Re-read `STATE.json` after each task finishes.
-       - Halt if the task remains unfinished or reports a blocker.
-       - On `Failed` status or any process failure, halt immediately and
-         surface the error.
-     - `verify`:
-       - Immediately spawn `verify` agent without arguments.
-       - Re-read `STATE.json` after completion.
-       - Handle outcomes:
-         - Pass (`phase: done` or `status: completed` or missing
-           symlink): Complete successfully.
-         - Unsuccessful or blocked (`phase: spec` and
-           `status: revision_required`): Restart the cycle by spawning
-           `spec` agent without arguments.
-         - On `Failed` status or any process failure, halt immediately
-           and surface the error.
-3. **Wait & Resume**:
-   - Await each spawned `subagent`'s result.
-   - Proceed sequentially; run no phases or tasks in parallel.
-4. **Exceptional Conditions**:
-   - Halt immediately on any subagent process failure (crash, timeout,
-     `AgentError`) or `Failed` status.
-5. **Finalize**:
-   - Emit execution summary upon workflow completion or halt.
+   - Missing, no proposal argument: halt.
+   - Missing, proposal provided: spawn `spec` with the proposal; await
+     completion; proceed to step 2.
+   - Present: proceed to step 2 without spawning.
+2. **Dispatch Loop**:
+   - Re-read `.spae/current/STATE.json`; record `phase`.
+   - Exit on `phase: "done"`, `status: "completed"`, or a missing
+     `.spae/current` symlink.
+   - Halt immediately if `phase` matches none of the phase-agent map's
+     rows.
+   - Spawn the subagent the map names for the recorded `phase`, no
+     arguments.
+   - Await completion; halt immediately on `Failed` status or any
+     process failure (crash, timeout, `AgentError`).
+   - Re-read `.spae/current/STATE.json`; halt immediately if `phase`
+     matches the value recorded at the start of this iteration.
+   - Repeat step 2.
+3. **Finalize**: Emit the execution summary.
 
 ## Directives
 
@@ -84,15 +75,18 @@ snapshots.
 - Rely only on `STATE.json` for all orchestration decisions.
 - Operate strictly in read-only mode; make no file writes.
 - Trust the machine-readable state file over subagent output text.
-- Pass the proposal argument verbatim to the `spec` subagent; never read
-  or expand file-path arguments.
-- When verify routes back to spec, continue the loop by spawning `spec`
-  agent without arguments.
+- Pass the proposal argument verbatim to the bootstrap `spec` spawn
+  only; never reuse it on later iterations, and never read or expand
+  file-path arguments.
+- Halt immediately on subagent `Failed` status or any process failure
+  (crash, timeout, `AgentError`).
 - List of agents permitted to invoke:
   - `spec`
   - `plan`
   - `inspect`
   - `build`
+  - `check`
+  - `fix`
   - `verify`
 
 ## Constraints
@@ -100,21 +94,21 @@ snapshots.
 - Perform orchestration only; never edit codebase files, tests, or
   documentation.
 - Restrict your activities to:
-  - Using the `subagent` tool to spawn relevant agents to orchestrate
-    the `SPAE` workflow.
+  - Using the `subagent` tool to spawn agents the phase-agent map names.
   - Reading `STATE.json` to orchestrate the `SPAE` workflow.
 - Never run `subagents` in parallel or concurrently.
 - Never activate skills.
 - Never invoke agents outside the permitted list.
-- Never prompt the user for decisions mid-run; let blockers halt
+- Never prompt the user for decisions mid-run; let failures halt
   execution.
 - Never perform activities beyond subagent invocation, state tracking,
   and reporting.
 
 ## Verification
 
-- Confirm successful sequential spawning of all required phase agents.
-- Confirm automatic recovery/restart when verification fails.
+- Confirm every spawned subagent's phase matches the phase-agent map at
+  spawn time.
+- Confirm `phase` changes on every iteration; halt on a stalled phase.
 - Confirm zero project writes from the orchestration agent itself.
 
 ## Result directives
