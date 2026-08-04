@@ -37,8 +37,8 @@ Determine input from the current repository state:
 
 ## Workflow
 
-1. **GATE**—Run `git status --porcelain=v2 --branch`. Halt on no changes
-   or git error.
+1. **GATE**—Run `git --no-pager status --porcelain=v2 --branch`. Halt on
+   no changes or git error.
 2. **ORIENT**—Goal: commit all eligible changes as atomic commits.
    Scope: current project. No changes outside git state.
 3. **PLAN**—Group files into logical commits. Isolate `.gitignore`
@@ -48,12 +48,13 @@ Determine input from the current repository state:
    - Scan candidate paths and content for secrets (pre-stage).
    - Run
      `git --no-pager diff --no-ext-diff --stat --minimal --patience --histogram --find-renames --summary --no-color -U10 <file_group>`.
-   - Run `git add <file1> <file2> ...`.
+   - Run `git --no-pager add <file1> <file2> ...`.
    - Scan staged diff for secrets (pre-commit).
    - Generate conventional commit message.
 5. **VERIFY**—Confirm staged diff matches intent and all secret checks
    pass. On failure: unstage, halt, report.
-6. **PERSIST**—Run `git commit -m "<message>"`. Confirm commit success.
+6. **PERSIST**—Run `git --no-pager commit -m "<message>"`. Confirm
+   commit success.
 7. **REPORT**—Emit the result following the result directives and using
    the result template.
 
@@ -76,11 +77,11 @@ Determine input from the current repository state:
 
 <!-- vale on -->
 
-- **On Secret Match**: Run `git restore --staged -- <files>`, halt, and
-  report only file paths plus matched rule names. Never print secret
-  values, request overrides, or commit flagged files.
-- **Diff Commands**: Use `--no-pager` and `--no-ext-diff` for all diff
-  operations.
+- **On Secret Match**: Run `git --no-pager restore --staged -- <files>`,
+  halt, and report only file paths plus matched rule names. Never print
+  secret values, request overrides, or commit flagged files.
+- **Git Commands**: Use `--no-pager` for every `git` invocation; scope
+  `--no-ext-diff` to `git diff` operations.
 - **Generated Files**: Avoid staging sensitive or build-related files
   unless source control should track them.
 - **Efficiency**: Batch operations by file group, target only relevant
