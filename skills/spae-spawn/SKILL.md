@@ -1,7 +1,8 @@
 ---
 name: spae-spawn
 description: >-
-  Executes the build phase of the SPAE structured workflow autonomously.
+  Executes the build phase of the SPAE structured workflow autonomously,
+  cycling build, check, and fix per task.
 user-invocable: false
 ---
 
@@ -14,68 +15,85 @@ user-invocable: false
 
 ## Goal
 
-- Orchestrate `build` agents sequentially to complete tasks.
-- Ensure `phase: verify` in `STATE.json` after all tasks complete.
+- Spawn the subagent matching the current `STATE.json` phase, looped
+  until every task completes.
+- Ensure `phase: verify` in `STATE.json` once the loop exits.
 
 ## Input
 
-Read `.spae/current/STATE.json` for phase, cursor, task registry, and
-metrics.
+Read `.spae/current/STATE.json` for phase, cursor, and task registry.
 
 ## `STATE.json`
 
-See `references/STATE.md` for the field reference, directives, and phase
-snapshots.
+See `references/STATE.md` for the field reference, directives, and
+phase snapshots.
+
+## Phase-agent map
+
+Every phase maps to exactly one subagent, spawned the same way
+regardless of phase:
+
+| `phase` | Subagent |
+| ------- | -------- |
+| `build` | `build`  |
+| `check` | `check`  |
+| `fix`   | `fix`    |
 
 ## Workflow
 
-1. **Validate State**: Verify `STATE.json` has `phase: build` and at
-   least one remaining task. Halt on malformed or missing `STATE.json`.
-2. **Orchestration Loop**: For each remaining task in registry order:
-   - a. **Read**: Read `active_task_id` from `STATE.json`.
-   - b. **Spawn**: Use the subagent tool to invoke the `build` subagent
-     and do nothing else. Don't pass any arguments or parameters to the
-     `build` agent.
-   - c. **Wait**: Await `build` agent's completion and result.
-   - d. **Verify**: Re-read `STATE.json`. Confirm the task from step 2a
-     shows `done` in the registry. If it remains `todo` or
-     `in_progress`, halt immediately.
-   - e. **Blocker**: On `Failed` status or any process failure, halt
-     immediately and surface the error.
-3. **Finalize Phase**: Confirm `STATE.json` shows `phase: verify`. Emit
-   the final completion feedback.
+1. **Validate State**: Confirm `STATE.json` has `phase` in `"build"`,
+   `"check"`, `"fix"` and a populated `cursor.active_task_id`. Halt on
+   malformed or missing `STATE.json`, or an unrecognized `phase`.
+2. **Dispatch Loop**:
+   - Re-read `.spae/current/STATE.json`; record `phase`.
+   - Exit on `phase: "verify"`.
+   - Halt immediately if `phase` matches none of the phase-agent map's
+     rows.
+   - Spawn the subagent the map names for the recorded `phase`, no
+     arguments.
+   - Await completion; halt immediately on `Failed` status or any
+     process failure (crash, timeout, `AgentError`).
+   - Re-read `.spae/current/STATE.json`; halt immediately if `phase`
+     matches the value recorded at the start of this iteration.
+   - Repeat step 2.
+3. **Finalize Phase**: Confirm `STATE.json` shows `phase: "verify"`.
+   Emit the final completion feedback.
 
 ## Directives
 
 - Limit actions entirely to orchestration.
 - Always use the subagent tool for subagent invocation.
-- Spawn a new `build` agent for each task.
 - Trust `STATE.json` over subagent result.
 - Halt immediately on subagent `Failed` status or any process failure
   (crash, timeout, `AgentError`).
 - List of agents permitted to invoke:
   - `build`
+  - `check`
+  - `fix`
 
 ## Constraints
 
 - Restrict your activities to:
   - Reading `.spae/current/STATE.json`.
-  - Using the subagent tool to invoke the `build` subagent.
+  - Using the subagent tool to spawn agents the phase-agent map names.
 - Never write to any project file.
 - Never activate skills.
 - Never invoke agents outside the permitted list.
 - Never make commits.
 - Never run `subagents` in parallel or concurrently.
-- Never prompt the user for decisions mid-run; let blockers halt
+- Never prompt the user for decisions mid-run; let failures halt
   execution.
 - Never perform activities beyond subagent invocation, state tracking,
   and reporting.
 
 ## Verification
 
-- Verify that all tasks show `done` state upon completion.
+- Confirm every spawned subagent's phase matches the phase-agent map at
+  spawn time.
+- Confirm `phase` changes on every iteration; halt on a stalled phase.
+- Confirm all tasks show `done` state upon completion.
 - Confirm the `workstream` advanced to `phase: verify`.
-- Confirm immediate halt when a `subagent` reports a blocker or fails.
+- Confirm zero project writes from the orchestration agent itself.
 
 ## Result directives
 
