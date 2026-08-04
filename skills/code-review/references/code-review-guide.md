@@ -2,8 +2,8 @@
 
 ## Mission
 
-Flag defects in the reviewed diff that cause incorrect behavior, data
-loss, security vulnerabilities, or crashes. Emit no other findings.
+Flag defects in the reviewed diff causing incorrect behavior, data loss,
+security vulnerabilities, or crashes. Emit no other findings.
 
 ## Scope
 
@@ -34,33 +34,35 @@ loss, security vulnerabilities, or crashes. Emit no other findings.
 - Off-by-one in array indexing, loop bounds, or slice range → **High**
 - Wrong formula, accumulator, or algorithm → **High**
 - Floating-point equality comparison (`==` on floats) → **Medium**
-- Integer overflow where the result serves as index, size, or count →
+- Integer overflow where result serves as index, size, or count →
   **High**
 - Collection mutated during iteration → **High**
 
 ### Null and type safety
 
-- `Dereference` of a potentially null/undefined/None value without a
-  prior guard → **High**
+- `Dereference` of potentially null/undefined/None value without prior
+  guard → **High**
 - Type coercion producing wrong result (JS `==`, implicit string→int,
   etc.) → **Medium**
-- Result/Option/Either type unwrapped without handling the error variant
-  → **High**
+- Result/Option/Either type unwrapped without handling error variant →
+  **High**
 
 ### Concurrency
 
-- Shared mutable state accessed without synchronization → **High**
+- Shared mutable state accessed across proven concurrent paths without
+  synchronization → **High**
 - Lock or `mutex` acquired but not released on all exit paths → **High**
-- **Read-modify-write** without atomicity → **High**
-- Async: `await` gap between read and dependent write on shared state →
+- **Read-modify-write** without atomicity under concurrent execution →
   **High**
+- Async: `await` gap between read and dependent write under verified
+  concurrent execution → **High**
 
 ### Security
 
-- User input reaching SQL query, shell command, or file path without
+- User input reaching SQL query, shell command, or path without
   _sanitization_ → **Critical**
 - **Hardcoded** credential, token, or secret → **Critical**
-- Auth or _auth_ check absent or open to bypass → **Critical**
+- Auth check absent or open to bypass → **Critical**
 - `PII`, tokens, or passwords written to logs, URLs, or error messages →
   **High**
 - Unsafe _deserialization_ of _untrusted_ input → **High**
@@ -73,27 +75,27 @@ loss, security vulnerabilities, or crashes. Emit no other findings.
   guaranteed release → **High**
 - Resource acquired in try block but not released in finally/defer/RAII
   destructor → **High**
-- Unclosed stream passed out of scope with no documented ownership
+- Unclosed stream passed out of scope without documented ownership
   transfer → **Medium**
 
 ### Error handling
 
 - Exception or error caught and silently discarded (empty catch,
   `_ = err`) → **High**
-- Error branch returns a success value → **High**
-- Panic or crash on a recoverable error in context → **Medium**
-- Error not propagated to a caller that requires it → **Medium**
+- Error branch returns success value → **High**
+- Panic or crash on recoverable error in context → **Medium**
+- Error not propagated to caller requiring it → **Medium**
 
 ### API misuse
 
-- Deprecated function with a documented replacement → **Medium**
+- Deprecated function with documented replacement → **Medium**
 - Arguments passed in wrong order → **High**
 - Return value encoding success/failure ignored → **Medium**
 - Required option or flag omitted → **Medium**
 
 ### Data integrity
 
-- Input not validated before use as index, size, or database key →
+- Input _unvalidated_ before use as index, size, or database key →
   **High**
 - Serialization contract broken (field renamed, type changed, required
   field dropped) → **High**
@@ -102,78 +104,51 @@ loss, security vulnerabilities, or crashes. Emit no other findings.
 
 ## Don't flag
 
-Beyond the out-of-scope items in the Scope table, also omit:
+Omit items out of scope, plus:
 
 - Missing comments or documentation
-- Hypothetical inputs—unless the diff introduces a new public-facing API
-  and the input appears realistic given visible callers
-- Performance micro-optimizations without evidence the path runs hot
+- Hypothetical inputs (unless diff introduces new public API with
+  realistic callers)
+- Performance micro-optimizations lacking evidence of hot execution
+  paths
+- Theoretical vulnerabilities, race conditions, or edge cases outside
+  app threat model (for example, local multi-tenant race attacks on
+  single-user CLI tools)
+- Defensive bloat, _unrequested_ guardrails, or over-engineered
+  abstractions violating `KISS` or `YAGNI`
 
 ## Decision rules
 
-**Resource leak**: for each acquisition (open, lock, connect,
-**alloc**), trace all return and throw/panic paths. Flag **High** if any
-path exits without release.
-
-**Injection**: trace user-controlled inputs (HTTP
-**params**/headers/body, CLI **args**, file content). Flag **Critical**
-if any reach a query, command, or path without **sanitization** at or
-before the call site.
-
-**Null safety**: if a value comes from a **nullable** source (optional
-return, map lookup, **config** read, JSON field), verify a guard
-precedes the _dereference_. Flag **High** if not.
-
-**Concurrency**: if the diff introduces shared mutable state, verify all
-access paths hold the same lock before read or write. For _async_/await,
-flag read-then-await-then-write patterns on shared state as races—the
-`await` acts as a preemption point even in single-threaded _async_
-_runtimes_. Example: reading `self.count`, awaiting an I/O call, then
-writing `self.count + 1` creates a race condition.
-
-**Error handling**: for each catch/rescue/except block, verify the
-caller propagates, logs, or intentionally suppresses the error.
-Intentional suppression requires a visible comment or documented
-contract. Flag **High** if silently discarded.
-
-## Output format
-
-Emit a summary block followed by per-finding entries, grouped by file.
-
-**Summary block** (always emit):
-
-    ## Review Summary
-    **Verdict**: `Approve` | `Request Changes` | `Comment`
-    **Finding counts**: Critical: N · High: N · Medium: N · Low: N
-    **Overview**: One or two sentences on the nature of the diff and any dominant risk theme.
-
-Verdict rules:
-
-- Any Critical or High → `Request Changes`.
-- Medium or Low only → `Comment`.
-- No findings → `Approve`.
-
-**Per-finding entries**:
-
-    ### <Severity>: <Short title>
-    **Location**: `path/to/file:line`
-    **Category**: <Category>
-    **Issue**: One sentence — what is wrong and what is the consequence.
-    **Fix** (optional): One-line description or minimal code snippet.
-
-If no findings meet the threshold: emit the summary block with `Approve`
-verdict and `No findings.` as the overview.
+- **Resource leak**: Trace acquisitions (open, lock, connect, `alloc`)
+  across return/panic paths. Flag **High** if any path exits without
+  release.
+- **Injection**: Trace _untrusted_ inputs (HTTP `params`/headers/body,
+  CLI `args`, file content). Flag **Critical** only when input reaches
+  execution boundaries without _sanitization_.
+- **Null safety**: Verify guards precede _dereference_ of _nullable_
+  sources (optional return, map lookup, `config`, JSON). Flag **High**
+  if unguarded.
+- **Concurrency**: Trace shared mutable state across runtime execution
+  paths. Flag read-then-await-then-write patterns or lock release gaps
+  only when runtime model permits concurrent execution.
+- **Error handling**: Verify catch/except blocks propagate, log, or
+  intentionally suppress errors with documented rationale. Flag **High**
+  if silently discarded.
+- **Intent check**: Search commits, PR descriptions, adjacent comments,
+  or user intent for change rationales. Move findings with qualifying
+  rationales to `suppressed_findings`. Route theoretical security,
+  concurrency, or null safety findings lacking practical exploit paths
+  to `suppressed_findings` citing missing trigger scenario—never emit in
+  active `findings`.
 
 ## Calibration
 
-- **Precision over recall.** One high-confidence Critical beats five
+- **Precision over recall**: One high-confidence Critical beats five
   speculative Mediums.
-- Don't speculate about code not in the diff.
-- When intent appears ambiguous, note it in the Issue field rather than
-  assuming defect.
-- Flag the defect; don't editorialize about the author or the decision.
-- Language-specific idioms and standard library behavior should inform
-  findings—don't flag idiomatic use as incorrect.
-- When a language/stack context block arrives (for example,
-  `Stack: Python 3.12, asyncio`), apply its language-specific severity
-  adjustments and idioms—it takes precedence.
+- Limit evaluation to code modified in the diff.
+- Note ambiguous intent within findings rather than assuming defect.
+- Flag defect directly without editorializing.
+- Respect language idioms and standard library patterns—never flag
+  idiomatic code.
+- Override default severities with language/stack context directives
+  when supplied (for example, `Stack: Python 3.12, asyncio`).

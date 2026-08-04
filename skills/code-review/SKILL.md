@@ -45,6 +45,13 @@ Determine scope from the first available source:
 
 Abort with a clear message if no scope detected.
 
+Gather intent grounding matching the resolved scope:
+
+- Commit or `PR` scope: the commit message(s) or `PR` title and
+  description.
+- Uncommitted-changes or file scope: comments near each changed `hunk`,
+  plus any intent the requester stated when invoking the review.
+
 ## Workflow
 
 1. **GATE**—Identify changed files and diff boundaries; abort if no
@@ -54,12 +61,31 @@ Abort with a clear message if no scope detected.
    severity levels, decision rules, scope, and calibration. Read
    `references/report-schema.json` as the output contract. Anchor to
    review goal; name what the review won't change.
+   - Ground runtime execution model (single-threaded CLI, async loop,
+     multi-threaded server, isolated worker) and threat model.
+   - Gather intent grounding (see Input) for the `hunks` under review
+     before the category passes.
 3. **ACT**—Execute:
    - Read relevant project documentation (`AGENTS.md`, `ORIENT.md`,
      `DESIGN.md`), nearby code, and tests for grounding.
    - Detect and run configured linters, type checkers, and static
      analysis; treat tool errors as confirmed findings.
-   - Review passes per guide categories:
+   - Sweep up to `PHASE_CAP` (7) phases against a running ledger; stop
+     the first phase that contributes zero new candidates:
+     - Each phase scans every category below in full before consulting
+       the ledger—produce the complete candidate list first, then
+       dedupe. Skipping already-covered ground before scanning defeats
+       the sweep.
+     - Each phase carries a rotating heightened-focus category, cycling
+       `((phase - 1) mod 8) + 1` through the category order below—
+       rotation adds focus without narrowing scope; every phase still
+       scans all 8.
+     - Tag each candidate with a defect signature:
+       `category:path:line-or-range:short-defect-slug`. Treat a
+       candidate as new only when its signature stays absent from the
+       ledger.
+     - Append new candidates to the ledger after each phase.
+   - Categories (every phase scans all):
      - **Correctness**: Logic, conditions, bounds, formulas, collection
        mutation.
      - **Null and type safety**: Null/undefined `dereferences`,
@@ -77,14 +103,21 @@ Abort with a clear message if no scope detected.
        ignored return values, missing required options.
      - **Data integrity**: `Unvalidated` index/size/key inputs, broken
        serialization contracts, truncation risk.
-4. **VERIFY**—Prove each finding against code and project mandates.
-   Apply decision rules from the guide (resource leak, injection, null
-   safety, concurrency, error handling). Drop speculative or
-   out-of-scope findings.
-5. **PERSIST**—Skip if no findings. Otherwise write
-   `code-review-report.yaml` to the project root conforming to
-   `references/report-schema.json`. Write once, after VERIFY passes. Use
-   `|` block scalars for multi-line `suggestion` and `excerpt` fields.
+4. **VERIFY**—Run once, after the phase sweep completes—never per phase.
+   Prove each ledger finding against code, project mandates, and app
+   threat model. Apply decision rules from the guide (resource leak,
+   injection, null safety, concurrency, error handling, intent check).
+   - Drop speculative, out-of-scope, or `unexploitable` theoretical
+     findings from active `findings`.
+   - Route findings lacking concrete exploit paths or carrying
+     qualifying intent evidence to `suppressed_findings` citing the
+     missing trigger scenario—never emit them in `findings`.
+5. **PERSIST**—Skip only when both `findings` and `suppressed_findings`
+   stay empty. Otherwise write `code-review-report.yaml` to the project
+   root conforming to `references/report-schema.json`; omit the
+   `suppressed_findings` key entirely when empty. Write once, after
+   VERIFY passes. Use `|` block scalars for multi-line `suggestion` and
+   `excerpt` fields.
 6. **REPORT**—Sort findings by severity. Emit the result following the
    result directives and result template.
 
@@ -94,12 +127,21 @@ Abort with a clear message if no scope detected.
 - Rank findings: `Critical`, `High`, `Medium`, `Low`, `Nit`.
   - Emit `Nit` only when trivially co-located with a higher-severity
     finding.
-- Verdict: `Request Changes` (any Critical/High) · `Comment` (Medium/Low
-  only) · `Approve` (no findings).
+- Verdict: `Request Changes` (any confirmed, practically exploitable
+  Critical/High) · `Comment` (Medium/Low only) · `Approve` (no
+  findings). Derive verdict from `findings` only—`suppressed_findings`
+  never shifts it.
+- Filter candidate findings against the app threat model, `KISS`, and
+  `YAGNI`; reject defensive bloat, ungrounded guardrails, and
+  theoretical non-exploits.
 - Mark uncertainty explicitly: _"Context may change this finding, but…"_
-- Suggest targeted fixes; don't rewrite the patch.
+- Suggest targeted, scope-appropriate fixes; don't rewrite the patch.
 - Omit empty categories and "none found" sections.
 - Verify findings against `AGENTS.md` before reporting.
+- Default to `PHASE_CAP` (7) phases as a single named constant—never
+  scatter phase-count literals across the workflow.
+- Surface phases run in the result `Actions` list (for example,
+  `ran 3/7 phases, stopped on saturation`).
 
 ## Constraints
 
@@ -109,14 +151,17 @@ Abort with a clear message if no scope detected.
 - Don't change project source files during review.
 - Don't flag: missing comments/docs, performance micro-optimizations
   without evidence the path runs hot, hypothetical inputs (unless the
-  diff introduces a new public-facing API).
+  diff introduces a new public-facing API), or theoretical
+  vulnerabilities outside the app threat model.
+- Run `VERIFY`, `PERSIST`, and `REPORT` once, after the phase
+  sweep—never per phase.
 
 ## Calibration
 
 - Precision over recall—one high-confidence Critical beats five
   speculative Mediums.
 - Don't speculate about code outside the diff.
-- Note ambiguous intent in the Issue field rather than assuming defect.
+- Note ambiguous intent in the finding rather than assuming defect.
 - Flag the defect; don't editorialize about the author or decision.
 - Language-specific idioms inform findings—don't flag idiomatic use as
   incorrect.
@@ -131,8 +176,15 @@ Abort with a clear message if no scope detected.
 - Severity reflects user impact or `exploitability`.
 - Suggestions describe concrete changes.
 - Report matches workspace mandates.
-- If findings exist: `code-review-report.yaml` written and conforms to
-  `references/report-schema.json`.
+- Every `suppressed_findings` entry cites qualifying intent
+  evidence—never a general or vague rationale.
+- If findings or suppressed findings exist: `code-review-report.yaml`
+  written and conforms to `references/report-schema.json`.
+- Ledger dedup keys off the defect signature
+  (`category:path:line-or-range:slug`)—no phase counts a finding new
+  without a fresh signature.
+- Phase sweep halts on the first zero-new-finding phase, or at
+  `PHASE_CAP` (7), whichever comes first.
 
 ## Result directives
 

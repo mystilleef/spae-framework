@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "CodeReviewReport",
-  "description": "Output contract for the code-review skill. Emitted as YAML. Use | block scalars for multi-line code in suggestion and excerpt fields.",
+  "description": "Output contract for the code-review skill. Emitted as YAML. Use | block scalars for multi-line code in suggestion, excerpt, and suppressionRationale fields.",
   "type": "object",
   "required": ["scope", "result", "findings"],
   "additionalProperties": false,
@@ -31,7 +31,7 @@
     },
     "findings": {
       "type": "array",
-      "description": "Defects found, sorted by severity: Blocker → High → Medium → Nit.",
+      "description": "Defects found, sorted by severity: Critical → High → Medium → Low → Nit.",
       "items": {
         "type": "object",
         "required": ["severity", "path", "finding", "suggestion"],
@@ -39,7 +39,7 @@
         "properties": {
           "severity": {
             "type": "string",
-            "enum": ["Blocker", "High", "Medium", "Nit"],
+            "enum": ["Critical", "High", "Medium", "Low", "Nit"],
             "description": "Severity ranked by user impact or exploitability."
           },
           "path": {
@@ -61,6 +61,52 @@
           "suggestion": {
             "type": "string",
             "description": "Concrete fix — not vague advice."
+          }
+        }
+      }
+    },
+    "suppressed_findings": {
+      "type": "array",
+      "description": "Behavior-sensitive findings with qualifying intent evidence, moved out of findings for audit. Omit this key entirely when empty.",
+      "items": {
+        "type": "object",
+        "required": [
+          "severity",
+          "path",
+          "finding",
+          "suggestion",
+          "suppressionRationale"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": ["Critical", "High", "Medium", "Low", "Nit"],
+            "description": "Severity ranked by user impact or exploitability."
+          },
+          "path": {
+            "type": "string",
+            "description": "File path of the finding."
+          },
+          "line": {
+            "type": "integer",
+            "description": "Line number of the finding."
+          },
+          "excerpt": {
+            "type": "string",
+            "description": "Quoted code excerpt supporting the finding."
+          },
+          "finding": {
+            "type": "string",
+            "description": "One sentence stating the defect."
+          },
+          "suggestion": {
+            "type": "string",
+            "description": "Concrete fix — not vague advice."
+          },
+          "suppressionRationale": {
+            "type": "string",
+            "description": "Quoted intent evidence and its source (commit, PR description, comment, or requester statement) justifying suppression."
           }
         }
       }
