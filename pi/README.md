@@ -1,4 +1,4 @@
-# `SPAE`: Pi
+# SPAE: Pi
 
 Agent definitions for the [Pi](https://github.com/mystilleef/pi)
 harness.
@@ -29,8 +29,8 @@ for the built-in `/run` command.
 | `plan`         | Decompose `SPEC.md` into an atomic task graph     |
 | `inspect`      | Perform gap analysis and optimize `PLAN.md`       |
 | `build`        | Execute one atomic task from `PLAN.md`            |
-| `tdd`          | Run a failing-test-first build cycle              |
-| `execute`      | Execute all tasks from `PLAN.md` sequentially     |
+| `check`        | Gate completed task against `PLAN.md`             |
+| `fix`          | Close gaps identified in `FIX.md`                 |
 | `verify`       | Verify implementation against `SPEC.md`           |
 | `test`         | Fill test coverage gaps                           |
 | `purify`       | Simplify and optimize code                        |
@@ -50,8 +50,8 @@ These agents require nested subagent support via
 | Agent         | Purpose                                               |
 | ------------- | ----------------------------------------------------- |
 | `orchestrate` | Run all `SPAE` phases autonomously from current state |
-| `prepare`     | Run preparatory phases only—run spec, plan, inspect |
-| `spawn`       | Run the build phase only—loops all remaining tasks    |
+| `prepare`     | Run preparatory phases only—run spec, plan, inspect   |
+| `spawn`       | Run build phase—cycles build, check, and fix per task |
 | `coverage`    | Spawn test agents to address code coverage gaps       |
 | `clean`       | Run `purify` then `refactor` agents sequentially      |
 

@@ -38,8 +38,8 @@ agents.
 | `prepare`   | `/run prepare`            |
 | `inspect`   | `/run inspect`            |
 | `implement` | `/run implement`          |
-| `tdd`       | `/run tdd`                |
-| `execute`   | `/run execute`            |
+| `check`     | `/run check`              |
+| `fix`       | `/run fix`                |
 | `verify`    | `/run verify`             |
 
 ## Agents
@@ -50,8 +50,8 @@ agents.
 | `prepare`      | Decompose `SPEC.md` into an atomic task graph     |
 | `inspect`      | Perform gap analysis and optimize `PLAN.md`       |
 | `implement`    | Execute one atomic task from `PLAN.md`            |
-| `tdd`          | Run a failing-test-first build cycle              |
-| `execute`      | Execute all tasks from `PLAN.md` sequentially     |
+| `check`        | Gate completed task against `PLAN.md`             |
+| `fix`          | Close gaps identified in `FIX.md`                 |
 | `verify`       | Verify implementation against `SPEC.md`           |
 | `coverage`     | Fill test coverage gaps                           |
 | `purify`       | Simplify and optimize code                        |

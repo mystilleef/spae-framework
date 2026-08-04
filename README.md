@@ -3,10 +3,10 @@
 The `SPAE` framework provides a cross-platform, structured, agent-first
 workflow for AI agent harnesses.
 
-It follows a five-phase workflow that produces consistent, high-quality,
+It follows a seven-step workflow that produces consistent, high-quality,
 predictable `LLM` outputs, even when using lower-tier agents.
 
-**spec → plan → inspect → build → verify**
+**spec → plan → inspect → build → check → fix → verify**
 
 ## What `SPAE` does
 
@@ -25,7 +25,7 @@ predictable `LLM` outputs, even when using lower-tier agents.
 - **Harness agnostic**—use any combination of Gemini, Claude, OpenAI,
   Pi, OpenCode, or Codex at each phase
 - **Zero-knowledge resumption**—any agent resumes any `workstream` by
-  reading the artifacts
+  reading artifacts
 - **Atomic execution**—every task stays small enough to verify in a
   single cycle
 - **Human oversight**—each phase requires explicit invocation; use
@@ -45,6 +45,8 @@ invocation for its arguments.
 | `plan`    | `/run plan`            |
 | `inspect` | `/run inspect`         |
 | `build`   | `/run build`           |
+| `check`   | `/run check`           |
+| `fix`     | `/run fix`             |
 | `verify`  | `/run verify`          |
 
 ---
@@ -54,28 +56,29 @@ invocation for its arguments.
 Run phases in order. Each agent reads only its designated inputs and
 writes only its designated outputs.
 
-| Phase | Agent                  | Purpose                             |
-| ----- | ---------------------- | ----------------------------------- |
-| 1     | `/run spec <proposal>` | Distill requirements to `SPEC.md`   |
-| 2     | `/run plan`            | Decompose `SPEC.md` to atomic tasks |
-| 3     | `/run inspect`         | Optimize `PLAN.md` via gap analysis |
-| 4     | `/run build`           | Execute tasks from `PLAN.md`        |
-| 5     | `/run verify`          | Verify code against `SPEC.md`       |
+| Phase | Agent                  | Purpose                                |
+| ----- | ---------------------- | -------------------------------------- |
+| 1     | `/run spec <proposal>` | Distill requirements to `SPEC.md`      |
+| 2     | `/run plan`            | Decompose `SPEC.md` to atomic tasks    |
+| 3     | `/run inspect`         | Optimize `PLAN.md` via gap analysis    |
+| 4     | `/run build`           | Execute one atomic task from `PLAN.md` |
+| 5     | `/run check`           | Gate completed task against `PLAN.md`  |
+| 6     | `/run fix`             | Close gaps found by `/run check`       |
+| 7     | `/run verify`          | Verify code against `SPEC.md`          |
 
-Choose one execution mode per `workstream` after `/run inspect`:
+After `/run inspect`, iterate through the task execution loop:
 
-- `/run build`—one task per cycle; best for complex or high-risk plans
-- `/run tdd`—failing-test-first cycle; best for behavioral changes
-- `/run execute`—all tasks at once; best for small, low-risk plans
+- `/run build`—executes the active atomic task and sets phase to `check`
+- `/run check`—verifies active task implementation against `PLAN.md`; marks task `done` if clean, or writes `FIX.md` and routes to `/run fix` if gaps exist
+- `/run fix`—closes gaps listed in `FIX.md`, deletes `FIX.md`, and returns phase to `check`
 
-If `/run verify` finds gaps, it creates `VERIFY.md` and resets the cycle
-to `/run spec`. Repeat until `/run verify` passes.
+If `/run verify` finds gaps, it creates `VERIFY.md` and resets state to `/run spec`. Repeat until `/run verify` passes.
 
 ---
 
 ## Orchestration (`Pi` only)
 
-> **Only the Pi harness currently supports orchestration agents and
+> **Only the Pi harness supports orchestration agents and
 > skills.** Orchestration requires nested subagent support; testing
 > covered Pi only. Pi users must install
 > [`mystilleef/pi-subagent`](https://github.com/mystilleef/pi-subagent).
@@ -88,11 +91,11 @@ step.
 
 ### **SPAE** orchestrators
 
-| Agent         | Invocation                      | Purpose               |
-| ------------- | ------------------------------- | --------------------- |
-| `orchestrate` | `/run orchestrate [<proposal>]` | Run all phases        |
-| `prepare`     | `/run prepare [<proposal>]`     | Run prep phases (1-3) |
-| `spawn`       | `/run spawn`                    | Loop all build tasks  |
+| Agent         | Invocation                      | Purpose                                            |
+| ------------- | ------------------------------- | -------------------------------------------------- |
+| `orchestrate` | `/run orchestrate [<proposal>]` | Run all phases                                     |
+| `prepare`     | `/run prepare [<proposal>]`     | Run prep phases (1-3)                              |
+| `spawn`       | `/run spawn`                    | Loop build, check, and fix cycle across all tasks |
 
 **`orchestrate`** reads `STATE.json`, determines the current phase, and
 spawns the appropriate `SPAE` agent sequentially until the workflow
@@ -104,8 +107,8 @@ inspect—autonomously until the workflow reaches the `build` phase. Pass
 a proposal on first run to seed the `spec` phase.
 
 **`spawn`** targets the build phase exclusively—iterates all remaining
-tasks and spawns a `build` agent per task until the phase advances to
-`verify`.
+tasks, cycling `build`, `check`, and `fix` per task until the phase
+advances to `verify`.
 
 ---
 
@@ -166,6 +169,7 @@ directory—add `.spae/` to `.gitignore`.
 | `SPEC.md`    | Normalized requirements—immutable during execution |
 | `PLAN.md`    | Atomic task graph—immutable during execution       |
 | `VERIFY.md`  | Ephemeral signal—created when verification fails   |
+| `FIX.md`     | Ephemeral signal—created when task check fails     |
 
 ---
 
