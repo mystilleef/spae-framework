@@ -41,6 +41,11 @@ mocking, assertion, and performance standards.
 See `references/shell-command-guide.md` for command safety, timeouts,
 redirects, and non-interactive environment directives.
 
+## Cleanup
+
+See `references/cleanup-guide.md` for the self-introduced-artifact
+checklist and diff-only audit scope.
+
 ## Workflow
 
 1. **GATE**—Require an actionable symptom: error, failure, trace, or
@@ -57,6 +62,9 @@ redirects, and non-interactive environment directives.
      reproducing the root cause, when practical.
    - Apply the smallest safe fix after evidence confirms.
 5. **VERIFY**—Loop over every criterion declared in PLAN:
+   - Audit the task's own `git diff`/`git status` against the
+     Self-cleanup checklist in `references/cleanup-guide.md`; remove
+     every self-introduced artifact before proceeding.
    - For each unmet criterion: revert the fix, return to **ACT**,
      execute, then re-enter **VERIFY**.
    - Exit only when all criteria pass.
@@ -104,6 +112,8 @@ redirects, and non-interactive environment directives.
 - Root cause identified with evidence.
 - Fix covered by a test when practical.
 - Strongest relevant checks pass.
+- No self-introduced cleanup violation remains per
+  `references/cleanup-guide.md`.
 - If verification fails, revert the fix and return to step 2.
 - Report remaining risks or skipped checks plainly.
 
