@@ -44,10 +44,15 @@ project, abort with a clear message if none detected.
 See `references/testing-guide.md` for test structure, isolation,
 mocking, assertion, and performance standards.
 
-## Shell Commands
+## Shell commands
 
 See `references/shell-command-guide.md` for command safety, timeouts,
 redirects, and non-interactive environment directives.
+
+## Cleanup
+
+See `references/cleanup-guide.md` for the self-introduced-artifact
+checklist and diff-only audit scope.
 
 ## Workflow
 
@@ -60,7 +65,8 @@ redirects, and non-interactive environment directives.
    - If scope resolves to current changes, the project contains
      TypeScript or JavaScript sources, and `fallow` resolves
      (`fallow --version`): run
-     `git diff HEAD | fallow audit -f json -q --diff-stdin` and treat
+     `git --no-pager diff --no-ext-diff HEAD | fallow audit -f json -q --diff-stdin`
+     and treat
      confirmed findings as additional dead-code signal. Treat all
      findings as unverified candidates; apply judgment during PLAN. Skip
      silently if `fallow` cannot be found or the project lacks TS/JS
@@ -71,7 +77,8 @@ redirects, and non-interactive environment directives.
      via the template below and halt.
 2. **ORIENT**—State goal and scope in one sentence. Name what won't
    change: behavior, public interfaces, and feature scope.
-3. **PLAN**—Read `references/testing-guide.md`. Declare minimal changes:
+3. **PLAN**—Read `references/testing-guide.md` and
+   `references/cleanup-guide.md`. Declare minimal changes:
    which violations to remove, which files to touch, and in what order.
    Check ambiguous or risky slices before acting.
 4. **ACT**—Execute only what PLAN declared. Nothing more.
@@ -84,8 +91,12 @@ redirects, and non-interactive environment directives.
    - Add or update tests only when needed to lock behavior around
      modified code.
 5. **VERIFY**—Loop over every criterion in `Verification`:
-   - For each unmet criterion: return to `ACT`, execute, then re-enter
-     `VERIFY`.
+   - Run relevant tests after each `ACT` step.
+   - Audit the task's own `git diff`/`git status` against the
+     Self-cleanup checklist in `references/cleanup-guide.md`; remove
+     every self-introduced artifact before proceeding.
+   - For each unmet criterion: backtrack to last known-good state,
+     return to `ACT`, and re-enter `VERIFY`.
    - Exit only when all criteria pass.
    - Halt only for out-of-scope blockers.
 6. **PERSIST**—Confirm all edits written. Run final compilation or
@@ -116,6 +127,20 @@ redirects, and non-interactive environment directives.
   explicitly requests otherwise.
 - Don't expand feature scope.
 - Don't mask failing tests; fix root causes or report blockers.
+- **Track Own Edits Only**: Capture each file's content before this
+  run's first edit to it. Revert means rewriting captured content back,
+  or deleting files this run created—never a git-level reset, stash,
+  checkout, or restore, which erases uncommitted work from earlier
+  phases in the same tree.
+- **Never Leave It Broken**: End every purify pass with tests passing
+  again or the offending edits reverted, regardless of why VERIFY halts.
+- **Self-Inflicted Failures Stay In-Scope**: A failure this pass's own
+  edits cause never qualifies as an out-of-scope blocker; loop
+  `VERIFY`'s backtrack step instead of halting.
+- **Bug Found Mid-Purify**: A pre-existing bug this pass exposes counts
+  as out-of-scope. Revert the edits that surfaced it, then report the
+  bug as a separate finding—fixing it here would expand feature scope
+  and change preserved behavior.
 - Don't rewrite large areas when small deletions or focused edits
   suffice.
 - Abort and report if verification needs unavailable services, secrets,
@@ -137,6 +162,10 @@ redirects, and non-interactive environment directives.
 - Coverage protects modified behavior or documented gaps remain.
 - Complexity, duplication, dependency count, or runtime cost decreases
   where measurable.
+- No self-introduced cleanup violation remains per
+  `references/cleanup-guide.md`.
+- `Result: Failed` only follows a working tree the agent restores to the
+  pre-purify baseline; never a suite left red.
 
 ## Result directives
 
