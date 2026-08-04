@@ -2,39 +2,36 @@
 
 ## Field reference
 
-| Field                     | Type             | Valid values                                                               | Notes                                                        |
-| ------------------------- | ---------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `version`                 | string           | `"1.0"`                                                                    | Fixed                                                        |
-| `workstream`              | string           | kebab-case slug                                                            | Set on init; never mutated                                   |
-| `phase`                   | string           | `"spec"` \| `"plan"` \| `"inspect"` \| `"build"` \| `"verify"` \| `"done"` | Advances forward; verify no-pass routes backward to `"spec"` |
-| `status`                  | string           | `"active"` \| `"revision_required"` \| `"completed"`                       | `revision_required` and `completed` written only by verify   |
-| `cursor.active_task_id`   | string           | `"T-NNN"`                                                                  | `build` and `verify` phases only                             |
-| `cursor.task_status`      | string           | `"todo"` \| `"in_progress"` \| `"done"` \| `"blocked"`                     | `build` and `verify` phases only                             |
-| `tasks`                   | object           | `{ "T-NNN": "todo" \| "in_progress" \| "done" \| "blocked" }`              | Populated by plan; mutated by execution skills               |
-| `metrics.tasks_total`     | integer          | ≥ 0                                                                        | Set by plan; never decremented                               |
-| `metrics.tasks_completed` | integer          | ≥ 0                                                                        | Incremented per task completion                              |
-| `blockers`                | array of strings | —                                                                          | `[]` when clear; never null                                  |
+| Field                     | Type             | Valid values                                                                                       | Notes                                                        |
+| ------------------------- | ---------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `version`                 | string           | `"1.0"`                                                                                            | Fixed                                                        |
+| `workstream`              | string           | kebab-case slug                                                                                    | Set on init; never mutated                                   |
+| `phase`                   | string           | `"spec"` \| `"plan"` \| `"inspect"` \| `"build"` \| `"check"` \| `"fix"` \| `"verify"` \| `"done"` | Advances forward; verify no-pass routes backward to `"spec"` |
+| `status`                  | string           | `"active"` \| `"revision_required"` \| `"completed"`                                               | `revision_required` and `completed` written only by verify   |
+| `cursor.active_task_id`   | string           | `"T-NNN"`                                                                                          | `build`, `check`, `fix`, and `verify` phases only            |
+| `tasks`                   | object           | `{ "T-NNN": "todo" \| "in_progress" \| "done" }`                                                  | Populated by plan; mutated by execution skills               |
 
 ## Directives
 
 - Read STATE.json at start; confirm `phase: "build"` and an active task
-  in the cursor.
+  in the cursor. Halt on state drift: if `tasks[active_task_id]` reads
+  `"done"`, halt and report; make no STATE.json write. `"todo"` is the
+  normal entry state (ORIENT marks it `"in_progress"` next); `"in_progress"`
+  is normal on a retry after a prior failed attempt.
 - **Mark in progress** (before implementation): write
-  `cursor.task_status: "in_progress"` and
   `tasks[task_id]: "in_progress"`.
-- **On task done** (after verification passes):
-  - Write `tasks[task_id]: "done"`.
-  - Increment `metrics.tasks_completed` by 1.
-  - If more `"todo"` tasks remain: advance `cursor.active_task_id` to
-    the next task ID in PLAN.md order; set `cursor.task_status: "todo"`.
-  - If no tasks remain: set `phase: "verify"`; keep `cursor` pointing to
-    the last completed task with `task_status: "done"`.
-- **On blocker**: write `cursor.task_status: "blocked"`,
-  `tasks[task_id]: "blocked"`, append a description string to
-  `blockers[]`. Don't advance the cursor or change `phase`.
+- **On task done** (after verification passes): write `phase: "check"`
+  only — `/check` owns the `done` transition and the cursor advance.
+- **On failure**: make no `STATE.json` write; report the failure in the
+  result only. Don't advance the cursor or change `phase`.
 - Run task verification before any STATE.json write.
-- Never mutate `workstream`, `version`, `status`, or
-  `metrics.tasks_total`.
+- Never mutate `workstream`, `version`, or `status`.
+- Confirm every write with a fresh read before treating the write as
+  done; a field mismatch counts as an unmet `VERIFY` criterion, not a
+  finished write.
+- A forgotten or partial write—not a task failure—stalls orchestrator
+  dispatch and corrupts manual resumption; every write here gates
+  automation, not bookkeeping.
 
 ## Snapshots
 
@@ -46,10 +43,8 @@
   "workstream": "example-workstream",
   "phase": "build",
   "status": "active",
-  "cursor": {"active_task_id": "T-002", "task_status": "todo"},
-  "tasks": {"T-001": "done", "T-002": "todo", "T-003": "todo"},
-  "metrics": {"tasks_total": 3, "tasks_completed": 1},
-  "blockers": []
+  "cursor": {"active_task_id": "T-002"},
+  "tasks": {"T-001": "done", "T-002": "todo", "T-003": "todo"}
 }
 ```
 
@@ -57,52 +52,22 @@
 
 ```json
 {
-  "cursor": {"active_task_id": "T-002", "task_status": "in_progress"},
+  "cursor": {"active_task_id": "T-002"},
   "tasks": {"T-001": "done", "T-002": "in_progress", "T-003": "todo"}
 }
 ```
 
-**Exit — task done, more remain**:
+**Exit — task implemented, handed to `/check`**:
 
 ```json
 {
   "version": "1.0",
   "workstream": "example-workstream",
-  "phase": "build",
+  "phase": "check",
   "status": "active",
-  "cursor": {"active_task_id": "T-003", "task_status": "todo"},
-  "tasks": {"T-001": "done", "T-002": "done", "T-003": "todo"},
-  "metrics": {"tasks_total": 3, "tasks_completed": 2},
-  "blockers": []
+  "cursor": {"active_task_id": "T-002"},
+  "tasks": {"T-001": "done", "T-002": "in_progress", "T-003": "todo"}
 }
 ```
 
-**Exit — final task done**:
-
-```json
-{
-  "version": "1.0",
-  "workstream": "example-workstream",
-  "phase": "verify",
-  "status": "active",
-  "cursor": {"active_task_id": "T-003", "task_status": "done"},
-  "tasks": {"T-001": "done", "T-002": "done", "T-003": "done"},
-  "metrics": {"tasks_total": 3, "tasks_completed": 3},
-  "blockers": []
-}
-```
-
-**Exit — blocker**:
-
-```json
-{
-  "version": "1.0",
-  "workstream": "example-workstream",
-  "phase": "build",
-  "status": "active",
-  "cursor": {"active_task_id": "T-002", "task_status": "blocked"},
-  "tasks": {"T-001": "done", "T-002": "blocked", "T-003": "todo"},
-  "metrics": {"tasks_total": 3, "tasks_completed": 1},
-  "blockers": ["T-002: description of blocker"]
-}
-```
+**Exit — failure**: no write occurs. State remains identical to entry.
