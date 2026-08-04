@@ -24,24 +24,20 @@ user-invocable: true
 
 Read:
 
-- `.spae/current/STATE.json`
+- `.spae/current/STATE.json` (consult `references/STATE.md` for field
+  reference, directives, and phase snapshots)
 - `.spae/current/SPEC.md`
 - `.spae/current/PLAN.md`
-- All source files modified by this **workstream** (committed and
-  uncommitted changes). Use `.spae/current/PLAN.md` tasks to scope the
-  delta.
-- `.spae/current/VERIFY.md`, when present.
-
-## `STATE.json`
-
-See `references/STATE.md` for the field reference, directives, and phase
-snapshots.
+- All source files modified by this **workstream** (scoped from
+  `.spae/current/PLAN.md` tasks)
+- `.spae/current/VERIFY.md`, when present
 
 ## Workflow
 
-1. **GATE**—Read `.spae/current/STATE.json`; confirm `phase: verify`;
-   confirm every `.spae/current/PLAN.md` task reports `done`. Halt
-   immediately on failure; report which check failed; make no changes.
+1. **GATE**—Read `.spae/current/STATE.json`; confirm `phase: verify`.
+   Confirm every `.spae/current/PLAN.md` task reports `done` in the
+   `tasks` registry. Halt immediately on failure; report which check
+   failed; make no changes.
 2. **ORIENT**—Goal: compare implemented repository state against each
    `.spae/current/SPEC.md` spec item; determine pass, no-pass, or
    blocked verdict.
@@ -68,23 +64,36 @@ snapshots.
      - **Hard block**: regression, contract break, missing or incorrect
        required behavior, check failure mapping to a `SPEC.md` item;
        drives verdict to no-pass.
-     - **Soft finding**: absent or thin test coverage of required
-       behavior, failure modes, or edge cases; unsafe optimization;
-       drives verdict to no-pass.
-     - **Observation**: ambiguous or untestable spec item, minor
-       deviation outside SPEC scope; note only; no verdict impact.
-5. **VERIFY**—Sanity-check the verdict without ceding the arbiter role.
+     - **Soft finding**: absent test coverage of explicit required
+       behavior; unsafe optimization; complexity ungrounded in an
+       explicit `SPEC.md` spec item (for example, a validation library
+       pulled in for a single basic check); note only; no verdict
+       impact.
+     - **Observation**: thin edge-case test coverage, ambiguous or
+       untestable spec item, minor deviation outside SPEC scope,
+       `unrequested` guardrail, theoretical risk; note only; no verdict
+       impact.
+   - Draft findings against the `references/VERIFY.md` schema; consult
+     `references/prose-protocol.md` for phrasing.
+5. **VERIFY**—Confirm any drafted `VERIFY.md` content matches
+   `references/VERIFY.md` structure.
 6. **PERSIST**—Apply verdict:
    - **Pass**: set `STATE.json` to `status: completed`, `phase: done`;
      remove `.spae/current/VERIFY.md` when present; remove
      `.spae/current` symlink.
-   - **No pass**: create or overwrite `.spae/current/VERIFY.md` with
-     hard blocks and soft findings from the current run only, followed
-     by observations as informational notes; set `STATE.json` to
-     `status: revision_required`, `phase: spec`, `cursor: {}`.
+   - **No pass**: create or overwrite `.spae/current/VERIFY.md` using
+     the `references/VERIFY.md` schema with hard blocks from the current
+     run only, followed by soft findings and observations as
+     informational notes; set `STATE.json` to
+     `status: revision_required`, `phase: spec`, `cursor: {}`,
+     `tasks: {}`.
    - **Blocked**: write blocker details only to
      `.spae/current/VERIFY.md` (omit observations); set `STATE.json` to
-     `status: revision_required`, `phase: spec`, `cursor: {}`.
+     `status: revision_required`, `phase: spec`, `cursor: {}`,
+     `tasks: {}`.
+   - **All verdicts**: re-read `STATE.json` after writing; on a field
+     mismatch, rewrite and re-read. On **Pass**, confirm the re-read
+     before removing `.spae/current`.
 7. **REPORT**—Emit the result following the result directives and using
    the result template. On pass, surface observations under Findings. On
    blocked, emit the Blocked result block.
@@ -92,16 +101,26 @@ snapshots.
 ## Directives
 
 - Optimize all operations for agent, token, and context efficiency.
+- Consult `references/shell-command-guide.md` for command safety,
+  timeouts, redirects, and environment directives.
 - Focus on the delta between `.spae/current/SPEC.md` and repository
   state.
-- Check test exhaustiveness against the `.spae/current/SPEC.md` testing
-  strategy; thin coverage of failure modes or edge cases classifies as a
-  soft finding.
+- Enforce `KISS` and `YAGNI` principles; penalize over-engineering,
+  defensive bloat, or speculative abstractions.
+- Ground bloat findings in the diff itself; never flag a hypothetical
+  future risk, stylistic preference, or `unshipped` edge case.
+- Classify theoretical gaps, `unrequested` guardrails, and minor edge
+  cases strictly as observations; forbid theoretical gaps from driving a
+  no-pass verdict.
+- Confine verification evaluation strictly to documented SPEC.md
+  requirements.
 - Prefer existing project verification commands and patterns.
 - Keep `.spae/current/VERIFY.md` findings concrete, reproducible, and
   tied to `.spae/current/SPEC.md` spec items.
 - Include enough detail for `/spec` to rewrite `SPEC.md` from scratch
   without repeating the full investigation.
+- Draft `VERIFY.md` matching the `references/VERIFY.md` schema.
+- Consult `references/prose-protocol.md` before drafting `VERIFY.md`.
 
 ## Constraints
 
@@ -111,7 +130,7 @@ snapshots.
 - Preserve the `SPAE` artifact model; don't create extra tracking files.
 - Don't stage or commit `.spae/` artifacts.
 - **Autonomy**: Never ask users for input or clarification
-  mid-execution; halts and blockers stop autonomously.
+  mid-execution; halts and failures stop autonomously.
 - **Full autonomy**: Never require, request, or instruct human
   execution, an attended or interactive terminal, or human presence to
   reach a verdict; treat any such dependency as a spec defect, not a
@@ -120,15 +139,20 @@ snapshots.
 
 ## Verification
 
-- `.spae/current/STATE.json` reflects the final status and phase (before
-  symlink removal).
+- `.spae/current/STATE.json` reflects final verdict state:
+  `status: "completed"`, `phase: "done"` on pass; or
+  `status: "revision_required"`, `phase: "spec"`, `cursor: {}`,
+  `tasks: {}` on no pass.
 - `.spae/current` symlink absent after a passing run.
 - `.spae/current/VERIFY.md` exists only after failure or a blocked run.
 - `.spae/current/VERIFY.md` findings map to concrete
-  `.spae/current/SPEC.md` **requirement** IDs or blocker details.
-- Required project checks pass or documented blockers explain failures.
+  `.spae/current/SPEC.md` **requirement** IDs or blocker details,
+  matching `references/VERIFY.md` structure.
+- Required project checks pass or documented findings explain failures.
 - No `VERIFY.md` finding or result output instructs the user to perform
   a verification step, attach a terminal, or supply evidence.
+- No speculative abstraction, defensive bloat, or `SPEC.md`-ungrounded
+  complexity survives the implementation `unflagged`.
 
 ## Result directives
 
@@ -139,6 +163,8 @@ snapshots.
 - Use lists and sub-lists over paragraphs and long sentences.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
+- Source every `SPAE Status` value from the confirmed re-read, never
+  from working memory of intent.
 
 ### Result template
 
