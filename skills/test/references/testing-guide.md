@@ -62,6 +62,18 @@ system boundary. Reserve end-to-end tests for critical user flows.
 - Raise an error for missing required values; never let tests silently
   pass on bad state.
 
+## Hygiene
+
+- Never leave `console.*`, `print`, `fmt.Println`, or equivalent
+  debug-output calls in committed test bodies; assert instead of print.
+- Never leave `debugger` statements or active breakpoints in committed
+  tests.
+- When a test intentionally exercises stdout/stderr output (for example,
+  asserting on a CLI's printed output), capture the stream and assert on
+  the captured value; never let it pass through to the real stdout.
+- Mock or suppress expected error/warning logs from the code under test;
+  a clean test run must produce no incidental log output.
+
 ## Performance
 
 - Use fake/controlled timers for time-dependent logic; never introduce
@@ -80,3 +92,5 @@ system boundary. Reserve end-to-end tests for critical user flows.
   done.
 - Run the full test suite and confirm zero new failures.
 - Verify the test runner lists the new file by name in its output.
+- Scan every new or changed test file for stray console/print/debugger
+  calls; remove them before declaring the task done.

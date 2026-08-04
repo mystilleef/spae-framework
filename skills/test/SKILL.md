@@ -41,6 +41,11 @@ mocking, assertion, and performance standards.
 See `references/shell-command-guide.md` for command safety, timeouts,
 redirects, and non-interactive environment directives.
 
+## Cleanup
+
+See `references/cleanup-guide.md` for the self-introduced-artifact
+checklist and diff-only audit scope.
+
 ## Behavioral surface
 
 Target only methods and functions with business logic, state
@@ -56,8 +61,9 @@ decision.
    changes. Abort immediately if none.
 2. **ORIENT**—Goal: cover all behavioral gaps in scope. Production code
    unchanged.
-3. **PLAN**—Read `references/testing-guide.md` and
-   `references/shell-command-guide.md`. Inspect production code,
+3. **PLAN**—Read `references/testing-guide.md`,
+   `references/shell-command-guide.md`, and
+   `references/cleanup-guide.md`. Inspect production code,
    adjacent tests, and coverage commands. List every gap across all four
    categories per behavioral-surface target.
    - **Short-circuit**: zero gaps found → emit `Result: No Gaps` and
@@ -68,6 +74,9 @@ decision.
    - Run targeted tests; run broader suite or coverage tool.
    - Audit every new test file against CI Parity rules in
      `references/testing-guide.md`; fix any violation before proceeding.
+   - Audit the task's own `git diff`/`git status` against the
+     Self-cleanup checklist in `references/cleanup-guide.md`; remove
+     every self-introduced artifact before proceeding.
    - For each unmet criterion: return to `ACT`, execute, then re-enter
      `VERIFY`.
    - Exit only when all pass and no regressions remain.
@@ -116,6 +125,8 @@ decision.
   agent-executed inspection, no critical gaps.
 - Tests cover real behavioral risk, not vanity coverage.
 - All new tests pass CI Parity audit in `references/testing-guide.md`.
+- No self-introduced cleanup violation remains per
+  `references/cleanup-guide.md`.
 
 ## Result directives
 
