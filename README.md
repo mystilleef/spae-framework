@@ -1,15 +1,17 @@
 # State-persistent atomic execution framework
 
-The `SPAE` framework provides a cross-platform, structured, agent-first
-workflow for AI agent harnesses.
+The `SPAE` framework provides a cross-platform, agent-first, structured
+workflow loop for AI agent harnesses.
 
-It follows a seven-step workflow that produces consistent, high-quality,
-predictable `LLM` outputs, even when using lower-tier agents.
+It runs a seven-step loop that produces consistent, high-quality,
+predictable `LLM` outputs, even when using lower-tier agents. Gaps found
+at the end feed back to the start. The loop exits only when `verify`
+passes.
 
 **spec → plan → inspect → build → check → fix → verify**
 
 > **Official harness**: `Pi` serves as the official and recommended
-> harness for `SPAE`. Nested-subagent testing covered Pi in depth; Agy
+> harness for `SPAE`. Nested-subagent testing covered Pi in depth. `Agy`
 > also ships the orchestration agents, with light testing. Other
 > harnesses run each phase by hand. See [Installation](#installation).
 
@@ -20,20 +22,23 @@ predictable `LLM` outputs, even when using lower-tier agents.
 - Decomposing requests into atomic, independently verifiable tasks
 - Persisting state in external artifacts (not conversational memory)
 - Enforcing phase boundaries so each agent reads only what it needs
-- Allowing any harness (Pi, Claude, Agy, Gemini, OpenAI, OpenCode,
+- Allowing any harness (Pi, Claude, `Agy`, Gemini, OpenAI, OpenCode,
   Codex) to resume work at any point
 
 ---
 
 ## Framework design
 
-- **Harness agnostic**—use any combination of Pi, Claude, Agy, Gemini,
-  OpenAI, OpenCode, or Codex at each phase; `Pi` remains recommended
+- **Harness agnostic**—use any combination of Pi, Claude, `Agy`, Gemini,
+  OpenAI, OpenCode, or Codex at each phase, though `Pi` remains
+  recommended
 - **Zero-knowledge resumption**—any agent resumes any `workstream` by
   reading artifacts
 - **Atomic execution**—every task stays small enough to verify in a
   single cycle
-- **Human oversight**—each phase requires explicit invocation; use
+- **Closed loop**—`verify` feeds gaps back to `spec`, and the workflow
+  ends only when `verify` passes
+- **Human oversight**—each phase requires explicit invocation. Use
   orchestration agents to automate on supported harnesses
 
 ---
@@ -58,8 +63,14 @@ invocation for its arguments.
 
 ## Workflow
 
-Run phases in order. Each agent reads only its designated inputs and
-writes only its designated outputs.
+Run phases in order, looping until `/run verify` passes. Each agent
+reads only its designated inputs and writes only its designated outputs.
+
+The workflow nests two loops:
+
+- **Task loop**—`build → check ⇄ fix` repeats per task until `check`
+  marks it `done`
+- **Workstream loop**—`verify → spec` repeats until `verify` passes
 
 | Phase | Agent                  | Purpose                                |
 | ----- | ---------------------- | -------------------------------------- |
@@ -71,27 +82,28 @@ writes only its designated outputs.
 | 6     | `/run fix`             | Close gaps found by `/run check`       |
 | 7     | `/run verify`          | Verify code against `SPEC.md`          |
 
-After `/run inspect`, iterate through the task execution loop:
+After `/run inspect`, iterate through the task loop:
 
 - `/run build`—executes the active atomic task and sets phase to `check`
-- `/run check`—verifies active task implementation against `PLAN.md`;
-  marks task `done` if clean, or writes `FIX.md` and routes to
+- `/run check`—verifies active task implementation against `PLAN.md`.
+  Marks task `done` if clean, or writes `FIX.md` and routes to
   `/run fix` if gaps exist
 - `/run fix`—closes gaps listed in `FIX.md`, deletes `FIX.md`, and
   returns phase to `check`
 
 If `/run verify` finds gaps, it creates `VERIFY.md` and resets state to
-`/run spec`. Repeat until `/run verify` passes.
+`/run spec`, restarting the workstream loop. Repeat until `/run verify`
+passes.
 
 ---
 
 ## Orchestration (`Pi` and `Agy`)
 
-> **Only Pi and Agy support orchestration agents and skills.**
-> Orchestration requires nested subagent support; testing covered Pi in
-> depth and Agy lightly. Pi users must install
+> **Only Pi and `Agy` support orchestration agents and skills.**
+> Orchestration requires nested subagent support. Testing covered Pi in
+> depth and `Agy` lightly. Pi users must install
 > [`mystilleef/pi-subagent`](https://github.com/mystilleef/pi-subagent).
-> Agy ships native nested subagents.
+> `Agy` ships native nested subagents.
 
 Orchestration agents spawn and drive nested `subagents` autonomously,
 completing multi-agent workflows without human intervention at each
@@ -101,11 +113,11 @@ step.
 
 ### **SPAE** orchestrators
 
-| Agent         | Invocation                      | Purpose                                           |
-| ------------- | ------------------------------- | ------------------------------------------------- |
-| `orchestrate` | `/run orchestrate [<proposal>]` | Run all phases                                    |
-| `prepare`     | `/run prepare [<proposal>]`     | Run prep phases (1-3)                             |
-| `spawn`       | `/run spawn`                    | Loop build, check, and fix cycle across all tasks |
+| Agent         | Invocation                      | Purpose                   |
+| ------------- | ------------------------------- | ------------------------- |
+| `orchestrate` | `/run orchestrate [<proposal>]` | Run all phases            |
+| `prepare`     | `/run prepare [<proposal>]`     | Run prep phases (1-3)     |
+| `spawn`       | `/run spawn`                    | Cycle all remaining tasks |
 
 **`orchestrate`** reads `STATE.json`, determines the current phase, and
 spawns the appropriate `SPAE` agent sequentially until the workflow
@@ -137,7 +149,7 @@ repeatedly until they achieve the desired outcome.
 ## Post-verification
 
 After `/run verify` passes, run these agents to refine and ship the
-implementation. Follow the order below for best results.
+implementation. Follow the order below.
 
 | Order | Agent           | Purpose                          |
 | ----- | --------------- | -------------------------------- |
@@ -147,11 +159,11 @@ implementation. Follow the order below for best results.
 | 4     | `/run review`   | Review for correctness and style |
 | 5     | `/run commit`   | Stage and commit implementation  |
 
-**Pi and Agy only.** `/run coverage` and `/run clean` operate as
-orchestration agents and require Pi or Agy. `/run clean` replaces steps
-2–3 by running `purify` then `refactor` automatically. The `coverage`
-and `clean` agents execute phases of their subagents repeatedly until
-they achieve the desired outcome.
+**Pi and `Agy` only.** `/run coverage` and `/run clean` operate as
+orchestration agents and require Pi or `Agy`. `/run clean` replaces
+steps 2–3 by running `purify` then `refactor` automatically. The
+`coverage` and `clean` agents execute phases of their subagents
+repeatedly until they achieve the desired outcome.
 
 ---
 
@@ -215,13 +227,13 @@ agent files.
 | -------- | --------------------- | ---------------------------- |
 | **Pi**   | `pi/agents/`          | `~/.pi/agent/agents/`        |
 | Claude   | `claude/agents/`      | `~/.claude/agents/`          |
-| Agy      | `antigravity/agents/` | `~/.gemini/config/agents/`   |
+| `Agy`    | `antigravity/agents/` | `~/.gemini/config/agents/`   |
 | Gemini   | `gemini/agents/`      | `~/.gemini/agents/`          |
 | OpenCode | `opencode/agents/`    | `~/.config/opencode/agents/` |
 | Codex    | `codex/agents/`       | `~/.codex/agents/`           |
 
-> **Gemini CLI is deprecated** in favor of Agy, the Antigravity CLI. Use
-> the `antigravity/` files for new installs.
+> **Gemini CLI is deprecated** in favor of `Agy`, the Antigravity CLI.
+> Use the `antigravity/` files for new installs.
 
 ### Run command
 
@@ -232,7 +244,7 @@ The `/run` command orchestrates subagent invocation. Invoke agents as
 | -------- | ----------------------------------------------------------------- |
 | **Pi**   | Requires `mystilleef/pi-subagent` for built-in `/run`             |
 | Claude   | Copy `claude/commands/` to `~/.claude/commands/`                  |
-| Agy      | Copy `antigravity/skills/` to `~/.gemini/config/skills/`          |
+| `Agy`    | Copy `antigravity/skills/` to `~/.gemini/config/skills/`          |
 | Gemini   | Copy `gemini/commands/` to `~/.gemini/commands/`                  |
 | OpenCode | Copy `opencode/commands/` to `~/.config/opencode/commands/`       |
 | Codex    | Copy `codex/skills/` to `~/.codex/skills/`; use `$run` for `/run` |
