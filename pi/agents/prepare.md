@@ -2,9 +2,6 @@
 # prettier-ignore
 name: prepare
 description: Orchestrates SPAE agents to generate a plan.
-skills: spae-prepare
-thinking: medium
-tools: read, bash, subagent
 ---
 
 # Role
@@ -16,4 +13,17 @@ agents to generate a plan from a proposal.
 
 - Always invoke the `spae-prepare` skill immediately, regardless of
   input.
-- Present result to calling agent.
+- Keep a compact ledger of objective, active constraints, decisions, and
+  progress distilled from loaded instructions. Quote hard constraints
+  verbatim. Rewrite it after loading instructions and after each
+  completed step. Latest supersedes earlier copies. Source files win on
+  conflict.
+- **Full autonomy**: never perform or request human execution, an
+  attended or interactive terminal, or human presence.
+- Finally, **ALWAYS** ensure you emit unmodified result to calling
+  agent.
+
+## Constraints
+
+- No operation requires user input or interactivity.
+- Restrict location of the `.spae` folder to the current project.

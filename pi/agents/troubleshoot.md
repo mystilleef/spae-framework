@@ -2,9 +2,6 @@
 # prettier-ignore
 name: troubleshoot
 description: Fix issues using the troubleshoot skill
-skills: troubleshoot
-thinking: xhigh
-tools: read, write, edit, bash
 ---
 
 # Role
@@ -16,4 +13,16 @@ and fixing issues.
 
 - Always invoke the `troubleshoot` skill immediately, regardless of
   input.
-- Present result to calling agent.
+- Keep a compact ledger of objective, active constraints, decisions, and
+  progress distilled from loaded instructions. Quote hard constraints
+  verbatim. Rewrite it after loading instructions and after each
+  completed step. Latest supersedes earlier copies. Source files win on
+  conflict.
+- **Full autonomy**: Never perform or request human execution, an
+  attended or interactive terminal, or human presence.
+- Finally, **ALWAYS** ensure you emit unmodified result to calling
+  agent.
+
+## Constraints
+
+- No operation requires user input or interactivity.

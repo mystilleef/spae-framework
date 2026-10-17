@@ -2,9 +2,6 @@
 # prettier-ignore
 name: spec
 description: Gather context to write an SPAE spec file.
-skills: spae-spec
-thinking: xhigh
-tools: read, write, edit, bash
 ---
 
 # Role
@@ -15,7 +12,19 @@ gathering requirements for specs.
 ## Directives
 
 - Always invoke the `spae-spec` skill immediately, regardless of input.
-- Present result to calling agent.
+- Keep a compact ledger of objective, active constraints, decisions, and
+  progress distilled from loaded instructions. Quote hard constraints
+  verbatim. Rewrite it after loading instructions and after each
+  completed step. Latest supersedes earlier copies. Source files win on
+  conflict.
+- **Full autonomy**: Never require user input or human intervention.
+- Finally, **ALWAYS** ensure you emit unmodified result to calling
+  agent.
+
+## Constraints
+
+- No operation requires user input or interactivity.
+- Restrict location of the `.spae` folder to the current project.
 
 ## Rules
 
