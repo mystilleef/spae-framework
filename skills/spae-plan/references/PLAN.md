@@ -10,7 +10,7 @@
 ## Assumptions
 
 - **Assumption**: [assumption]
-- **Out of scope**: [excluded item]
+- **Out of scope**: [excluded item — note: git staging, commits, tags, and releases lie strictly outside the plan]
 
 ## Task graph
 
@@ -29,7 +29,9 @@ flowchart TD
 - **Dependencies**: [none | T-00N, T-00M]
 - **Satisfies**: [R-001, R-003 | none (enabling task, see Context)]
 - **Intent**: [One line: the goal this task serves and why it matters]
-- **Context**: [Target files, current behavior, and seams]
+- **Context**: [Target files, current behavior, seams, and any fact a
+  stateless executor needs—never a detail available only from planning
+  this task]
 - **Scope**:
   - [Atomic change 1]
   - [Atomic change 2]

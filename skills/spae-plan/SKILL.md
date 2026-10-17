@@ -37,9 +37,12 @@ Reading qualifies as content-blocking.
 
 ## Workflow
 
-1. **GATE**—Confirm `.spae/current/SPEC.md` exists and
-   `.spae/current/STATE.json` reports `phase: plan`. Halt immediately
-   with a clear result on failure. Make no changes.
+1. **GATE**—Read `.spae/current/STATE.json`; self-heal metadata: inject
+   missing `version` (`"1.0"`), `workstream` (from symlink or directory
+   path), and `status` (`"active"`). Confirm `.spae/current/SPEC.md`
+   exists and `STATE.json` reports `phase: plan`. Halt immediately on
+   _unparseable_ JSON, missing `SPEC.md`, or `phase ≠ plan`; report
+   failure and make no changes.
 2. **ORIENT**—Extract goal, requirements, testing strategy, out-of-scope
    items, and assumptions from `SPEC.md`. Capture every `R-NNN` item
    into an in-memory coverage checklist. Gather only the source patterns
@@ -77,6 +80,10 @@ Reading qualifies as content-blocking.
 - Keep `PLAN.md` high-signal and minimal.
 - Prefer existing codebase patterns over speculative design.
 - Slice vertically; avoid infrastructure-only tasks unless required.
+- Assume each task executes, reviews, and refines under a stateless
+  agent with no memory beyond `PLAN.md` text and resulting source; write
+  `Context` to supply every fact that agent needs—never a detail
+  available only from planning the task.
 - Write acceptance criteria as observable outcomes; name testable
   behaviors for a `Satisfies`-bearing task (include failure modes and
   edge cases only when specified in `SPEC.md` or required by task
@@ -89,7 +96,10 @@ Reading qualifies as content-blocking.
   of encoding them in `PLAN.md`.
 - Never add `SPAE` artifacts beyond core files and ephemeral
   `VERIFY.md`.
-- Never stage or commit `.spae/`.
+- Never generate tasks for git operations (staging, commits, tags,
+  branches) or release deployment. The plan scope concludes when local
+  tests pass against verified source code.
+- Never stage or commit `.spae/` artifacts or execute git mutations.
 - Consult `references/prose-protocol.md` before drafting `PLAN.md`.
 
 ## Constraints
@@ -98,6 +108,8 @@ Reading qualifies as content-blocking.
   `.spae/current/STATE.json`.
 - **Forbidden writes**: source code, tests, configuration files, docs,
   `SPEC.md`, `VERIFY.md`, and any non-`SPAE` project file.
+- **Scope boundary**: Never create tasks for git mutations, package
+  publishing, or release workflows.
 - **Read-only source**: inspect repository code only for fit.
 - **Phase boundary**: hand off to `/inspect`; don't execute tasks.
 - **Autonomy**: Never ask users for input or clarification
@@ -114,6 +126,8 @@ Reading qualifies as content-blocking.
   declaring task.
 - Every task includes dependencies, acceptance criteria, and
   verification steps.
+- Zero tasks mandate git commands, commits, tags, package releases, or
+  external deployments.
 - Every `Satisfies`-bearing task's Acceptance section names testable
   behaviors (includes failure modes and edge cases when specified in
   `SPEC.md` or required by task logic); a `Satisfies: none` task's
