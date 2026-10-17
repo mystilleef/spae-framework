@@ -1,6 +1,5 @@
 ---
 description: Aggressively optimize code.
-mode: subagent
 ---
 
 # Role

@@ -1,8 +1,6 @@
 ---
 name: plan
 description: Runs the SPAE planning phase for a task or workstream
-model: gemini-3.1-pro-preview
-max_turns: 100
 ---
 
 # Role

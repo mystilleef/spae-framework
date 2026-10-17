@@ -1,7 +1,5 @@
 name = "work"
 description = "Gather context to run adhoc tasks."
-model_reasoning_effort = "medium"
-sandbox_mode = "workspace-write"
 
 developer_instructions = """
 # Role

@@ -1,8 +1,6 @@
 ---
 name: work
 description: Gather context to perform adhoc tasks.
-model: auto-gemini-3
-max_turns: 100
 ---
 
 # Role

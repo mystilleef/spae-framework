@@ -1,7 +1,5 @@
 name = "troubleshoot"
 description = "Fix issues using the troubleshoot skill"
-model_reasoning_effort = "high"
-sandbox_mode = "workspace-write"
 
 developer_instructions = """
 # Role

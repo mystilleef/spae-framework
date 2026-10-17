@@ -1,9 +1,6 @@
 ---
 name: troubleshoot
 description: Fix issues using the troubleshoot skill
-model: gemini-3.1-pro-preview
-max_turns: 100
-timeout_mins: 30
 ---
 
 # Role

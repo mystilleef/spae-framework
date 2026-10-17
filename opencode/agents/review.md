@@ -1,6 +1,5 @@
 ---
 description: Perform a code review
-mode: subagent
 ---
 
 # Role

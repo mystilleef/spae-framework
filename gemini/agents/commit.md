@@ -1,9 +1,6 @@
 ---
 name: commit
 description: Commit atomic changes to the current repository
-model: auto-gemini-3
-max_turns: 100
-timeout_mins: 30
 ---
 
 # Role

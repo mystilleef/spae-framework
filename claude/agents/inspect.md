@@ -1,9 +1,6 @@
 ---
 name: inspect
 description: Runs the SPAE inspect phase for a task or workstream.
-skills: spae-inspect
-effort: high
-permissionMode: bypassPermissions
 ---
 
 # Role

@@ -1,8 +1,6 @@
 ---
 name: query
 description: Read-only context gathering and information retrieval.
-model: auto-gemini-3
-max_turns: 100
 ---
 
 # Role

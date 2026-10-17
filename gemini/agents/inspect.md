@@ -1,8 +1,6 @@
 ---
 name: inspect
 description: Runs the SPAE review phase for a task or workstream
-model: gemini-3.1-pro-preview
-max_turns: 100
 ---
 
 # Role

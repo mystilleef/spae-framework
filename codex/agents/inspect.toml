@@ -1,7 +1,5 @@
 name = "inspect"
 description = "Runs the SPAE inspect phase for a task or workstream"
-model_reasoning_effort = "high"
-sandbox_mode = "workspace-write"
 
 developer_instructions = """
 # Role

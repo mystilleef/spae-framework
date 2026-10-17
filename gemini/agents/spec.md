@@ -1,8 +1,6 @@
 ---
 name: spec
 description: Gather context to write an SPAE spec file.
-model: gemini-3.1-pro-preview
-max_turns: 100
 ---
 
 # Role

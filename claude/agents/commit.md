@@ -1,9 +1,6 @@
 ---
 name: commit
 description: Runs the auto-commit skill.
-skills: auto-commit
-effort: medium
-permissionMode: bypassPermissions
 ---
 
 # Role

@@ -1,9 +1,6 @@
 ---
 name: troubleshoot
 description: Fix issues using the troubleshoot skill.
-skills: troubleshoot
-effort: high
-permissionMode: bypassPermissions
 ---
 
 # Role

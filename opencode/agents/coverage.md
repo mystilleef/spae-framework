@@ -1,6 +1,5 @@
 ---
 description: Perform coverage analysis on the current project
-mode: subagent
 ---
 
 # Role

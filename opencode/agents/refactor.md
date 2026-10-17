@@ -1,6 +1,5 @@
 ---
 description: Refactor changes to the project
-mode: subagent
 ---
 
 # Role

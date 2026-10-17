@@ -1,9 +1,6 @@
 ---
 name: coverage
 description: Perform coverage analysis on the current project.
-skills: coverage
-effort: high
-permissionMode: bypassPermissions
 ---
 
 # Role

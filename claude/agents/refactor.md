@@ -1,9 +1,6 @@
 ---
 name: refactor
 description: Refactor changes to the project.
-skills: refactor
-effort: high
-permissionMode: bypassPermissions
 ---
 
 # Role

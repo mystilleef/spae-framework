@@ -1,6 +1,5 @@
 ---
 description: Gather context to write an SPAE spec file.
-mode: subagent
 ---
 
 # Role

@@ -1,6 +1,5 @@
 ---
 description: Runs one atomic SPAE build task for a task or workstream
-mode: subagent
 ---
 
 # Role

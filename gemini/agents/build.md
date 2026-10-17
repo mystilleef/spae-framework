@@ -1,8 +1,6 @@
 ---
 name: build
 description: Runs one atomic SPAE build task for a task or workstream
-model: auto-gemini-3
-max_turns: 100
 ---
 
 # Role

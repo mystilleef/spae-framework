@@ -1,6 +1,5 @@
 ---
 description: Answer user query in read-only mode
-mode: subagent
 ---
 
 # Role

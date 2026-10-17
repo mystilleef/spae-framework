@@ -1,6 +1,5 @@
 ---
 description: Document code
-mode: subagent
 ---
 
 # Role

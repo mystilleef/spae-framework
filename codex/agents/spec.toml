@@ -1,7 +1,5 @@
 name = "spec"
 description = "Gather context to write an SPAE spec file."
-model_reasoning_effort = "high"
-sandbox_mode = "workspace-write"
 
 developer_instructions = """
 # Role

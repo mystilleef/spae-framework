@@ -1,6 +1,5 @@
 ---
 description: Runs the auto-commit skill
-mode: subagent
 ---
 
 # Role

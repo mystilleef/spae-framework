@@ -1,9 +1,6 @@
 ---
-# prettier-ignore
 name: review
 description: Perform a code review
-model: gemini-3.1-pro-preview
-max_turns: 100
 ---
 
 # Role

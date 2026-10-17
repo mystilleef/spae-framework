@@ -1,9 +1,6 @@
 ---
 name: verify
 description: Find gaps between implementation and specs.
-skills: spae-verify
-effort: high
-permissionMode: bypassPermissions
 ---
 
 # Role

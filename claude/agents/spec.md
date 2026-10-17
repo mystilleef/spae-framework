@@ -1,9 +1,6 @@
 ---
 name: spec
 description: Gather context to write an SPAE spec file.
-skills: spae-spec
-effort: high
-permissionMode: bypassPermissions
 ---
 
 # Role

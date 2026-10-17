@@ -1,6 +1,5 @@
 ---
 description: Runs the SPAE inspect phase for a task or workstream
-mode: subagent
 ---
 
 # Role

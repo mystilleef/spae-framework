@@ -1,7 +1,5 @@
 name = "review"
 description = "Perform a code review"
-model_reasoning_effort = "high"
-sandbox_mode = "workspace-write"
 
 developer_instructions = """
 # Role

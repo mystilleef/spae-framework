@@ -1,6 +1,5 @@
 ---
 description: Gather context to run adhoc tasks.
-mode: subagent
 ---
 
 # Role

@@ -1,9 +1,6 @@
 ---
 name: review
 description: Perform a code review.
-skills: code-review
-effort: high
-permissionMode: bypassPermissions
 ---
 
 # Role

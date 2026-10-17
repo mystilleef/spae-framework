@@ -1,6 +1,5 @@
 ---
 description: Runs the SPAE planning phase for a task or workstream
-mode: subagent
 ---
 
 # Role

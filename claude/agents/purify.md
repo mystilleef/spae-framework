@@ -1,9 +1,6 @@
 ---
 name: purify
 description: Aggressively optimize code.
-skills: purify
-effort: high
-permissionMode: bypassPermissions
 ---
 
 # Role

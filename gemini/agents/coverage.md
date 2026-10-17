@@ -2,8 +2,6 @@
 name: coverage
 description:
   Evaluate test coverage and fill real gaps with high-value tests.
-model: auto-gemini-3
-max_turns: 100
 ---
 
 # Role

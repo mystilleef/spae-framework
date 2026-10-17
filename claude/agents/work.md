@@ -1,8 +1,6 @@
 ---
 name: work
 description: Gather context to run adhoc tasks.
-effort: medium
-permissionMode: bypassPermissions
 ---
 
 # Role

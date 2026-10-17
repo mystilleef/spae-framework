@@ -1,9 +1,6 @@
 ---
 name: document
 description: Document code.
-skills: document
-effort: medium
-permissionMode: bypassPermissions
 ---
 
 # Role

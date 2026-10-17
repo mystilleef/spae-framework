@@ -1,7 +1,5 @@
 name = "refactor"
 description = "Refactor changes to the project"
-model_reasoning_effort = "high"
-sandbox_mode = "workspace-write"
 
 developer_instructions = """
 # Role

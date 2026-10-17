@@ -1,6 +1,5 @@
 ---
 description: Fix issues using the troubleshoot skill
-mode: subagent
 ---
 
 # Role

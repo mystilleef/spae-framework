@@ -1,8 +1,6 @@
 ---
 name: refactor
 description: Refactor code to simplify it while preserving behavior.
-model: auto-gemini-3
-max_turns: 100
 ---
 
 # Role

@@ -1,7 +1,5 @@
 name = "coverage"
 description = "Perform coverage analysis on the current project"
-model_reasoning_effort = "high"
-sandbox_mode = "workspace-write"
 
 developer_instructions = """
 # Role

@@ -1,6 +1,5 @@
 ---
 description: Find gaps between implementation and specs
-mode: subagent
 ---
 
 # Role
