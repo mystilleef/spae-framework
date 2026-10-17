@@ -50,18 +50,22 @@ checklist and diff-only audit scope.
 
 ## Workflow
 
-1. **GATE**—Confirm `.spae/current/STATE.json` has `phase: build` and an
-   active task. Halt on state drift: if `tasks[`active_task_id`]` reads
-   `"done"`, halt; report and make no changes. Read the plan `## Goal`
-   and active task section —
-   including its `Intent` — from `.spae/current/PLAN.md`. Read dependent
-   and forward task titles plus acceptance criteria to map seams, not
-   build them. Verify every task ID in the active task's `Dependencies`
-   field carries status `"done"` in `tasks` registry in `STATE.json`;
-   fail the task for any incomplete dependency.
+1. **GATE**—Read `.spae/current/STATE.json`; confirm `phase: build` and
+   an active task cursor. Self-heal metadata: inject missing `version`
+   (`"1.0"`), `workstream` (from symlink or directory path), and
+   `status` (`"active"`). Halt on state drift: if
+   `tasks[`active_task_id`]` reads `"done"`, halt; report and make no
+   changes. Halt on _unparseable_ JSON, unrecognized phase, or active
+   task missing from `PLAN.md`. Read the plan `## Goal` and active task
+   section — including its `Intent` — from `.spae/current/PLAN.md`. Read
+   dependent and forward task titles plus acceptance criteria to map
+   seams, not build them. Verify every task ID in the active task's
+   `Dependencies` field carries status `"done"` in `tasks` registry in
+   `STATE.json`; fail the task for any incomplete dependency.
 2. **ORIENT**—State the goal in one sentence: execute the active task
    and hand off to `/check`. Name what won't change: `PLAN.md`,
-   `SPEC.md`, and forward-task seams. **Task status update**: set
+   `SPEC.md`, and forward-task seams. Capture pre-task baseline snapshot
+   per `references/cleanup-guide.md`. **Task status update**: set
    `tasks[`active_task_id`]` to `"in_progress"` in
    `.spae/current/STATE.json`.
 3. **PLAN**—Declare the full implementation path that satisfies every
@@ -83,9 +87,9 @@ checklist and diff-only audit scope.
 
 5. **VERIFY**—Loop over every acceptance criterion and verification
    command listed for the active task:
-   - Audit every new test file against CI Parity rules in
+   - Audit every added or updated test file against CI Parity rules in
      `references/testing-guide.md`; fix any violation before proceeding.
-   - Audit the task's own `git diff`/`git status` against the
+   - Audit task edits against the pre-task baseline using the
      Self-cleanup checklist in `references/cleanup-guide.md`; remove
      every self-introduced artifact before proceeding.
    - For each unmet criterion or failing command: return to `ACT`,
@@ -106,7 +110,7 @@ checklist and diff-only audit scope.
 - Consult `references/shell-command-guide.md` for command safety,
   timeouts, redirects, and non-interactive environment directives.
 - Consult `references/cleanup-guide.md` for self-introduced-artifact
-  scope and checklist.
+  scope, baseline snapshotting, and checklist directives.
 - Execute exactly one atomic task per invocation.
 - Prefer existing project patterns over new design.
 - Keep production code minimal, local, and test-driven; never reduce
@@ -146,9 +150,11 @@ checklist and diff-only audit scope.
 - Never edit `.spae/current/PLAN.md` during `/build`.
 - Never edit `.spae/current/SPEC.md` during `/build`.
 - Never execute more than one task.
-- Never stage or commit `.spae/` artifacts.
+- Never execute git mutations (staging, commits, branches, tags, pushes,
+  or releases); never stage or commit `.spae/` artifacts.
 - Avoid incidental refactoring, cleanup, formatting, or dependency churn
-  outside the active task.
+  outside the active task; never delete pre-existing uncommitted files
+  or edit outside active-task scope.
 - **Autonomy**: Never ask users for input or clarification
   mid-execution; halts and failures stop autonomously.
 - **Full autonomy**: Never perform or request human execution, an
@@ -174,7 +180,8 @@ checklist and diff-only audit scope.
 - Relevant project tests pass with no new failures.
 - Task tests cover expected behavior, failure modes, and edge cases
   exhaustively; no thin-coverage shortcuts.
-- All new tests pass CI Parity audit in `references/testing-guide.md`.
+- All added or updated tests pass CI Parity audit in
+  `references/testing-guide.md`.
 - No self-introduced cleanup violation remains per
   `references/cleanup-guide.md`.
 - Implementation advances the task `Intent` and plan `## Goal`; no
