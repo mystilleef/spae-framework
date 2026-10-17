@@ -26,6 +26,8 @@
 ## Out of scope
 
 - [Excluded item — reason]
+- Git repository management and release deployments — SPAE governs
+  verified local source and test modifications only
 
 ## Assumptions
 

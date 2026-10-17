@@ -26,65 +26,130 @@ argument-hint: "[optional-workstream-name] [optional-task]"
 
 ## Input
 
-Determine scope by the first available source:
+Determine target `workstream` and scope by first available source:
 
-- proposal or task from user
-- Existing `STATE.json` (consult `references/STATE.md` for field
-  reference, directives, and phase snapshots) and `VERIFY.md` in
-  `.spae/current` when present.
+- Explicit argument: target directory `.spae/[workstream]/`.
+- Implicit active: resolve target directory via `.spae/current` symlink.
+- Implicit new: auto-generate slug, target directory `.spae/[slug]/`.
 
 ## Workflow
 
-Select sub-workflow by `.spae/current` symlink state:
+Select sub-workflow by target `workstream` state:
 
-- **New** (symlink absent): `New spec workflow`
-- **Revision** (symlink present): `Revision spec workflow`
+- **New**: Target directory missing → `New spec workflow`.
+- **Resume**: Target directory exists with `STATE.json` (`phase: spec`,
+  `status: active`) → `Resume spec workflow`.
+- **Revision**: Target directory exists with `STATE.json`
+  (`status: revision_required`) and `VERIFY.md` present →
+  `Revision spec workflow`.
 
 ### New spec workflow
 
-If absent symlink follow this workflow.
+Follow this workflow when target `workstream` directory missing.
 
-1. **GATE**—`.spae/current` absent. Halt if symlink exists (revision
-   path).
-2. **ORIENT**—Produce `SPEC.md` and `STATE.json` for `[workstream]`.
-   Codebase unmodified.
-3. **PLAN**—Derive `[workstream]` slug from `args` or auto-generate.
-   Identify codebase sections to read.
+1. **GATE**—Confirm target `workstream` directory absent. Halt if target
+   directory exists.
+2. **ORIENT**—Initialize `.spae/[workstream]/` directory; create
+   `STATE.json` (`phase: spec`, `status: active`, `cursor: {}`,
+   `tasks: {}`). Read `AGENTS.md` at project root in full when present;
+   treat constraints, conventions, and gates as non-negotiable spec
+   inputs. Source code unmodified.
+3. **PLAN**—Identify codebase sections to read.
 4. **ACT**—Execute:
-   - Initialize `.spae/[workstream]/`; point `.spae/current` symlink;
-     create `STATE.json` (`phase: spec`, `status: active`).
-   - If `AGENTS.md` exists at the project root, read it in full
-     **before** any codebase sections; treat its constraints,
-     conventions, and gates as non-negotiable spec inputs.
    - Read codebase sections narrowly; widen only on uncertainty.
    - Consult `references/prose-protocol.md` before drafting.
+   - Sweep the proposal for aspect coverage per
+     `references/aspect-sweep.md`: scan all categories each phase,
+     dedupe new candidates against the ledger, halt on the first
+     zero-new-candidate phase or `PHASE_CAP` (4).
    - Derive goal, requirements, testing strategy, out-of-scope
-     boundaries, and assumptions; reflect all `AGENTS.md` constraints.
+     boundaries, and assumptions from the ledger; reflect all
+     `AGENTS.md` constraints.
    - Assess derived requirements against `YAGNI`; discard `unrequested`
-     scope, speculative features, or theoretical complexity.
+     scope, speculative features, or theoretical complexity;
+     YAGNI-discarded ledger aspects land in `Out of scope` with a
+     one-line rationale, never a silent drop.
+   - Automatically place all version control operations (git staging,
+     commits, branches, tags) and release operations (publishing,
+     deployments) into `Out of scope`.
+   - Forbid creating any `R-NNN` requirement covering git mutations,
+     package publishing, or release workflows.
 5. **VERIFY**—Loop over spec completeness criteria:
    - For each failure: return to `ACT`, fix, then re-enter `VERIFY`.
-   - Exit only when spec complete and structure matches
-     `references/SPEC.md`.
-   - Fail only for out-of-scope conditions.
-6. **PERSIST**—Write `SPEC.md`. Update `STATE.json` (`phase: plan`,
+   - Exit only when spec complete, structure matches
+     `references/SPEC.md`, and every aspect-ledger entry resolves to a
+     named `SPEC.md` disposition—no orphaned aspect.
+   - Halt only for out-of-scope conditions.
+6. **PERSIST**—Write `SPEC.md`. Point `.spae/current` symlink to
+   `.spae/[workstream]`. Update `STATE.json` (`phase: plan`,
    `status: active`, `cursor: {}`, `tasks: {}`). Re-read `STATE.json`
    after writing; on a field mismatch, rewrite and re-read before
    `REPORT`.
-7. **REPORT**—Emit result using the Result template.
+7. **REPORT**—Emit result using Result template.
+
+### Resume spec workflow
+
+Follow this workflow when target `workstream` directory exists with
+`phase: spec`, `status: active`.
+
+1. **GATE**—Target directory exists; `STATE.json` contains
+   `phase: spec`. Self-heal metadata: inject missing `version`
+   (`"1.0"`), `workstream` (from symlink or directory path), and
+   `status` (`"active"`). Halt on unparseable JSON or phase mismatch.
+2. **ORIENT**—Read `AGENTS.md` at project root in full when present;
+   treat constraints as binding. Source code unmodified.
+3. **PLAN**—Survey existing draft artifacts and prompt context. Identify
+   codebase sections to inspect.
+4. **ACT**—Execute:
+   - Inspect codebase sections narrowly to complete missing details.
+   - Consult `references/prose-protocol.md` before drafting.
+   - Seed the aspect ledger from the current `SPEC.md` draft's existing
+     `R-NNN`, `Out of scope`, `Assumptions`, and `Testing strategy`
+     entries (mark covered), then sweep remaining proposal or task
+     context per `references/aspect-sweep.md`: scan all categories each
+     phase, dedupe against the ledger, halt on the first
+     zero-new-candidate phase or `PHASE_CAP` (4).
+   - Complete `SPEC.md` draft following `references/SPEC.md` structure.
+   - Assess requirements against `YAGNI`; discard `unrequested` scope or
+     speculative features; YAGNI-discarded ledger aspects land in
+     `Out of scope` with a one-line rationale, never a silent drop.
+   - Automatically place all version control operations (git staging,
+     commits, branches, tags) and release operations (publishing,
+     deployments) into `Out of scope`.
+   - Forbid creating any `R-NNN` requirement covering git mutations,
+     package publishing, or release workflows.
+5. **VERIFY**—Loop over spec completeness criteria:
+   - For each failure: return to `ACT`, fix, then re-enter `VERIFY`.
+   - Exit only when spec complete, structure matches
+     `references/SPEC.md`, and every aspect-ledger entry resolves to a
+     named `SPEC.md` disposition—no orphaned aspect.
+   - Halt only for out-of-scope conditions.
+6. **PERSIST**—Write `SPEC.md`. Point `.spae/current` symlink to
+   `.spae/[workstream]`. Update `STATE.json` (`phase: plan`,
+   `status: active`, `cursor: {}`, `tasks: {}`). Re-read `STATE.json`
+   after writing; on a field mismatch, rewrite and re-read before
+   `REPORT`.
+7. **REPORT**—Emit result using Result template.
 
 ### Revision spec workflow
 
-If present symlink follow this workflow.
+Follow this workflow when target `workstream` directory exists with
+`status: revision_required`.
 
-1. **GATE**—`.spae/current` present. `VERIFY.md` exists. `STATE.json`
-   `status: revision_required`. Halt immediately on any failure.
-2. **ORIENT**—Delete `SPEC.md` and rewrite it from scratch to address
-   every `VERIFY.md` hard block. Source code unmodified.
+1. **GATE**—Target directory exists. Self-heal metadata: inject missing
+   `version` (`"1.0"`) and `workstream` (from symlink or directory
+   path). Halt with a diagnostic on:
+   - Target directory missing or orphaned symlink.
+   - `STATE.json` missing or unparseable JSON syntax.
+   - `VERIFY.md` absent.
+   - `STATE.json` `status` ≠ `revision_required`.
+2. **ORIENT**—Delete `SPEC.md`. Set `STATE.json` (`phase: spec`,
+   `status: active`). Read `AGENTS.md` at project root in full when
+   present before inspecting source files; treat constraints as binding;
+   reflect in revised requirements. Source code unmodified.
 3. **PLAN**—Survey `VERIFY.md` findings; identify source files to
    inspect and requirements to derive.
 4. **ACT**—Execute:
-   - Delete `SPEC.md`. Don't reuse.
    - Read `VERIFY.md` in full. Convert each hard block into a spec item.
      Assess soft findings against `YAGNI`; discard soft findings adding
      `unrequested` scope or theoretical complexity.
@@ -94,10 +159,7 @@ If present symlink follow this workflow.
      - Convert an observation to a spec item only when it names
        actionable scope reduction—simplify or remove an existing
        element—never to formalize or expand `unrequested` scope.
-     - Otherwise, drop it after noting the context.
-   - If `AGENTS.md` exists at the project root, read it in full
-     **before** inspecting source files; treat its constraints as
-     binding; reflect them in the revised requirements.
+     - Otherwise, drop after noting context.
    - Inspect source files to ground new requirements.
    - Consult `references/prose-protocol.md` before drafting.
    - Write new `SPEC.md` from scratch; never reuse old spec; assign
@@ -107,21 +169,22 @@ If present symlink follow this workflow.
    item converted under `ACT`:
    - For each unaddressed item: return to `ACT`, address it, then
      re-enter `VERIFY`.
-   - Exit only when every item resolves and the spec matches
+   - Exit only when every item resolves and spec matches
      `references/SPEC.md`.
-   - Fail only for out-of-scope conditions.
-6. **PERSIST**—Write `SPEC.md`. Update `STATE.json` (`phase: plan`,
+   - Halt only for out-of-scope conditions.
+6. **PERSIST**—Write `SPEC.md`. Point `.spae/current` symlink to
+   `.spae/[workstream]`. Update `STATE.json` (`phase: plan`,
    `status: active`, `cursor: {}`, `tasks: {}`). Re-read `STATE.json`
    after writing; on a field mismatch, rewrite and re-read before
    `REPORT`.
-7. **REPORT**—Emit the result following the result directives and using
-   the result template.
+7. **REPORT**—Emit result following result directives and using result
+   template.
 
 ## Directives
 
 - Optimize for agent, token, and context efficiency.
 - Align with existing codebase patterns; avoid speculative design.
-- Filter all requirements and incoming findings against `YAGNI`; reject
+- Filter all requirements and incoming findings against `YAGNI`; discard
   `unrequested` scope, speculative design, or theoretical complexity.
 - Write observable, testable, and implementation-neutral requirements.
 - Match testing strategy detail to task size; require failure modes and
@@ -129,44 +192,60 @@ If present symlink follow this workflow.
   paths.
 - Treat `manual` testing strategy as agent-executed, unattended
   inspection only; never encode a spec item, approach, or assumption
-  that presumes human execution, an attended or interactive terminal, or
+  presuming human execution, an attended or interactive terminal, or
   human presence.
 - Tag each item with a unique, stable `R-NNN` identifier.
 - Document assumptions explicitly instead of guessing scope.
 - Match level of detail to task size; avoid process bloat.
 - Consult `references/prose-protocol.md` before drafting `SPEC.md`.
+- Consult `references/aspect-sweep.md` before running the `New` or
+  `Resume` aspect sweep; default to `PHASE_CAP` (4) as a single named
+  constant—never scatter phase-count literals across the workflow.
+- Surface aspect-sweep phases run in the result `Actions` list (for
+  example, `aspect sweep: 2/4 phases, stopped on saturation`).
+- Aspect sweep applies to `New` and `Resume` workflows only; `Revision`
+  consumes `VERIFY.md`'s pre-itemized `R-NNN` findings directly—no
+  sweep.
 - Set `Out of scope` and `Assumptions` to `None` on single-behavior
   specs unless explicit constraints exist; avoid invented exclusions or
   assumptions; keep section headers intact.
-- Never stage or commit the `.spae/` directory.
+- Automatically place all version control operations (git staging,
+  commits, branches, tags) and release operations (publishing,
+  deployments) into `Out of scope` with a standard rationale; never
+  create an `R-NNN` requirement for them.
+- Never stage or commit `.spae/` directory or execute git mutations.
 
 ## Constraints
 
-- **`AGENTS.md` authority**: If `AGENTS.md` exists at the project root,
-  its constraints, conventions, and gates bind all spec requirements;
+- **`AGENTS.md` authority**: If `AGENTS.md` exists at project root,
+  constraints, conventions, and gates bind all spec requirements;
   contradictions count as spec defects.
 - **Write Scope**: write only `.spae/current` symlink,
-  `.spae/[workstream]/SPEC.md`, `.spae/[workstream]/STATE.json`, forbid
+  `.spae/[workstream]/SPEC.md`, `.spae/[workstream]/STATE.json`; forbid
   all other writes.
+- **Scope boundary**: Never author requirements for git operations,
+  package publishing, or release workflows.
 - **Read-only files**: inspect source code to ground requirements and
   confirm fit; stay read-only.
 - **Phase boundary**: hand off work to `/plan`; don't decompose tasks.
 - **Autonomy**: Never ask users for input or clarification
   mid-execution; halts and failures stop autonomously.
 - **Full autonomy**: Never author a spec item, testing strategy, or
-  assumption that presumes human execution, an attended or interactive
+  assumption presuming human execution, an attended or interactive
   terminal, or human presence; treat such a need as a scope defect and
-  resolve it before writing `SPEC.md`.
+  resolve before writing `SPEC.md`.
 - **Ambiguity**: resolve from codebase evidence first; fall back to a
   documented conservative assumption only when evidence proves
   insufficient; record under **Assumptions** in `SPEC.md`.
-- Never introduce fields to `STATE.json` outside the schema reference.
+- Never introduce fields to `STATE.json` outside schema reference.
 
 ## Verification
 
 - Ensure `.spae/[workstream]/SPEC.md` contains distilled requirements
   and structure matching `references/SPEC.md` exactly.
 - Confirm each item carries a unique `R-NNN` identifier.
+- Confirm zero requirements mandate git operations, package
+  publishing, or release deployments.
 - Confirm no spec item, testing strategy, or assumption in `SPEC.md`
   presumes human execution, an attended or interactive terminal, or
   human presence.
@@ -175,6 +254,11 @@ If present symlink follow this workflow.
   verification on single-behavior specs.
 - Confirm section depth matches task size; no invented edge case,
   failure mode, or exclusion on a single-behavior spec.
+- Confirm every `New`/`Resume` aspect-ledger entry resolves to an
+  `R-NNN`, `Out of scope`, `Assumption`, `Testing strategy` element, or
+  `Goal` success criterion—no orphaned aspect.
+- Confirm `Revision` runs no aspect sweep; converted `VERIFY.md` items
+  map directly to spec items.
 - Ensure `.spae/[workstream]/STATE.json` specifies `phase: "plan"`,
   `status: "active"`, `cursor: {}`, and `tasks: {}`.
 - Confirm `.spae/current` links to `.spae/[workstream]`.
@@ -183,7 +267,7 @@ If present symlink follow this workflow.
 - Confirm revision processes resolve every `VERIFY.md` hard block and
   soft finding, and each converted observation, without editing
   forbidden files.
-- Confirm invalid `STATE.json` or orphaned artifacts halt with
+- Confirm unparseable `STATE.json` or orphaned artifacts halt with
   diagnostics; no artifacts modified.
 - Verify all other halt conditions leave artifacts intact.
 
@@ -194,10 +278,10 @@ If present symlink follow this workflow.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists over paragraphs and long sentences.
-- Emit the result template as live markdown—never in a code fence.
-- Output nothing outside the template.
-- Source every `SPAE Status` value from the confirmed re-read, never
-  from working memory of intent.
+- Emit result template as live markdown—never in a code fence.
+- Output nothing outside template.
+- Source every `SPAE Status` value from confirmed re-read, never from
+  working memory of intent.
 
 ### Result template
 
