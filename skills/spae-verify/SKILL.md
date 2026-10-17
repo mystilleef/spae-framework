@@ -34,10 +34,13 @@ Read:
 
 ## Workflow
 
-1. **GATE**—Read `.spae/current/STATE.json`; confirm `phase: verify`.
-   Confirm every `.spae/current/PLAN.md` task reports `done` in the
-   `tasks` registry. Halt immediately on failure; report which check
-   failed; make no changes.
+1. **GATE**—Read `.spae/current/STATE.json`; self-heal metadata: inject
+   missing `version` (`"1.0"`), `workstream` (from symlink or directory
+   path), and `status` (`"active"`). Confirm `phase: verify`. Confirm
+   every `.spae/current/PLAN.md` task reports `done` in the `tasks`
+   registry. Halt immediately on _unparseable_ JSON, unrecognized
+   `phase`, or incomplete tasks; report which check failed; make no
+   changes.
 2. **ORIENT**—Goal: compare implemented repository state against each
    `.spae/current/SPEC.md` spec item; determine pass, no-pass, or
    blocked verdict.
@@ -128,7 +131,8 @@ Read:
   `.spae/current/SPEC.md`, `.spae/current/PLAN.md`, or non-`SPAE`
   project files.
 - Preserve the `SPAE` artifact model; don't create extra tracking files.
-- Don't stage or commit `.spae/` artifacts.
+- Never execute git mutations (staging, commits, branches, tags, pushes,
+  or releases); don't stage or commit `.spae/` artifacts.
 - **Autonomy**: Never ask users for input or clarification
   mid-execution; halts and failures stop autonomously.
 - **Full autonomy**: Never require, request, or instruct human
