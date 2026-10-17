@@ -67,9 +67,19 @@ checklist and diff-only audit scope.
    - **Short-circuit**: halt and emit `Result: No Changes` if none
      detected: duplicated logic, long methods, large classes,
      `primitive` obsession, `SOLID` violations.
+   - When detected smells carry high regression risk resisting safe
+     atomic extraction under existing tests: record in `Findings`, omit
+     edits, and emit `Result: No Changes`.
 2. **ORIENT**—Name the smallest production area worth refactoring and
-   what won't change.
+   what won't change. Capture pre-task baseline snapshot per
+   `references/cleanup-guide.md`.
 3. **PLAN**—Declare the minimal change and rationale.
+   - Target one cohesive responsibility boundary (for example,
+     extracting a dedicated collaborator, domain service, or validation
+     module) rather than whole-class overhauls or disconnected
+     micro-edits.
+   - Declare the ordered sequence of transformations needed to decouple
+     that responsibility.
    - Analyze package, module, or class boundaries for cyclic imports and
      unresolved downstream consumers.
    - Select the fix from the playbook; resolve compound violations using
@@ -78,24 +88,36 @@ checklist and diff-only audit scope.
    declared.
 5. **VERIFY**—Loop over every criterion declared in PLAN:
    - Run the full suite after each `ACT` step.
-   - Audit the task's own `git diff`/`git status` against the
+   - Audit task edits against the pre-task baseline using the
      Self-cleanup checklist in `references/cleanup-guide.md`; remove
      every self-introduced artifact before proceeding.
    - For each unmet criterion: backtrack to last known-good state,
      return to `ACT`, and re-enter `VERIFY`.
    - Exit only when all criteria pass.
-   - Halt only for out-of-scope blockers.
+   - Halt only for out-of-scope blockers (failing baseline tests,
+     compilation errors, or missing runtime environments); never treat
+     complex codebase smells as blockers.
 6. **REPORT**—Emit the result following the result directives and using
    the result template.
 
 ## Directives
 
+- **Cohesive Scope**: Scope each invocation to one distinct
+  responsibility boundary; batch related transformations internally
+  under sequential test verification rather than micro-slicing single
+  methods.
 - **Two Hats**: Never add features or new tests while refactoring.
+  Extracting internal functions, modules, or cohesive units under
+  existing test suites satisfies Two Hats without requiring new test
+  files.
 - **Violations**: Detect and fix using the violation catalog and fix
   playbook in `references/refactoring-guide.md`.
 
 ## Constraints
 
+- **No Confirmation Halts**: Never halt to request user scope
+  confirmation or interactive direction; execute the smallest safe
+  transformation within detected scope or emit `Result: No Changes`.
 - **Zero Behavioral Change**: External function and observable behavior
   must remain identical.
 - **Defer if Broken**: Stabilize failing code before refactoring.
