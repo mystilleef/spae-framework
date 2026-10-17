@@ -248,3 +248,28 @@ The `/run` command orchestrates subagent invocation. Invoke agents as
 | Gemini   | Copy `gemini/commands/` to `~/.gemini/commands/`                  |
 | OpenCode | Copy `opencode/commands/` to `~/.config/opencode/commands/`       |
 | Codex    | Copy `codex/skills/` to `~/.codex/skills/`; use `$run` for `/run` |
+
+---
+
+## Smoke test
+
+Verify harness setup with [`proposal.md`](proposal.md), a tiny `slug`
+`CLI` project.
+
+1. Copy `proposal.md` to an empty directory outside this repository.
+2. Start the harness there.
+3. Seed the workflow:
+   - Manual: `/run spec proposal.md`, then each phase in order
+   - **Pi** and `Agy`: `/run orchestrate proposal.md` runs every phase
+4. Confirm `.spae/current/STATE.json` after each phase. Orchestration
+   ends at `done`:
+
+| After     | `phase`   | Also confirm                           |
+| --------- | --------- | -------------------------------------- |
+| `spec`    | `plan`    | `SPEC.md` holds `R-NNN` items          |
+| `plan`    | `inspect` | `PLAN.md` holds a task graph           |
+| `inspect` | `build`   | Cursor `active_task_id` reads `T-001`  |
+| `verify`  | `done`    | `status` reads `completed`; tests pass |
+
+Failure at any phase marks a setup gap: agent files, skills, or `/run`
+wiring. See [Installation](#installation).
