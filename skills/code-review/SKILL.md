@@ -14,9 +14,10 @@ argument-hint: "[optional: diff, commit, PR, file, or focus area]"
 
 ## Goal
 
-Conduct a skeptical, evidence-based review that flags only material
-defects—incorrect behavior, data loss, security vulnerabilities, or
-crashes. Return prioritized findings with exact code citations.
+Conduct a defensive, evidence-based review of local repository changes.
+Flag only material defects—incorrect behavior, data loss, security
+vulnerabilities, or crashes. Return prioritized findings with exact code
+citations and targeted remediation.
 
 ## Scope
 
@@ -62,7 +63,9 @@ Gather intent grounding matching the resolved scope:
    `references/report-schema.json` as the output contract. Anchor to
    review goal; name what the review won't change.
    - Ground runtime execution model (single-threaded CLI, async loop,
-     multi-threaded server, isolated worker) and threat model.
+     multi-threaded server, isolated worker) and threat model. Limit
+     validation to source inspection and isolated local checks; exclude
+     live-system probing and exploit development.
    - Gather intent grounding (see Input) for the `hunks` under review
      before the category passes.
 3. **ACT**—Execute:
@@ -107,11 +110,13 @@ Gather intent grounding matching the resolved scope:
    Prove each ledger finding against code, project mandates, and app
    threat model. Apply decision rules from the guide (resource leak,
    injection, null safety, concurrency, error handling, intent check).
-   - Drop speculative, out-of-scope, or `unexploitable` theoretical
-     findings from active `findings`.
-   - Route findings lacking concrete exploit paths or carrying
-     qualifying intent evidence to `suppressed_findings` citing the
-     missing trigger scenario—never emit them in `findings`.
+   - Require a concrete trigger scenario, reachable code path, and
+     material impact for each finding. Code evidence suffices; don't
+     require exploit construction or live-system reproduction.
+   - Drop speculative or out-of-scope findings from active `findings`.
+   - Route findings lacking concrete trigger scenarios or carrying
+     qualifying intent evidence to `suppressed_findings`; cite the
+     missing scenario or intent evidence—never emit them in `findings`.
 5. **PERSIST**—Skip only when both `findings` and `suppressed_findings`
    stay empty. Otherwise write `code-review-report.yaml` to the project
    root conforming to `references/report-schema.json`; omit the
@@ -127,13 +132,14 @@ Gather intent grounding matching the resolved scope:
 - Rank findings: `Critical`, `High`, `Medium`, `Low`, `Nit`.
   - Emit `Nit` only when trivially co-located with a higher-severity
     finding.
-- Verdict: `Request Changes` (any confirmed, practically exploitable
-  Critical/High) · `Comment` (Medium/Low only) · `Approve` (no
+- Verdict: `Request Changes` (any confirmed Critical/High with a
+  concrete trigger scenario and material impact) · `Comment`
+  (Medium/Low only) · `Approve` (no
   findings). Derive verdict from `findings` only—`suppressed_findings`
   never shifts it.
 - Filter candidate findings against the app threat model, `KISS`, and
   `YAGNI`; reject defensive bloat, ungrounded guardrails, and
-  theoretical non-exploits.
+  theoretical defects outside realistic execution paths.
 - Mark uncertainty explicitly: _"Context may change this finding, but…"_
 - Suggest targeted, scope-appropriate fixes; don't rewrite the patch.
 - Omit empty categories and "none found" sections.
@@ -146,6 +152,9 @@ Gather intent grounding matching the resolved scope:
 ## Constraints
 
 - No finding without direct code evidence.
+- Preserve security coverage: trace trust boundaries, assess impact,
+  and recommend fixes. Don't develop weaponized exploits, access live
+  systems, or bypass safeguards to validate findings.
 - No praise, broad commentary, or unrelated cleanup requests.
 - No large raw tool output; summarize diagnostics.
 - Don't change project source files during review.
@@ -173,7 +182,8 @@ Gather intent grounding matching the resolved scope:
 
 - Static analysis output checked when available and practical.
 - Findings map to diff or file excerpts and line references.
-- Severity reflects user impact or `exploitability`.
+- Severity reflects user impact; assess security exploitability within
+  the app threat model, without requiring exploit development.
 - Suggestions describe concrete changes.
 - Report matches workspace mandates.
 - Every `suppressed_findings` entry cites qualifying intent

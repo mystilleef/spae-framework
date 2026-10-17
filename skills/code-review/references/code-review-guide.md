@@ -2,8 +2,10 @@
 
 ## Mission
 
-Flag defects in the reviewed diff causing incorrect behavior, data loss,
-security vulnerabilities, or crashes. Emit no other findings.
+Defensively review local repository changes for incorrect behavior,
+data loss, security vulnerabilities, or crashes. Emit no other findings.
+Use source evidence and isolated local checks; don't develop weaponized
+exploits, probe live systems, or bypass safeguards.
 
 ## Scope
 
@@ -137,9 +139,14 @@ Omit items out of scope, plus:
 - **Intent check**: Search commits, PR descriptions, adjacent comments,
   or user intent for change rationales. Move findings with qualifying
   rationales to `suppressed_findings`. Route theoretical security,
-  concurrency, or null safety findings lacking practical exploit paths
-  to `suppressed_findings` citing missing trigger scenario—never emit in
-  active `findings`.
+  concurrency, or null safety findings lacking concrete trigger
+  scenarios to `suppressed_findings`; cite the missing scenario—never
+  emit in active `findings`.
+- **Evidence threshold**: Establish a concrete trigger scenario,
+  reachable code path, and material impact. Source evidence suffices;
+  don't require exploit construction or live-system reproduction.
+  Assess exploitability only for security findings, within the app
+  threat model; judge other defects by observable failure and impact.
 
 ## Calibration
 
