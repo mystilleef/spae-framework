@@ -33,12 +33,15 @@ Read:
 ## Workflow
 
 1. **GATE**—Read `.spae/current/STATE.json`; confirm `phase: check` and
-   `active_task_id`. Self-heal state drift: if `tasks[`active_task_id`]`
-   reads `"todo"`, correct it to `"in_progress"` and write `STATE.json`
-   before proceeding. Halt on state drift: if `tasks[`active_task_id`]`
-   reads `"done"`, halt. Read active `PLAN.md` task section; confirm
-   title, `Intent`, `Acceptance`, `Verification`. Halt on missing or
-   malformed input; report and make no changes.
+   `active_task_id`. Self-heal metadata: inject missing `version`
+   (`"1.0"`), `workstream` (from symlink or directory path), and
+   `status` (`"active"`). Self-heal state drift: if
+   `tasks[`active_task_id`]` reads `"todo"` or lacks an entry, set it to
+   `"in_progress"` and write `STATE.json` before proceeding. Halt on
+   state drift: if `tasks[`active_task_id`]` reads `"done"`, halt. Read
+   active `PLAN.md` task section; confirm title, `Intent`, `Acceptance`,
+   `Verification`. Halt on _unparseable_ JSON, unrecognized phase, or
+   active task absent from `PLAN.md`; report and make no changes.
 2. **ORIENT**—Verify active task; hand off to `/fix`, `/build`, or
    `/verify`. Leave source, tests, `config`, docs, `PLAN.md`, `SPEC.md`,
    task scope, and `workstream` completion untouched.
@@ -53,13 +56,16 @@ Read:
    - Label findings with exactly two tags:
      - **Gap**: unmet `Acceptance`, failed `Verification`, `Intent`
        mismatch, speculative abstraction, _unrequested_ complexity,
-       defensive bloat beyond task `Scope`, or a self-introduced cleanup
-       violation per `references/cleanup-guide.md`. Include unmet item,
-       file:line, expected vs actual, reproducible evidence. Blocks a
-       clear result.
+       defensive bloat beyond task `Scope`, or a task-introduced cleanup
+       violation within declared task scope per
+       `references/cleanup-guide.md`. Include unmet item, file:line,
+       expected vs actual, reproducible evidence. Blocks a clear result.
+       Never flag pre-existing uncommitted files or edits outside task
+       scope as gaps.
      - **Observation**: minor concern outside task scope, `unrequested`
-       edge-case coverage, theoretical risk. Report only; never write to
-       `FIX.md` or affect the verdict.
+       edge-case coverage, theoretical risk, or pre-existing uncommitted
+       files outside task scope. Report only; never write to `FIX.md` or
+       affect the verdict.
    - Draft gaps per `references/FIX.md` schema; consult
      `references/prose-protocol.md`.
 5. **VERIFY**—Reconcile every `Acceptance`, `Verification`, and `Intent`
@@ -86,9 +92,11 @@ Read:
 - Consult `references/shell-command-guide.md` for command safety,
   timeouts, redirects, and environment directives.
 - Consult `references/cleanup-guide.md` for self-introduced-artifact
-  scope and criteria.
+  scope, checklist, and uncommitted working-tree safety directives.
 - Follow canonical `SPAE` Step 5 `/check` contract on conflicts.
 - Focus on active-task evidence; prefer existing project checks.
+- Treat pre-existing uncommitted files and modifications outside active
+  task scope strictly as external baseline.
 - Enforce `KISS` and `YAGNI`; flag `Intent` mismatches over speculative
   scope or defensive bloat.
 - Ground bloat findings in the diff; never flag hypothetical future
@@ -109,11 +117,14 @@ Read:
 - Never read/edit `.spae/current/SPEC.md`; never edit
   `.spae/current/PLAN.md`.
 - Never edit source, tests, `config`, docs, or non-`SPAE` project files.
+- Never flag, write to `FIX.md`, or request deletion of pre-existing
+  uncommitted files outside active-task scope.
 - Never claim `workstream` completion (only `/verify` holds that
   authority).
 - Never add artifacts beyond canonical `SPAE` files or fields beyond
   `STATE.json` schema.
-- Never stage/commit `.spae/` artifacts.
+- Never execute git mutations (staging, commits, branches, tags, pushes,
+  or releases); never stage or commit `.spae/` artifacts.
 - **Autonomy**: Never ask users for input or clarification
   mid-execution; halts and failures stop autonomously.
 - **Full autonomy**: Never ask for human execution, attended terminal,
