@@ -8,6 +8,11 @@ predictable `LLM` outputs, even when using lower-tier agents.
 
 **spec → plan → inspect → build → check → fix → verify**
 
+> **Official harness**: `Pi` serves as the official and recommended
+> harness for `SPAE`. It alone runs the orchestration agents, and
+> nested-subagent testing covered Pi only. Other harnesses run each
+> phase by hand. See [Installation](#installation).
+
 ## What `SPAE` does
 
 `SPAE` prevents context drift, hallucination, and scope creep by:
@@ -15,15 +20,15 @@ predictable `LLM` outputs, even when using lower-tier agents.
 - Decomposing requests into atomic, independently verifiable tasks
 - Persisting state in external artifacts (not conversational memory)
 - Enforcing phase boundaries so each agent reads only what it needs
-- Allowing any harness (Gemini, Claude, OpenAI, Pi, OpenCode, Codex) to
+- Allowing any harness (Pi, Claude, Gemini, OpenAI, OpenCode, Codex) to
   resume work at any point
 
 ---
 
 ## Framework design
 
-- **Harness agnostic**—use any combination of Gemini, Claude, OpenAI,
-  Pi, OpenCode, or Codex at each phase
+- **Harness agnostic**—use any combination of Pi, Claude, Gemini,
+  OpenAI, OpenCode, or Codex at each phase; `Pi` remains recommended
 - **Zero-knowledge resumption**—any agent resumes any `workstream` by
   reading artifacts
 - **Atomic execution**—every task stays small enough to verify in a
@@ -69,18 +74,22 @@ writes only its designated outputs.
 After `/run inspect`, iterate through the task execution loop:
 
 - `/run build`—executes the active atomic task and sets phase to `check`
-- `/run check`—verifies active task implementation against `PLAN.md`; marks task `done` if clean, or writes `FIX.md` and routes to `/run fix` if gaps exist
-- `/run fix`—closes gaps listed in `FIX.md`, deletes `FIX.md`, and returns phase to `check`
+- `/run check`—verifies active task implementation against `PLAN.md`;
+  marks task `done` if clean, or writes `FIX.md` and routes to
+  `/run fix` if gaps exist
+- `/run fix`—closes gaps listed in `FIX.md`, deletes `FIX.md`, and
+  returns phase to `check`
 
-If `/run verify` finds gaps, it creates `VERIFY.md` and resets state to `/run spec`. Repeat until `/run verify` passes.
+If `/run verify` finds gaps, it creates `VERIFY.md` and resets state to
+`/run spec`. Repeat until `/run verify` passes.
 
 ---
 
 ## Orchestration (`Pi` only)
 
-> **Only the Pi harness supports orchestration agents and
-> skills.** Orchestration requires nested subagent support; testing
-> covered Pi only. Pi users must install
+> **Only the Pi harness supports orchestration agents and skills.**
+> Orchestration requires nested subagent support; testing covered Pi
+> only. Pi users must install
 > [`mystilleef/pi-subagent`](https://github.com/mystilleef/pi-subagent).
 
 Orchestration agents spawn and drive nested `subagents` autonomously,
@@ -91,10 +100,10 @@ step.
 
 ### **SPAE** orchestrators
 
-| Agent         | Invocation                      | Purpose                                            |
-| ------------- | ------------------------------- | -------------------------------------------------- |
-| `orchestrate` | `/run orchestrate [<proposal>]` | Run all phases                                     |
-| `prepare`     | `/run prepare [<proposal>]`     | Run prep phases (1-3)                              |
+| Agent         | Invocation                      | Purpose                                           |
+| ------------- | ------------------------------- | ------------------------------------------------- |
+| `orchestrate` | `/run orchestrate [<proposal>]` | Run all phases                                    |
+| `prepare`     | `/run prepare [<proposal>]`     | Run prep phases (1-3)                             |
 | `spawn`       | `/run spawn`                    | Loop build, check, and fix cycle across all tasks |
 
 **`orchestrate`** reads `STATE.json`, determines the current phase, and
@@ -180,12 +189,16 @@ directory—add `.spae/` to `.gitignore`.
 - Subagent support recommended for all harnesses
 - Nested subagent support required for orchestration
 - Custom commands, skills, or prompts recommended
-- Pi users must install
+- `Pi` (official, recommended) requires
   [mystilleef/pi-subagent](https://github.com/mystilleef/pi-subagent)
 
 ---
 
 ## Installation
+
+Use `Pi` (bold in the tables below) for the full workflow, including
+orchestration. Its agents and install steps live in
+[`pi/README.md`](pi/README.md).
 
 ### Skills
 
@@ -199,9 +212,9 @@ agent files.
 
 | Harness  | Source             | Destination                  |
 | -------- | ------------------ | ---------------------------- |
+| **Pi**   | `pi/agents/`       | `~/.pi/agent/agents/`        |
 | Claude   | `claude/agents/`   | `~/.claude/agents/`          |
 | Gemini   | `gemini/agents/`   | `~/.gemini/agents/`          |
-| Pi       | `pi/agents/`       | `~/.pi/agent/agents/`        |
 | OpenCode | `opencode/agents/` | `~/.config/opencode/agents/` |
 | Codex    | `codex/agents/`    | `~/.codex/agents/`           |
 
@@ -212,8 +225,8 @@ The `/run` command orchestrates subagent invocation. Invoke agents as
 
 | Harness  | Notes                                                             |
 | -------- | ----------------------------------------------------------------- |
+| **Pi**   | Requires `mystilleef/pi-subagent` for built-in `/run`             |
 | Claude   | Copy `claude/commands/` to `~/.claude/commands/`                  |
 | Gemini   | Copy `gemini/commands/` to `~/.gemini/commands/`                  |
-| Pi       | Requires `mystilleef/pi-subagent` for built-in `/run`             |
 | OpenCode | Copy `opencode/commands/` to `~/.config/opencode/commands/`       |
 | Codex    | Copy `codex/skills/` to `~/.codex/skills/`; use `$run` for `/run` |
