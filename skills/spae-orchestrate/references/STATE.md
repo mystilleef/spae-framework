@@ -2,19 +2,19 @@
 
 ## Field reference
 
-| Field                     | Type             | Valid values                                                               | Notes                                                        |
-| ------------------------- | ---------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `version`                 | string           | `"1.0"`                                                                    | Fixed                                                        |
-| `workstream`              | string           | kebab-case slug                                                            | Set on init; never mutated                                   |
-| `phase`                   | string           | `"spec"` \| `"plan"` \| `"inspect"` \| `"build"` \| `"check"` \| `"fix"` \| `"verify"` \| `"done"` | Advances forward; verify no-pass routes backward to `"spec"` |
-| `status`                  | string           | `"active"` \| `"revision_required"` \| `"completed"`                       | `revision_required` and `completed` written only by verify   |
-| `cursor.active_task_id`   | string           | `"T-NNN"`                                                                  | `build`, `check`, `fix`, and `verify` phases only            |
-| `tasks`                   | object           | `{ "T-NNN": "todo" \| "in_progress" \| "done" }`                          | Populated by plan; mutated by execution skills               |
+| Field                   | Type   | Valid values                                                                                       | Category           | Notes                                                        |
+| ----------------------- | ------ | -------------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------ |
+| `version`               | string | `"1.0"`                                                                                            | Derivable Metadata | Fixed; defaults to `"1.0"` when omitted                      |
+| `workstream`            | string | kebab-case slug                                                                                    | Derivable Metadata | Set on init; infer from path or symlink target when omitted  |
+| `phase`                 | string | `"spec"` \| `"plan"` \| `"inspect"` \| `"build"` \| `"check"` \| `"fix"` \| `"verify"` \| `"done"` | Execution State    | Advances forward; verify no-pass routes backward to `"spec"` |
+| `status`                | string | `"active"` \| `"revision_required"` \| `"completed"`                                               | Derivable Metadata | `revision_required` and `completed` written only by verify   |
+| `cursor.active_task_id` | string | `"T-NNN"`                                                                                          | Execution State    | `build`, `check`, `fix`, and `verify` phases only            |
+| `tasks`                 | object | `{ "T-NNN": "todo" \| "in_progress" \| "done" }`                                                   | Execution State    | Populated by plan; mutated by execution skills               |
 
 ## Directives
 
-- **Orchestrate runs in read-only mode.** `subagents` write all state
-  updates.
+- **Orchestrate runs in read-only mode.** Spawned subagents perform
+  state updates and metadata self-healing.
 - **Read at start**: resolve the current phase to identify the next
   `subagent`.
 - **Read after every spawn**: confirm `phase` differs from the value
@@ -23,8 +23,9 @@
   - `phase` matches the value recorded at the start of the iteration.
   - `phase` matches none of `spec`, `plan`, `inspect`, `build`, `check`,
     `fix`, `verify`, `done`.
-  - `subagent` reports `Failed` status, crashes, or times out.
-- Trust STATE.json over `subagent` text.
+  - _unparseable_ JSON syntax.
+  - Subagent reports `Failed` status, crashes, or times out.
+- Trust `STATE.json` over `subagent` text.
 
 ## Snapshots
 
