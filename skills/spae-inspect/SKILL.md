@@ -39,7 +39,10 @@ Reading qualifies as content-blocking.
 ## Workflow
 
 1. **GATE**—Read `.spae/current/STATE.json`, `.spae/current/SPEC.md`,
-   and `.spae/current/PLAN.md`. Halt when `phase ≠ inspect`.
+   and `.spae/current/PLAN.md`. Self-heal metadata: inject missing
+   `version` (`"1.0"`), `workstream` (from symlink or directory path),
+   and `status` (`"active"`). Halt on _unparseable_ JSON, missing
+   `SPEC.md`, missing `PLAN.md`, or `phase ≠ inspect`.
 2. **ORIENT**—Goal: tighten the task graph for execution readiness.
    Source stays read-only; `SPEC.md` unchanged.
 3. **PLAN**—Classify each gap before editing `PLAN.md`. Declare the
@@ -72,6 +75,15 @@ Reading qualifies as content-blocking.
    - Flag any ≥2 adjacent tasks sharing no independent acceptance value
      and no dependency-ordering reason for separation as `Should fix`
      (merge candidate).
+   - Flag any task whose `Scope` or `Acceptance` relies on a dependency
+     task's output absent from its own `Dependencies` list, or on a
+     dependency's implementation incidental instead of its stated
+     `Acceptance` contract, as `Must fix` (hidden-coupling gap).
+   - Flag any task whose Scope, Intent, Context, or Verification
+     declares git operations (`git add`, `git commit`, `git tag`,
+     `git push`), package releases, or external deployments as
+     `Must fix` (unauthorized lifecycle task); purge the task or strip
+     out-of-scope actions and renumber remaining tasks atomically.
    - **Classify findings**:
      - `Must fix`: gaps breaking requirements, contracts, safety, or
        verification.
@@ -112,7 +124,7 @@ Reading qualifies as content-blocking.
   execution, not just build commands.
 - Route every `workstream` to `/build` after inspection.
 - Ensure `.spae/` stays local execution state and never gets staged or
-  committed.
+  committed; never execute git mutations.
 - Consult `references/prose-protocol.md` before editing `PLAN.md`.
 
 ## Constraints
@@ -121,6 +133,8 @@ Reading qualifies as content-blocking.
   `.spae/current/STATE.json`.
 - **Forbidden Writes**: Never edit source code, tests, configuration,
   docs, `SPEC.md`, `VERIFY.md`, or any non-`SPAE` project file.
+- **Scope Boundaries**: Never permit tasks specifying git mutations,
+  package publishing, or release workflows.
 - **Artifact Limit**: Don't create new `SPAE` artifacts beyond the
   canonical files.
 - **Scope Control**: Don't add requirements, features, tasks, or gates
@@ -138,9 +152,14 @@ Reading qualifies as content-blocking.
 
 - `.spae/current/PLAN.md` satisfies `.spae/current/SPEC.md` and reflects
   required refinements.
+- Confirm zero tasks mandate git operations, package publishing, or
+  deployment steps.
 - Each task remains atomic, independently verifiable, and topologically
   ordered—every `Dependencies` ID numerically precedes the declaring
   task; no cycles survive.
+- No task carries a hidden-coupling gap: an undeclared dependency on
+  another task's output, or a reliance on a dependency's implementation
+  incidental instead of its declared contract.
 - Every `Satisfies`-bearing task's Acceptance section names testable
   behaviors matching `SPEC.md` requirements (flags missing failure modes
   or edge cases as `Should fix` only when specified in `SPEC.md` or

@@ -2,28 +2,29 @@
 
 ## Field reference
 
-| Field                     | Type             | Valid values                                                               | Notes                                                                           |
-| ------------------------- | ---------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `version`                 | string           | `"1.0"`                                                                    | Fixed                                                                           |
-| `workstream`              | string           | kebab-case slug                                                            | Set on init; never mutated                                                      |
-| `phase`                   | string           | `"spec"` \| `"plan"` \| `"inspect"` \| `"build"` \| `"check"` \| `"fix"` \| `"verify"` \| `"done"` | Advances forward; verify no-pass routes backward to `"spec"`                    |
-| `status`                  | string           | `"active"` \| `"revision_required"` \| `"completed"`                       | `revision_required` and `completed` written only by verify                      |
-| `cursor.active_task_id`   | string           | `"T-NNN"`                                                                  | `build`, `check`, `fix`, and `verify` phases only                               |
-| `tasks`                   | object           | `{ "T-NNN": "todo" \| "in_progress" \| "done" }`                          | Populated by plan; mutated by execution skills                                  |
+| Field                   | Type   | Valid values                                                                                       | Category           | Notes                                                                   |
+| ----------------------- | ------ | -------------------------------------------------------------------------------------------------- | ------------------ | ----------------------------------------------------------------------- |
+| `version`               | string | `"1.0"`                                                                                            | Derivable Metadata | Fixed; inject `"1.0"` when omitted                                      |
+| `workstream`            | string | kebab-case slug                                                                                    | Derivable Metadata | Infer from path or symlink target when omitted                          |
+| `phase`                 | string | `"spec"` \| `"plan"` \| `"inspect"` \| `"build"` \| `"check"` \| `"fix"` \| `"verify"` \| `"done"` | Execution State    | Advances forward; verify no-pass routes backward to `"spec"`            |
+| `status`                | string | `"active"` \| `"revision_required"` \| `"completed"`                                               | Derivable Metadata | Preserve; default to `"active"`; `/inspect` writes no status transition |
+| `cursor.active_task_id` | string | `"T-NNN"`                                                                                          | Execution State    | `build`, `check`, `fix`, and `verify` phases only                       |
+| `tasks`                 | object | `{ "T-NNN": "todo" \| "in_progress" \| "done" }`                                                   | Execution State    | Populated by plan; mutated by execution skills                          |
 
 ## Directives
 
-- Read STATE.json at start; confirm `phase: "inspect"` before
-  proceeding.
-- Don't mutate STATE.json until the exit step.
-- **Exit**: after refining PLAN.md, update STATE.json atomically:
+- Read `STATE.json` at start; confirm `phase: "inspect"`. Self-heal
+  metadata: inject missing `version: "1.0"`, `workstream` (from path or
+  symlink target), and `status: "active"`. Halt on _unparseable_ JSON,
+  unrecognized `phase`, or missing `PLAN.md`.
+- Don't mutate `STATE.json` until the exit step.
+- **Exit**: after refining `PLAN.md`, update `STATE.json` atomically:
   - Set `phase: "build"`.
-  - Set `cursor: {active_task_id: "T-001"}`.
-  - Rebuild `tasks` to mirror the refined PLAN.md IDs exactly, each
+  - Set `cursor.active_task_id` to `"T-001"`.
+  - Rebuild `tasks` to mirror the refined `PLAN.md` IDs exactly, each
     mapped to `"todo"`; plan already reset prior progress, so no task
     carries a completed state here.
-  - Preserve `status`, `version`, and `workstream` unchanged.
-- Never mutate `workstream`, `version`, or `status` during this phase.
+  - Maintain consistent `status`, `version`, and `workstream` fields.
 - Confirm every write with a fresh read before treating the write as
   done; a field mismatch counts as an unmet `VERIFY` criterion, not a
   finished write.
