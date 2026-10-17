@@ -45,17 +45,16 @@ framework must enforce these constraints:
   doesn't materially improve execution reliability.
 - **Prohibit `.spae` commits**: Never stage or commit the `.spae/`
   directory. These artifacts maintain local execution state and don't
-  belong in version control. Always ensure the project's `.gitignore`
-  includes `.spae/`.
+  belong in version control.
 - **Enforce phase write boundaries**: `/spec`, `/plan`, `/inspect`, and
-  `/check` may read repository code for context, but they may only
-  write their designated `SPAE` artifacts. Only `/build` and `/fix`
-  may edit source code, tests, configuration files, docs, or any other
-  non-`SPAE` project file.
+  `/check` may read repository code for context, but they may only write
+  their designated `SPAE` artifacts. Only `/build` and `/fix` may edit
+  source code, tests, configuration files, docs, or any other non-`SPAE`
+  project file.
 - **Fail forward, not sideways**: A task or phase failure in `/build`,
-  `/check`, or `/fix` halts orchestration immediately; it never
-  reroutes to `/spec` or any other phase. Only `/verify`'s no-pass
-  verdict returns a workstream to `/spec`.
+  `/check`, or `/fix` halts orchestration immediately; it never reroutes
+  to `/spec` or any other phase. Only `/verify`'s no-pass verdict
+  returns a workstream to `/spec`.
 
 ## Artifact location and workspace management
 
@@ -92,8 +91,8 @@ root clutter and supports concurrent tasks.
 
 ## The canonical artifacts
 
-The framework restricts all state to three core files and two
-ephemeral signals per `workstream`.
+The framework restricts all state to three core files and two ephemeral
+signals per `workstream`.
 
 ### 1. `STATE.json` (The execution cursor)
 
@@ -117,6 +116,22 @@ next action, tracks progress, and maintains the status of all tasks.
   }
 }
 ```
+
+The framework distinguishes **Critical Execution State** (`phase`,
+`cursor.active_task_id`, `tasks`) from **Derivable Metadata**
+(`version`, `workstream`, `status`):
+
+- **Critical Execution State**: Dictates lifecycle dispatch and task
+  progress. Missing or contradictory values halt orchestration.
+- **Derivable Metadata**: Enriches tracking. Skills self-heal missing
+  metadata automatically upon reading (injecting `version: "1.0"`,
+  inferring `workstream` from the symlink target or working directory,
+  and defaulting `status: "active"`).
+- **Hard Halt Boundaries**: Execution halts exclusively on unparseable
+  JSON syntax, unrecognized phase names, completed-task re-entry
+  (`"done"` task at entry to build/check/fix), missing task definitions
+  in `PLAN.md`, unmet task dependencies, or unresolvable environment
+  blockers.
 
 ### 2. `SPEC.md` (The normalized truth)
 
@@ -155,11 +170,10 @@ deletes this file upon a successful pass.
 ### 5. `FIX.md` (The ephemeral gap signal)
 
 Created only when `/check` detects gaps between the active task's
-implementation and its `PLAN.md` entry. Contains the task `Intent`,
-the specific gaps found, and pointers to the affected files—full
-context for a `/fix` agent to close them without re-reading the whole
-plan. `/fix` consumes this file to scope its edits, then deletes it
-upon completion.
+implementation and its `PLAN.md` entry. Contains the task `Intent`, the
+specific gaps found, and pointers to the affected files—full context for
+a `/fix` agent to close them without re-reading the whole plan. `/fix`
+consumes this file to scope its edits, then deletes it upon completion.
 
 ## The execution loop
 
@@ -167,8 +181,8 @@ Users orchestrate the workflow by manually invoking these skills in
 sequence. After `/inspect`, `/build` executes one atomic task, `/check`
 gates it against the plan, and `/fix` closes any gaps `/check` finds.
 The `build`-`check`-`fix` cycle repeats per task until `/check` clears
-it clean, then routes to `/build` for the next task or to `/verify`
-once the plan concludes.
+it clean, then routes to `/build` for the next task or to `/verify` once
+the plan concludes.
 
 ### Step 1: `/spec` (Smart entry & requirements)
 
@@ -194,8 +208,8 @@ once the plan concludes.
   (`DAG`) of atomic tasks. Orders tasks by dependency and risk. Ensures
   each task leaves the system in a working state. Treats repository code
   as read-only.
-- **Output**: Overwrites `PLAN.md`. Initializes `tasks` to `todo`, resets
-  `cursor: {}`, and updates `STATE.json` phase to `inspect`.
+- **Output**: Overwrites `PLAN.md`. Initializes `tasks` to `todo`,
+  resets `cursor: {}`, and updates `STATE.json` phase to `inspect`.
 - **Write scope**: `PLAN.md` and `STATE.json`.
 - **Forbidden writes**: Source code, tests, configuration files, docs,
   `SPEC.md`, and any other non-`SPAE` project file.
@@ -222,34 +236,38 @@ once the plan concludes.
 - **Input**: `STATE.json` (cursor) + `PLAN.md` (plan `Goal` + active
   task
   - `Intent`) + source code.
-- **Action**: Executes exactly one atomic task. Halts on state drift at entry.
-  Writes exhaustive tests first—expected behavior, failure modes, and edge
-  cases—then writes the minimal code that satisfies them. Runs project checks.
-  Reads forward tasks to avoid foreclosing them but never implements beyond
-  the active task. Holds exclusive authority to edit source code and other
-  non-`SPAE` project files. Drives task verification to green by iterating
-  test→implement, treating a failing check as ordinary work rather than a stop
-  signal. Fails the task only when it can't pass within its scope—an
-  infeasible acceptance criterion, a plan or spec defect, or a broken external
+- **Action**: Executes exactly one atomic task. Halts on state drift at
+  entry. Writes exhaustive tests first—expected behavior, failure modes,
+  and edge cases—then writes the minimal code that satisfies them. Runs
+  project checks. Reads forward tasks to avoid foreclosing them but
+  never implements beyond the active task. Holds exclusive authority to
+  edit source code and other non-`SPAE` project files. Drives task
+  verification to green by iterating test→implement, treating a failing
+  check as ordinary work rather than a stop signal. Fails the task only
+  when it can't pass within its scope—an infeasible acceptance
+  criterion, a plan or spec defect, or a broken external
   dependency—never by gaming a test or editing the plan. When a task
-  legitimately changes a contract, updates the tests it invalidates to match;
-  never weakens, skips, or deletes a test to force a pass.
+  legitimately changes a contract, updates the tests it invalidates to
+  match; never weakens, skips, or deletes a test to force a pass.
 - **Output**: Mutates source code. Leaves the active task `in_progress`
-  in the `tasks` registry—`/check` owns the `done` transition and
-  cursor advance. Updates `STATE.json` phase to `check`. The agent
-  never edits `PLAN.md` during this phase.
+  in the `tasks` registry—`/check` owns the `done` transition and cursor
+  advance. Updates `STATE.json` phase to `check`. The agent never edits
+  `PLAN.md` during this phase.
 
 ### Step 5: `/check` (Task verification gate)
 
 - **Input**: `STATE.json` (cursor) + `PLAN.md` (active task
   `Acceptance` + `Verification`) + source code + tests.
-- **Action**: Self-heals state drift at entry (`tasks[active_task_id]`
-  reading `todo`, corrected to `in_progress`); halts if it reads `done`.
-  Verifies the active task's
-  implementation against its `PLAN.md` entry. Runs project checks and the
-  task's own tests. Confirms every `Acceptance` outcome and `Verification`
-  step passes, with no gap against the task `Intent`. Reads source code for
-  analysis only.
+- **Action**: Self-heals metadata (injects missing `version`,
+  `workstream`, `status`) and state drift at entry
+  (`tasks[active_task_id]` reading `todo` or missing, corrected to
+  `in_progress`); halts if it reads `done`. Verifies the active task's
+  implementation against its `PLAN.md` entry. Runs project checks and
+  the task's own tests. Confirms every `Acceptance` outcome and
+  `Verification` step passes, with no gap against the task `Intent`.
+  Reads source code for analysis only. Evaluates gaps strictly within
+  the active task's declared scope and ignores pre-existing uncommitted
+  files outside task scope.
 - **Output (Gaps found)**: Writes `FIX.md` with the findings. Updates
   `STATE.json` phase to `fix`. The active task stays `in_progress`.
 - **Output (Clean)**: Marks the active task `done` in the `tasks`
@@ -261,15 +279,17 @@ once the plan concludes.
 
 ### Step 6: `/fix` (Gap remediation)
 
-- **Input**: `STATE.json` (cursor) + `FIX.md` (gaps) + `PLAN.md`
-  (active task `Intent`) + source code.
+- **Input**: `STATE.json` (cursor) + `FIX.md` (gaps) + `PLAN.md` (active
+  task `Intent`) + source code.
 - **Action**: Addresses exactly the gaps `FIX.md` lists—nothing beyond
   their scope. Holds the same source-editing authority as `/build`.
-  Self-heals state drift at entry (`todo` → `in_progress`); halts if
+  Self-heals metadata (injects missing `version`, `workstream`,
+  `status`) and state drift at entry (`todo` → `in_progress`); halts if
   the active task reads `done`. Iterates test→implement until the task's
-  tests pass, treating a failing check as ordinary work rather than a stop
-  signal. Fails the task only when a gap can't close within scope—an
-  infeasible finding, a plan or spec defect, or a broken external dependency.
+  tests pass, treating a failing check as ordinary work rather than a
+  stop signal. Fails the task only when a gap can't close within
+  scope—an infeasible finding, a plan or spec defect, or a broken
+  external dependency.
 - **Output**: Mutates source code. Deletes `FIX.md`. Updates
   `STATE.json` phase to `check`. The active task stays `in_progress`;
   the agent never marks it `done` or edits `PLAN.md`.
@@ -277,14 +297,14 @@ once the plan concludes.
 ### Step 7: `/verify` (The arbiter)
 
 - **Input**: `SPEC.md` + source code.
-- **Action**: Compares implementation strictly against explicit `SPEC.md`
-  requirements. Restricts fail verdicts exclusively to hard block
-  requirement failures, regressions, or check breaks; relegates
+- **Action**: Compares implementation strictly against explicit
+  `SPEC.md` requirements. Restricts fail verdicts exclusively to hard
+  block requirement failures, regressions, or check breaks; relegates
   theoretical edge cases to observations. Acts as the final arbiter of
   `workstream` completion.
 - **Output (Fail)**: Creates `VERIFY.md` with detailed findings. Updates
-  `STATE.json` with `status: revision_required`, `phase: spec`, `cursor: {}`,
-  and `tasks: {}`.
+  `STATE.json` with `status: revision_required`, `phase: spec`,
+  `cursor: {}`, and `tasks: {}`.
 - **Output (Pass)**: Deletes `VERIFY.md`. Removes `.spae/current`.
   Updates `STATE.json` with `status: completed` and `phase: done`.
 - **Write scope**: `VERIFY.md`, `STATE.json`, and `.spae/current`.
