@@ -139,13 +139,17 @@ wrong responsibility boundaries.
 Extract after splitting—the correct abstraction boundary becomes visible
 only once responsibilities separate.
 
+**God class / Compound SRP:** isolate and extract one cohesive
+responsibility boundary at a time; avoid broad multi-entity splits in a
+single unverified step.
+
 ## Guardrails
 
 - Preserve exact behavior—refactoring changes structure, not semantics
 - Introduce a design pattern only when it solves an actual, present
   problem
 - Never merge distinct concerns to reduce line count
-- Verify with existing tests before and after each change; add tests if
-  none exist
+- Verify with existing test suites before and after each transformation;
+  rely on baseline tests to confirm zero behavioral regressions
 - Before deleting code (entries #17, #18): run the test suite and search
   for callers—delete only after confirming nothing depends on it
