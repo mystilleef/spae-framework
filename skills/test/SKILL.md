@@ -55,6 +55,15 @@ every path delegates trivially, accesses a field, or returns a computed
 value with no state change, resource interaction, or error-propagation
 decision.
 
+Audit targets across four canonical categories:
+
+- **Happy path**: expected inputs yield expected outputs.
+- **Error / failure**: malformed inputs, thrown exceptions, error
+  returns.
+- **Boundary / edge**: null, empty, zero, min, max, overflow,
+  off-by-one.
+- **State transitions**: valid and invalid mutations, side effects.
+
 ## Workflow
 
 1. **GATE**—Confirm scope: user-provided files or current repository
@@ -63,16 +72,22 @@ decision.
    unchanged.
 3. **PLAN**—Read `references/testing-guide.md`,
    `references/shell-command-guide.md`, and
-   `references/cleanup-guide.md`. Inspect production code,
-   adjacent tests, and coverage commands. List every gap across all four
-   categories per behavioral-surface target.
+   `references/cleanup-guide.md`. Inspect production code, adjacent
+   tests, and coverage commands. Catalog existing test assertions to
+   prevent duplication. List every net-new gap across applicable
+   categories per behavioral-surface target. Map each proposed test to
+   an unasserted branch, edge condition, or error path.
    - **Short-circuit**: zero gaps found → emit `Result: No Gaps` and
      halt.
-4. **ACT**—Write tests for every enumerated gap. Cover all four
-   categories per target before declaring it complete.
+4. **ACT**—Write tests for every enumerated net-new gap. Cover all
+   applicable categories per target before declaring completion.
+   - Add tests to the existing test file for established units; create a
+     new test file only for new modules or distinct boundaries.
+   - Parameterize table-driven inputs instead of copy-pasting test
+     bodies.
 5. **VERIFY**—Loop over every criterion declared in PLAN:
    - Run targeted tests; run broader suite or coverage tool.
-   - Audit every new test file against CI Parity rules in
+   - Audit every added or updated test file against CI Parity rules in
      `references/testing-guide.md`; fix any violation before proceeding.
    - Audit the task's own `git diff`/`git status` against the
      Self-cleanup checklist in `references/cleanup-guide.md`; remove
@@ -80,7 +95,8 @@ decision.
    - For each unmet criterion: return to `ACT`, execute, then re-enter
      `VERIFY`.
    - Exit only when all pass and no regressions remain.
-   - Halt only for out-of-scope blockers.
+   - Halt only for out-of-scope blockers (failing baseline tests,
+     compilation errors, or missing runtime dependencies).
 6. **PERSIST**—Confirm all test files written; no partial writes.
 7. **REPORT**—Emit the result following the result directives and using
    the result template.
@@ -88,19 +104,28 @@ decision.
 ## Directives
 
 - Optimize all operations for agent, token, and context efficiency.
-- Cover all four categories per target before declaring coverage
-  complete.
+- Audit all applicable categories per behavioral-surface target; cover
+  only unverified, applicable paths before declaring coverage complete.
 - Use coverage tooling when available; when absent, use static analysis.
 - Keep tests focused, deterministic, and close to the behavior under
   test.
-- Don't limit yourself to just unit tests; write any category of tests
-  necessary to prove, verify, and confirm your solution.
+- Scope tests to the unit level by default; escalate to integration only
+  when behavior crosses external system boundaries.
 
 ## Constraints
 
+- **No Confirmation Halts**: Never halt to request user scope
+  confirmation or interactive direction; write tests autonomously within
+  detected scope or emit `Result: No Gaps`.
 - Don't change production behavior.
 - Don't write tests solely to raise a number.
 - Don't test outside the behavioral surface.
+- Never duplicate existing test assertions, execution paths, or
+  post-conditions.
+- Never write multiple test functions that assert identical invariants;
+  parameterize table-driven inputs instead.
+- Enforce negative validation: confirm each new test fails when
+  intentionally omitting or altering the targeted logic.
 - No hacks, workarounds, or shortcuts.
 - No violation of `DRY` and `SOLID` software principles.
 - Forbid laziness; fix issues properly, correctly, and idiomatically.
@@ -119,12 +144,16 @@ decision.
 
 - Production code unchanged;
 - Entire test suite passes with no failures.
-- All four categories audited per target on the behavioral surface.
+- All applicable categories audited per target on the behavioral
+  surface.
 - If coverage tool present: no meaningful uncovered lines or branches
-  remain; if absent: all five categories confirmed through direct,
+  remain; if absent: all applicable categories confirmed through direct,
   agent-executed inspection, no critical gaps.
 - Tests cover real behavioral risk, not vanity coverage.
-- All new tests pass CI Parity audit in `references/testing-guide.md`.
+- Zero redundant test assertions or duplicated execution paths
+  introduced.
+- All added or updated tests pass CI Parity audit in
+  `references/testing-guide.md`.
 - No self-introduced cleanup violation remains per
   `references/cleanup-guide.md`.
 
