@@ -36,7 +36,7 @@ Determine input by one of the following:
 See `references/testing-guide.md` for test structure, isolation,
 mocking, assertion, and performance standards.
 
-## Shell Commands
+## Shell commands
 
 See `references/shell-command-guide.md` for command safety, timeouts,
 redirects, and non-interactive environment directives.
@@ -49,7 +49,7 @@ checklist and diff-only audit scope.
 ## Workflow
 
 1. **GATE**—Require an actionable symptom: error, failure, trace, or
-   incorrect output. Halt and ask if none exists.
+   incorrect output. Halt with a diagnostic if none exists.
 2. **ORIENT**—Name the failure and scope in one sentence. State what
    won't change.
 3. **PLAN**—Read `references/shell-command-guide.md`. State one likely
@@ -68,7 +68,8 @@ checklist and diff-only audit scope.
    - For each unmet criterion: revert the fix, return to **ACT**,
      execute, then re-enter **VERIFY**.
    - Exit only when all criteria pass.
-   - Halt only for out-of-scope blockers.
+   - Halt only for out-of-scope blockers (missing external services,
+     credentials, or hardware dependencies).
 6. **PERSIST**—Write all fix artifacts once, atomically, after
    **VERIFY** passes. Never precedes **VERIFY**. Never partial.
 7. **REPORT**—Emit the result following the result directives and using
@@ -89,10 +90,12 @@ checklist and diff-only audit scope.
 
 ## Constraints
 
+- **No Confirmation Halts**: Never halt to request user confirmation
+  mid-investigation; fix proven root causes autonomously or report
+  diagnostic findings.
 - Don't broaden scope beyond the failure under investigation.
 - Don't mask failures, weaken tests, or remove coverage to pass checks.
 - Don't leave speculative changes after a hypothesis fails.
-- Don't skip clarification when no actionable symptom exists.
 - No violations of `DRY` and `SOLID` software principles.
 - No workarounds, hacks, or shortcuts.
 - Forbid laziness; fix issues properly, correctly, and idiomatically;
