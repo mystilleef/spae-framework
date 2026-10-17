@@ -3,6 +3,10 @@
 Agent definitions and commands for the
 [Gemini CLI](https://github.com/google-gemini/gemini-cli) harness.
 
+> **Deprecated.** Google replaced Gemini CLI with the Antigravity CLI
+> (`agy`). Use [`antigravity/`](../antigravity/README.md) for new
+> installs.
+
 ## Installation
 
 Copy skills to `~/.agents/skills/`:
