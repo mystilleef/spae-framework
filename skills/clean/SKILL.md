@@ -102,7 +102,7 @@ argument-hint: "[optional: files or focus area]"
 - **Files**:
   - [Terse list of files affected by spawned subagents]
 - **Findings**:
-  - [Terse list of findings from spawned subagent]
+  - [Terse list of findings from spawned subagents]
 - **Summary**:
   - [Terse list of summary from spawned subagents]
 
