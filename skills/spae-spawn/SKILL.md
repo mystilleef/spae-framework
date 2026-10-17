@@ -25,8 +25,8 @@ Read `.spae/current/STATE.json` for phase, cursor, and task registry.
 
 ## `STATE.json`
 
-See `references/STATE.md` for the field reference, directives, and
-phase snapshots.
+See `references/STATE.md` for the field reference, directives, and phase
+snapshots.
 
 ## Phase-agent map
 
@@ -43,7 +43,7 @@ regardless of phase:
 
 1. **Validate State**: Confirm `STATE.json` has `phase` in `"build"`,
    `"check"`, `"fix"` and a populated `cursor.active_task_id`. Halt on
-   malformed or missing `STATE.json`, or an unrecognized `phase`.
+   _unparseable_ JSON, missing `STATE.json`, or an unrecognized `phase`.
 2. **Dispatch Loop**:
    - Re-read `.spae/current/STATE.json`; record `phase`.
    - Exit on `phase: "verify"`.
@@ -79,7 +79,7 @@ regardless of phase:
 - Never write to any project file.
 - Never activate skills.
 - Never invoke agents outside the permitted list.
-- Never make commits.
+- Never execute git mutations (staging, commits, tags, pushes, or releases).
 - Never run `subagents` in parallel or concurrently.
 - Never prompt the user for decisions mid-run; let failures halt
   execution.
