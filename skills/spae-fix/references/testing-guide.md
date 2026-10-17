@@ -10,6 +10,10 @@ system boundary. Reserve end-to-end tests for critical user flows.
 - Group related cases logically.
 - Name each test as `verb + subject + condition + outcome`.
 - Keep test bodies lean; extract repeated setup into helper functions.
+- Extend existing test suites when covering established units; create
+  standalone test files only for new modules or distinct boundaries.
+- Prefer parameterized tests for table-driven input variations on
+  identical invariants; avoid copy-pasting test bodies.
 - Never commit focused (`only`) or skipped (`skip`, `xit`, `xtest`)
   tests.
 
@@ -29,6 +33,13 @@ system boundary. Reserve end-to-end tests for critical user flows.
   skip-guard instead.
 - Never assume a writable working directory; use `os.tmpdir()` or a
   framework temp helper.
+- Never assume the runner's privilege level; root and `CAP_DAC_OVERRIDE`
+  bypass read/write mode bits in containers and cloud sessions.
+  - Simulate `EACCES`/`EPERM` only in unit tests, by mocking or
+    injecting the filesystem failure; never trigger them via `chmod`.
+  - Never assert mode-bit access denial in integration or e2e tests.
+  - Assert permission-setting behavior through `stat` mode values, never
+    through denied access.
 - Never access live networks; mock all HTTP clients and `DNS` resolution
   in unit tests.
 - Never assume a specific timezone or locale; freeze or mock time and
@@ -58,6 +69,8 @@ system boundary. Reserve end-to-end tests for critical user flows.
 ## Assertions
 
 - Assert observable behavior, not internal implementation.
+- Eliminate redundant assertions; never duplicate existing test
+  coverage.
 - Cover the happy path and every distinct failure and cancellation path.
 - Raise an error for missing required values; never let tests silently
   pass on bad state.
@@ -91,6 +104,6 @@ system boundary. Reserve end-to-end tests for critical user flows.
 - Run the test file and confirm it passes before declaring the task
   done.
 - Run the full test suite and confirm zero new failures.
-- Verify the test runner lists the new file by name in its output.
+- Verify the test runner executes the added or updated tests.
 - Scan every new or changed test file for stray console/print/debugger
   calls; remove them before declaring the task done.

@@ -44,17 +44,21 @@ checklist and diff-only audit scope.
 ## Workflow
 
 1. **GATE**—Read `.spae/current/STATE.json`; confirm `phase: fix` and an
-   active task identifier. Self-heal state drift: if
-   `tasks[`active_task_id`]` reads `"todo"`, correct it to
+   active task identifier. Self-heal metadata: inject missing `version`
+   (`"1.0"`), `workstream` (from symlink or directory path), and
+   `status` (`"active"`). Self-heal state drift: if
+   `tasks[`active_task_id`]` reads `"todo"` or lacks an entry, set it to
    `"in_progress"` and write `STATE.json` before proceeding. Halt on
    state drift: if `tasks[`active_task_id`]` reads `"done"`, halt. Read
    `.spae/current/FIX.md`; confirm its task identifier matches the
    active task and its `## Gaps` list supplies concrete actionable gaps.
-   Halt on missing, malformed, or mismatched input; report the failed
-   precondition; make no changes.
+   Halt on _unparseable_ JSON, unrecognized phase, missing `FIX.md`, or
+   mismatched task identifier; report the failed precondition; make no
+   changes.
 2. **ORIENT**—Goal: close the named gaps for one active task and return
-   it to `/check`. Leave `PLAN.md`, `SPEC.md`, task completion, cursor
-   movement, forward tasks, and unrelated project concerns untouched.
+   it to `/check`. Leave task completion, cursor movement, forward
+   tasks, and unrelated project concerns untouched. Capture pre-task
+   baseline snapshot per `references/cleanup-guide.md`.
 3. **PLAN**—List each pre-classified `FIX.md` gap. Map its required test
    surface: expected behavior, failure modes, and edge cases. Use the
    task `Intent` only for context; never expand scope from it,
@@ -72,7 +76,7 @@ checklist and diff-only audit scope.
 
 5. **VERIFY**—Loop over every named gap and its relevant project checks:
    - Audit changed tests for project CI parity; correct violations.
-   - Audit the task's own `git diff`/`git status` against the
+   - Audit task edits against the pre-task baseline using the
      Self-cleanup checklist in `references/cleanup-guide.md`; remove
      every self-introduced artifact before proceeding.
    - For each unmet gap or failing check: return to **ACT**, remediate,
@@ -96,7 +100,7 @@ checklist and diff-only audit scope.
 - Consult `references/shell-command-guide.md` for command safety,
   timeouts, redirects, and non-interactive environment directives.
 - Consult `references/cleanup-guide.md` for self-introduced-artifact
-  scope and checklist.
+  scope, baseline snapshotting, and checklist directives.
 - Follow canonical _SPAE_ Step 6 `/fix` whenever guidance conflicts.
 - Remediate exactly one active task per invocation.
 - Scope every change solely from `FIX.md` `## Gaps`; consume those
@@ -118,7 +122,9 @@ checklist and diff-only audit scope.
 ## Constraints
 
 - May edit source, tests, documentation, configuration, and other
-  _non-SPAE_ project files only when named gaps require them.
+  _non-SPAE_ project files only when named gaps require them; never
+  delete pre-existing uncommitted files or edit outside active-task
+  scope.
 - May delete `.spae/current/FIX.md` and update
   `.spae/current/STATE.json` only after successful verification.
 - Never read or edit `.spae/current/PLAN.md` or `.spae/current/SPEC.md`.
@@ -127,7 +133,8 @@ checklist and diff-only audit scope.
 - Never add _SPAE_ artifacts or `STATE.json` fields.
 - Never act on observations, invent findings, inspect forward tasks, or
   expand remediation beyond named gaps.
-- Never stage or commit `.spae/` artifacts.
+- Never execute git mutations (staging, commits, branches, tags, pushes,
+  or releases); never stage or commit `.spae/` artifacts.
 - **Autonomy**: Never ask users for input or clarification
   mid-execution; halts and failures stop autonomously.
 - **Full autonomy**: Never request or require human execution, an
