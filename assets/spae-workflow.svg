@@ -1,0 +1,286 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" width="100%" height="auto">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="prepGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0369a1" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.6" />
+    </linearGradient>
+    <linearGradient id="taskGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4338ca" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.6" />
+    </linearGradient>
+    <linearGradient id="arbiterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#059669" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.6" />
+    </linearGradient>
+
+    <!-- Markers -->
+    <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arrowIndigo" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="#818cf8" />
+    </marker>
+    <marker id="arrowPurple" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="#c084fc" />
+    </marker>
+    <marker id="arrowPink" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="#f472b6" />
+    </marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="#34d399" />
+    </marker>
+    <marker id="arrowRose" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="#f43f5e" />
+    </marker>
+
+    <!-- Subtle drop shadows -->
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <style>
+    .font-sans { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  </style>
+
+  <!-- Background Canvas -->
+  <rect x="0" y="0" width="1200" height="620" rx="16" fill="url(#bgGrad)" stroke="#1e293b" stroke-width="2" />
+
+  <!-- HEADER -->
+  <g transform="translate(45, 24)">
+    <rect x="0" y="0" width="150" height="24" rx="12" fill="#1e293b" stroke="#334155" />
+    <text x="75" y="16" class="font-sans" font-size="11" font-weight="700" fill="#38bdf8" text-anchor="middle" letter-spacing="0.08em">SPAE PROTOCOL</text>
+    <text x="165" y="17" class="font-sans" font-size="16" font-weight="700" fill="#f8fafc">State-Persistent Atomic Execution Lifecycle</text>
+    <text x="1110" y="17" class="font-sans" font-size="11.5" fill="#64748b" text-anchor="end">Fresh agents · Zero conversational memory · External state</text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- 1. PREPARATION CARD                        -->
+  <!-- ========================================== -->
+  <g transform="translate(45, 65)">
+    <rect x="0" y="0" width="270" height="460" rx="14" fill="url(#prepGrad)" stroke="#0369a1" stroke-width="1.5" filter="url(#shadow)" />
+    
+    <!-- Header -->
+    <text x="20" y="30" class="font-sans" font-size="13" font-weight="700" fill="#38bdf8" letter-spacing="0.04em">1. PREPARATION</text>
+    <rect x="175" y="15" width="80" height="20" rx="10" fill="#0369a1" />
+    <text x="215" y="29" class="font-mono" font-size="9.5" font-weight="600" fill="#e0f2fe" text-anchor="middle">/prepare</text>
+
+    <!-- Input Node -->
+    <g transform="translate(15, 50)">
+      <rect x="0" y="0" width="240" height="38" rx="8" fill="#1e293b" stroke="#334155" />
+      <text x="120" y="24" class="font-sans" font-size="11.5" font-weight="600" fill="#f1f5f9" text-anchor="middle">Proposal / User Prompt</text>
+    </g>
+
+    <!-- Connector: Proposal -> Spec -->
+    <path d="M 135 88 V 104" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowBlue)" />
+
+    <!-- Step 1: Spec -->
+    <g transform="translate(15, 105)">
+      <rect x="0" y="0" width="240" height="66" rx="8" fill="#0f172a" stroke="#0284c7" stroke-width="1.2" />
+      <text x="15" y="24" class="font-mono" font-size="13" font-weight="700" fill="#38bdf8">1. /run spec</text>
+      <text x="15" y="42" class="font-sans" font-size="11" fill="#94a3b8">Distill goals, tests &amp; boundaries</text>
+      <rect x="15" y="48" width="62" height="14" rx="3" fill="#0369a1" />
+      <text x="46" y="58.5" class="font-mono" font-size="8.5" font-weight="600" fill="#e0f2fe" text-anchor="middle">SPEC.md</text>
+    </g>
+
+    <!-- Connector: Spec -> Plan -->
+    <path d="M 135 171 V 187" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowBlue)" />
+
+    <!-- Step 2: Plan -->
+    <g transform="translate(15, 188)">
+      <rect x="0" y="0" width="240" height="66" rx="8" fill="#0f172a" stroke="#0284c7" stroke-width="1.2" />
+      <text x="15" y="24" class="font-mono" font-size="13" font-weight="700" fill="#38bdf8">2. /run plan</text>
+      <text x="15" y="42" class="font-sans" font-size="11" fill="#94a3b8">Decompose into atomic DAG</text>
+      <rect x="15" y="48" width="62" height="14" rx="3" fill="#0369a1" />
+      <text x="46" y="58.5" class="font-mono" font-size="8.5" font-weight="600" fill="#e0f2fe" text-anchor="middle">PLAN.md</text>
+    </g>
+
+    <!-- Connector: Plan -> Inspect -->
+    <path d="M 135 254 V 270" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowBlue)" />
+
+    <!-- Step 3: Inspect -->
+    <g transform="translate(15, 271)">
+      <rect x="0" y="0" width="240" height="66" rx="8" fill="#0f172a" stroke="#0284c7" stroke-width="1.2" />
+      <text x="15" y="24" class="font-mono" font-size="13" font-weight="700" fill="#38bdf8">3. /run inspect</text>
+      <text x="15" y="42" class="font-sans" font-size="11" fill="#94a3b8">Gap analysis &amp; plan optimization</text>
+      <rect x="15" y="48" width="112" height="14" rx="3" fill="#075985" />
+      <text x="71" y="58.5" class="font-mono" font-size="8.5" font-weight="600" fill="#bae6fd" text-anchor="middle">STATE → phase: build</text>
+    </g>
+
+    <!-- Prep Guardrail Notice -->
+    <g transform="translate(15, 360)">
+      <rect x="0" y="0" width="240" height="85" rx="8" fill="#0b1329" stroke="#1e293b" />
+      <text x="15" y="22" class="font-sans" font-size="10" font-weight="700" fill="#38bdf8">WRITE BOUNDARY</text>
+      <text x="15" y="40" class="font-sans" font-size="9.5" fill="#94a3b8">Preparation phases write only</text>
+      <text x="15" y="55" class="font-sans" font-size="9.5" fill="#94a3b8">SPAE artifacts. Source code and</text>
+      <text x="15" y="70" class="font-sans" font-size="9.5" fill="#94a3b8">tests remain read-only.</text>
+    </g>
+  </g>
+
+  <!-- Connector: Inspect -> Build -->
+  <path d="M 315 370 H 345 V 195 H 375" fill="none" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowBlue)" />
+  <rect x="323" y="260" width="45" height="34" rx="4" fill="#0c1e38" stroke="#0284c7" stroke-width="1" />
+  <text x="345" y="274" class="font-sans" font-size="8.5" font-weight="700" fill="#38bdf8" text-anchor="middle">PLAN</text>
+  <text x="345" y="286" class="font-sans" font-size="8.5" fill="#94a3b8" text-anchor="middle">READY</text>
+
+  <!-- ========================================== -->
+  <!-- 2. TASK EXECUTION LOOP CARD                -->
+  <!-- ========================================== -->
+  <g transform="translate(375, 65)">
+    <rect x="0" y="0" width="460" height="460" rx="14" fill="url(#taskGrad)" stroke="#4338ca" stroke-width="1.5" filter="url(#shadow)" />
+
+    <!-- Header -->
+    <text x="20" y="30" class="font-sans" font-size="13" font-weight="700" fill="#a78bfa" letter-spacing="0.04em">2. ATOMIC TASK LOOP</text>
+    <rect x="375" y="15" width="70" height="20" rx="10" fill="#4c1d95" />
+    <text x="410" y="29" class="font-mono" font-size="9.5" font-weight="600" fill="#ede9fe" text-anchor="middle">/spawn</text>
+
+    <!-- Node 4: Build -->
+    <g transform="translate(20, 55)">
+      <rect x="0" y="0" width="185" height="92" rx="8" fill="#1e1b4b" stroke="#6366f1" stroke-width="1.2" />
+      <text x="14" y="24" class="font-mono" font-size="13" font-weight="700" fill="#a78bfa">4. /run build</text>
+      <text x="14" y="42" class="font-sans" font-size="11" fill="#c4b5fd">Execute One Task</text>
+      <text x="14" y="58" class="font-sans" font-size="9.5" fill="#94a3b8">Writes tests first → code</text>
+      <rect x="14" y="68" width="105" height="15" rx="3" fill="#312e81" />
+      <text x="66" y="79" class="font-mono" font-size="8" font-weight="600" fill="#e0e7ff" text-anchor="middle">task: in_progress</text>
+    </g>
+
+    <!-- Connector: Build -> Check -->
+    <path d="M 205 101 H 250" fill="none" stroke="#818cf8" stroke-width="2" marker-end="url(#arrowIndigo)" />
+    <text x="228" y="93" class="font-sans" font-size="8.5" fill="#c7d2fe" text-anchor="middle">code &amp; tests</text>
+
+    <!-- Node 5: Check -->
+    <g transform="translate(255, 55)">
+      <rect x="0" y="0" width="185" height="92" rx="8" fill="#2e1065" stroke="#8b5cf6" stroke-width="1.2" />
+      <text x="14" y="24" class="font-mono" font-size="13" font-weight="700" fill="#c084fc">5. /run check</text>
+      <text x="14" y="42" class="font-sans" font-size="11" fill="#e9d5ff">Task Verification</text>
+      <text x="14" y="58" class="font-sans" font-size="9.5" fill="#94a3b8">Gate vs PLAN.md intent</text>
+      <rect x="14" y="68" width="128" height="15" rx="3" fill="#4c1d95" />
+      <text x="78" y="79" class="font-mono" font-size="8" font-weight="600" fill="#fae8ff" text-anchor="middle">owns "done" transition</text>
+    </g>
+
+    <!-- Connector: Check -> Fix (Gaps Found) -->
+    <path d="M 375 147 V 185" fill="none" stroke="#f472b6" stroke-width="2" marker-end="url(#arrowPink)" />
+    <rect x="325" y="156" width="100" height="18" rx="4" fill="#3b0764" stroke="#f472b6" stroke-width="1" />
+    <text x="375" y="168" class="font-mono" font-size="8" font-weight="600" fill="#fbcfe8" text-anchor="middle">gaps: FIX.md</text>
+
+    <!-- Connector: Fix -> Check (Remediated) -->
+    <path d="M 315 185 V 147" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#arrowPurple)" />
+    <rect x="250" y="156" width="90" height="18" rx="4" fill="#1e1b4b" stroke="#a78bfa" stroke-width="1" />
+    <text x="295" y="168" class="font-mono" font-size="8" font-weight="600" fill="#e9d5ff" text-anchor="middle">deletes FIX.md</text>
+
+    <!-- Node 6: Fix -->
+    <g transform="translate(255, 187)">
+      <rect x="0" y="0" width="185" height="80" rx="8" fill="#3b0764" stroke="#d946ef" stroke-width="1.2" />
+      <text x="14" y="24" class="font-mono" font-size="13" font-weight="700" fill="#f0abfc">6. /run fix</text>
+      <text x="14" y="42" class="font-sans" font-size="11" fill="#fae8ff">Gap Remediation</text>
+      <text x="14" y="58" class="font-sans" font-size="9.5" fill="#94a3b8">Closes FIX.md gaps only</text>
+      <rect x="14" y="63" width="95" height="12" rx="2" fill="#581c87" />
+      <text x="61" y="72" class="font-mono" font-size="7.5" fill="#f5d0fe" text-anchor="middle">never marks done</text>
+    </g>
+
+    <!-- Task Clean Loopback (Check -> Build next task) -->
+    <path d="M 265 147 V 172 H 112 V 147" fill="none" stroke="#818cf8" stroke-width="2" marker-end="url(#arrowIndigo)" />
+    <rect x="135" y="163" width="105" height="18" rx="4" fill="#1e1b4b" stroke="#6366f1" stroke-width="1" />
+    <text x="187" y="175" class="font-mono" font-size="7.5" font-weight="600" fill="#c7d2fe" text-anchor="middle">task done · next task</text>
+
+    <!-- State & Isolation Architecture Box -->
+    <g transform="translate(20, 285)">
+      <rect x="0" y="0" width="420" height="160" rx="10" fill="#0c1222" stroke="#1e293b" />
+      
+      <!-- Box Header -->
+      <text x="16" y="22" class="font-sans" font-size="10" font-weight="700" fill="#818cf8" letter-spacing="0.06em">THE SPAE ENGINE RULES</text>
+      <line x1="16" y1="30" x2="404" y2="30" stroke="#1e293b" stroke-width="1" />
+
+      <!-- Features -->
+      <g transform="translate(16, 44)">
+        <circle cx="4" cy="4" r="3" fill="#6366f1" />
+        <text x="14" y="7" class="font-sans" font-size="9.5" fill="#cbd5e1"><tspan font-weight="700" fill="#f8fafc">Zero conversational memory:</tspan> Each phase runs in a fresh agent session.</text>
+      </g>
+      <g transform="translate(16, 68)">
+        <circle cx="4" cy="4" r="3" fill="#6366f1" />
+        <text x="14" y="7" class="font-sans" font-size="9.5" fill="#cbd5e1"><tspan font-weight="700" fill="#f8fafc">Single-cursor truth:</tspan> <tspan font-family="monospace" fill="#a78bfa">STATE.json</tspan> stores cursor &amp; progress across all harnesses.</text>
+      </g>
+      <g transform="translate(16, 92)">
+        <circle cx="4" cy="4" r="3" fill="#6366f1" />
+        <text x="14" y="7" class="font-sans" font-size="9.5" fill="#cbd5e1"><tspan font-weight="700" fill="#f8fafc">Exclusive edit rights:</tspan> Only <tspan font-family="monospace" fill="#c4b5fd">build</tspan> and <tspan font-family="monospace" fill="#f0abfc">fix</tspan> can modify source files &amp; tests.</text>
+      </g>
+      <g transform="translate(16, 116)">
+        <circle cx="4" cy="4" r="3" fill="#6366f1" />
+        <text x="14" y="7" class="font-sans" font-size="9.5" fill="#cbd5e1"><tspan font-weight="700" fill="#f8fafc">Atomic guarantees:</tspan> Every task leaves the codebase in a green, working state.</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Connector: Check -> Verify -->
+  <path d="M 815 101 H 875" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#arrowGreen)" />
+  <rect x="822" y="78" width="50" height="20" rx="4" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+  <text x="847" y="91" class="font-sans" font-size="7.5" font-weight="700" fill="#6ee7b7" text-anchor="middle">ALL DONE</text>
+
+  <!-- ========================================== -->
+  <!-- 3. WORKSTREAM ARBITER CARD                 -->
+  <!-- ========================================== -->
+  <g transform="translate(875, 65)">
+    <rect x="0" y="0" width="280" height="460" rx="14" fill="url(#arbiterGrad)" stroke="#059669" stroke-width="1.5" filter="url(#shadow)" />
+
+    <!-- Header -->
+    <text x="20" y="30" class="font-sans" font-size="13" font-weight="700" fill="#34d399" letter-spacing="0.04em">3. ARBITER</text>
+    <rect x="185" y="15" width="75" height="20" rx="10" fill="#065f46" />
+    <text x="222" y="29" class="font-mono" font-size="9.5" font-weight="600" fill="#d1fae5" text-anchor="middle">/verify</text>
+
+    <!-- Step 7: Verify -->
+    <g transform="translate(15, 55)">
+      <rect x="0" y="0" width="250" height="92" rx="8" fill="#064e3b" stroke="#10b981" stroke-width="1.2" />
+      <text x="15" y="24" class="font-mono" font-size="13" font-weight="700" fill="#6ee7b7">7. /run verify</text>
+      <text x="15" y="42" class="font-sans" font-size="11" fill="#a7f3d0">Global Acceptance Gate</text>
+      <text x="15" y="58" class="font-sans" font-size="9.5" fill="#94a3b8">Strict validation vs SPEC.md</text>
+      <rect x="15" y="68" width="135" height="15" rx="3" fill="#047857" />
+      <text x="82" y="79" class="font-mono" font-size="8" font-weight="600" fill="#d1fae5" text-anchor="middle">final completion arbiter</text>
+    </g>
+
+    <!-- Connector: Verify -> Pass -->
+    <path d="M 140 147 V 185" fill="none" stroke="#34d399" stroke-width="2" marker-end="url(#arrowGreen)" />
+    <text x="155" y="170" class="font-sans" font-size="9" font-weight="700" fill="#34d399">PASS</text>
+
+    <!-- Completion Node -->
+    <g transform="translate(15, 187)">
+      <rect x="0" y="0" width="250" height="92" rx="8" fill="#022c22" stroke="#059669" stroke-width="1.5" />
+      <text x="15" y="26" class="font-sans" font-size="13" font-weight="700" fill="#6ee7b7">Workstream Complete</text>
+      <text x="15" y="46" class="font-mono" font-size="9.5" fill="#a7f3d0">status: completed</text>
+      <text x="15" y="62" class="font-mono" font-size="9.5" fill="#a7f3d0">phase: done</text>
+      <text x="15" y="78" class="font-sans" font-size="9" fill="#6ee7b7">Cleans .spae/current symlink</text>
+    </g>
+
+    <!-- Arbiter Policy Notice -->
+    <g transform="translate(15, 300)">
+      <rect x="0" y="0" width="250" height="145" rx="10" fill="#0b1e17" stroke="#064e3b" />
+      <text x="14" y="22" class="font-sans" font-size="10" font-weight="700" fill="#34d399">ARBITER PRINCIPLES</text>
+      <line x1="14" y1="30" x2="236" y2="30" stroke="#064e3b" stroke-width="1" />
+      <text x="14" y="48" class="font-sans" font-size="9" fill="#94a3b8">Only verify can declare workstream</text>
+      <text x="14" y="63" class="font-sans" font-size="9" fill="#94a3b8">success. Unimplemented items or</text>
+      <text x="14" y="78" class="font-sans" font-size="9" fill="#94a3b8">spec defects trigger an automated</text>
+      <text x="14" y="93" class="font-sans" font-size="9" fill="#94a3b8">revision cycle via VERIFY.md.</text>
+      <text x="14" y="118" class="font-sans" font-size="9.5" font-weight="600" fill="#6ee7b7">No half-finished states exit.</text>
+    </g>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- 4. REVISION LOOPBACK PATH (VERIFY -> SPEC) -->
+  <!-- ========================================== -->
+  <!-- Path from Verify (right side) around bottom to Spec (left side) -->
+  <path d="M 1125 147 H 1170 V 555 H 25 V 205 H 60" fill="none" stroke="#f43f5e" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrowRose)" />
+
+  <!-- Badge on Feedback Path -->
+  <g transform="translate(425, 537)">
+    <rect x="0" y="0" width="350" height="36" rx="18" fill="#4c0519" stroke="#f43f5e" stroke-width="1.5" filter="url(#shadow)" />
+    <text x="175" y="22" class="font-sans" font-size="10.5" font-weight="700" fill="#fecdd3" text-anchor="middle">
+      FAIL: writes VERIFY.md · status: revision_required → /run spec
+    </text>
+  </g>
+
+</svg>

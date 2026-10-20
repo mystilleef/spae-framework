@@ -10,6 +10,8 @@ passes.
 
 **spec → plan → inspect → build → check → fix → verify**
 
+![SPAE Framework Execution Lifecycle](assets/spae-workflow.svg)
+
 > **Official harness**: `Pi` serves as the official and recommended
 > harness for `SPAE`. Orchestration testing covered Pi and `Agy`. Other
 > harnesses run each phase by hand, with orchestration untested. See
