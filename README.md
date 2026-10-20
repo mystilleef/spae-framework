@@ -10,6 +10,38 @@ passes.
 
 **spec → plan → inspect → build → check → fix → verify**
 
+```mermaid
+flowchart TD
+    proposal([Proposal]) --> spec
+
+    subgraph orchestrate ["orchestrate"]
+        subgraph prepare ["prepare"]
+            spec["<b>spec</b><br/>writes SPEC.md"]
+            plan["<b>plan</b><br/>writes PLAN.md"]
+            inspect["<b>inspect</b><br/>optimizes PLAN.md"]
+            spec --> plan --> inspect
+        end
+
+        subgraph spawn ["spawn · task loop"]
+            build["<b>build</b><br/>one atomic task"]
+            check{"<b>check</b>"}
+            fix["<b>fix</b><br/>closes FIX.md gaps"]
+            build --> check
+            check -->|"gaps: FIX.md"| fix
+            fix --> check
+            check -->|"task done,<br/>tasks remain"| build
+        end
+
+        verify{"<b>verify</b>"}
+
+        inspect --> build
+        check -->|"all tasks done"| verify
+        verify -->|"gaps: VERIFY.md"| spec
+    end
+
+    verify -->|pass| done([Done])
+```
+
 > **Official harness**: `Pi` serves as the official and recommended
 > harness for `SPAE`. Orchestration testing covered Pi and `Agy`. Other
 > harnesses run each phase by hand, with orchestration untested. See
