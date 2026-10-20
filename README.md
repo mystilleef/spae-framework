@@ -10,38 +10,6 @@ passes.
 
 **spec → plan → inspect → build → check → fix → verify**
 
-```mermaid
-flowchart TD
-    proposal([Proposal]) --> spec
-
-    subgraph orchestrate ["orchestrate"]
-        subgraph prepare ["prepare"]
-            spec["<b>spec</b><br/>writes SPEC.md"]
-            plan["<b>plan</b><br/>writes PLAN.md"]
-            inspect["<b>inspect</b><br/>optimizes PLAN.md"]
-            spec --> plan --> inspect
-        end
-
-        subgraph spawn ["spawn · task loop"]
-            build["<b>build</b><br/>one atomic task"]
-            check{"<b>check</b>"}
-            fix["<b>fix</b><br/>closes FIX.md gaps"]
-            build --> check
-            check -->|"gaps: FIX.md"| fix
-            fix --> check
-            check -->|"task done,<br/>tasks remain"| build
-        end
-
-        verify{"<b>verify</b>"}
-
-        inspect --> build
-        check -->|"all tasks done"| verify
-        verify -->|"gaps: VERIFY.md"| spec
-    end
-
-    verify -->|pass| done([Done])
-```
-
 > **Official harness**: `Pi` serves as the official and recommended
 > harness for `SPAE`. Orchestration testing covered Pi and `Agy`. Other
 > harnesses run each phase by hand, with orchestration untested. See
@@ -114,6 +82,30 @@ The workflow nests two loops:
 - **Task loop**—`build → check ⇄ fix` repeats per task until `check`
   marks it `done`
 - **Workstream loop**—`verify → spec` repeats until `verify` passes
+
+```mermaid
+flowchart TD
+    subgraph PREP ["Preparation (/run prepare)"]
+        START(["Proposal / Goal"]) --> SPEC["1. /run spec\nDistill requirements"]
+        SPEC -->|"writes SPEC.md"| PLAN["2. /run plan\nDecompose to DAG"]
+        PLAN -->|"writes PLAN.md"| INSPECT["3. /run inspect\nOptimize & validate"]
+    end
+
+    subgraph TASK_LOOP ["Task Execution Loop (/run spawn)"]
+        BUILD["4. /run build\nImplement active task"] -->|"Code & tests"| CHECK{"5. /run check\nGate vs PLAN.md"}
+        CHECK -->|"Gaps found\nwrites FIX.md"| FIX["6. /run fix\nRemediate gaps"]
+        FIX -->|"Resolved\ndeletes FIX.md"| CHECK
+        CHECK -->|"Task clean\nTasks remain"| BUILD
+    end
+
+    subgraph ARBITER ["Verification (/run verify)"]
+        VERIFY{"7. /run verify\nGate vs SPEC.md"} -->|"Pass: completed\ncleans .spae/current"| DONE(["Workstream Complete"])
+    end
+
+    INSPECT -->|"Optimized PLAN.md"| BUILD
+    CHECK -->|"All tasks clean"| VERIFY
+    VERIFY -->|"Fail: revision required\nwrites VERIFY.md"| SPEC
+```
 
 | Phase | Agent                  | Purpose                                |
 | ----- | ---------------------- | -------------------------------------- |
