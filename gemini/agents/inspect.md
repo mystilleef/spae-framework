@@ -1,6 +1,6 @@
 ---
 name: inspect
-description: Runs the SPAE review phase for a task or workstream
+description: Runs the SPAE inspect phase for a task or workstream
 ---
 
 # Role

@@ -1,6 +1,6 @@
 ---
 name: refactor
-description: Refactor code to simplify it while preserving behavior.
+description: Refactor changes to the project
 ---
 
 # Role

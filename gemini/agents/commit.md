@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Commit atomic changes to the current repository
+description: Runs the auto-commit skill
 ---
 
 # Role

@@ -1,6 +1,6 @@
 ---
 name: query
-description: Read-only context gathering and information retrieval.
+description: Answer user query in read-only mode
 ---
 
 # Role

@@ -1,7 +1,6 @@
 ---
 name: coverage
-description:
-  Evaluate test coverage and fill real gaps with high-value tests.
+description: Orchestrate test agents to fix gaps in code coverage.
 ---
 
 # Role

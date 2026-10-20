@@ -1,6 +1,6 @@
 ---
 name: work
-description: Gather context to perform adhoc tasks.
+description: Complete adhoc tasks.
 ---
 
 # Role

@@ -1,7 +1,6 @@
 ---
 name: verify
-description:
-  Verifies implementation against SPEC.md using the spae-verify skill.
+description: Find gaps between implementation and specs
 ---
 
 # Role
