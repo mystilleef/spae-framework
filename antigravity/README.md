@@ -82,7 +82,7 @@ command, so `/run` ships as a skill.
   `.spae/`. Phase agents fall back to `view_file`, `list_dir`, and
   `run_command`.
 - Run any agent as the main agent with `agy --agent <name>`.
-- Orchestration relies on nested subagents and has only light testing on
-  Agy. `Pi` remains the recommended harness.
+- Orchestration relies on nested subagents. Testing covered Agy. `Pi`
+  remains the recommended harness.
 
 See the [top-level README](../README.md) for the full workflow.

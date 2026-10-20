@@ -1,8 +1,8 @@
 # SPAE: Pi
 
 Agent definitions for the [Pi](https://github.com/mystilleef/pi)
-harness, the official and recommended harness for `SPAE`. Pi alone
-supports the orchestration agents below.
+harness, the official and recommended harness for `SPAE`. Pi supports
+the orchestration agents below.
 
 ## Installation
 

@@ -11,9 +11,9 @@ passes.
 **spec → plan → inspect → build → check → fix → verify**
 
 > **Official harness**: `Pi` serves as the official and recommended
-> harness for `SPAE`. Nested-subagent testing covered Pi in depth. `Agy`
-> also ships the orchestration agents, with light testing. Other
-> harnesses run each phase by hand. See [Installation](#installation).
+> harness for `SPAE`. Orchestration testing covered Pi and `Agy`. Other
+> harnesses run each phase by hand, with orchestration untested. See
+> [Installation](#installation).
 
 ## What `SPAE` does
 
@@ -32,6 +32,11 @@ passes.
 - **Harness agnostic**—use any combination of Pi, Claude, `Agy`, Gemini,
   OpenAI, OpenCode, or Codex at each phase, though `Pi` remains
   recommended
+- **Fresh agent per phase**—every phase invocation spawns a new agent
+  with no shared conversation. `.spae/` artifacts carry all state. Pick
+  the same or a different provider and model per invocation, for example
+  a stronger model for `inspect`, `check`, and `verify` (see
+  [Agents](#agents))
 - **Zero-knowledge resumption**—any agent resumes any `workstream` by
   reading artifacts
 - **Atomic execution**—every task stays small enough to verify in a
@@ -59,12 +64,18 @@ invocation for its arguments.
 | `fix`     | `/run fix`             |
 | `verify`  | `/run verify`          |
 
+OpenCode reserves `plan` and `build`, so its agents use `decompose` and
+`implement` instead. See [`opencode/README.md`](opencode/README.md).
+
 ---
 
 ## Workflow
 
 Run phases in order, looping until `/run verify` passes. Each agent
 reads only its designated inputs and writes only its designated outputs.
+Each `/run` call spawns a fresh agent, so `build`, `check`, and `fix` on
+one task each run in separate agents. Invoking skills directly in one
+session forfeits this isolation.
 
 The workflow nests two loops:
 
@@ -99,9 +110,8 @@ passes.
 
 ## Orchestration (`Pi` and `Agy`)
 
-> **Only Pi and `Agy` support orchestration agents and skills.**
-> Orchestration requires nested subagent support. Testing covered Pi in
-> depth and `Agy` lightly. Pi users must install
+> **Testing covered Pi and `Agy` only.** Orchestration requires nested
+> subagent support. Pi users must install
 > [`mystilleef/pi-subagent`](https://github.com/mystilleef/pi-subagent).
 > `Agy` ships native nested subagents.
 
@@ -159,11 +169,9 @@ implementation. Follow the order below.
 | 4     | `/run review`   | Review for correctness and style |
 | 5     | `/run commit`   | Stage and commit implementation  |
 
-**Pi and `Agy` only.** `/run coverage` and `/run clean` operate as
-orchestration agents and require Pi or `Agy`. `/run clean` replaces
-steps 2–3 by running `purify` then `refactor` automatically. The
-`coverage` and `clean` agents execute phases of their subagents
-repeatedly until they achieve the desired outcome.
+**Tested on Pi and `Agy` only.** `/run coverage` and `/run clean`
+operate as orchestration agents. `/run clean` replaces steps 2–3 by
+running `purify` then `refactor` automatically.
 
 ---
 
@@ -221,7 +229,11 @@ each phase and work with any compliant harness.
 ### Agents
 
 Agents wrap skills in isolated sessions. Each harness requires its own
-agent files.
+agent files. Every harness ships the same agents.
+
+Shipped agent files inherit model and provider from the parent agent,
+keeping front matter minimal. To mix models, add `model` or `provider`
+fields to your copies on harnesses that support them.
 
 | Harness  | Source                | Destination                  |
 | -------- | --------------------- | ---------------------------- |
@@ -233,7 +245,8 @@ agent files.
 | Codex    | `codex/agents/`       | `~/.codex/agents/`           |
 
 > **Gemini CLI is deprecated** in favor of `Agy`, the Antigravity CLI.
-> Use the `antigravity/` files for new installs.
+> Use the `antigravity/` files for new installs. The `gemini/` files
+> receive no further updates.
 
 ### Run command
 
