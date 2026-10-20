@@ -1,6 +1,6 @@
 ---
 name: review
-description: Perform a code review.
+description: Perform a code review
 ---
 
 # Role

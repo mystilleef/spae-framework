@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Runs the auto-commit skill.
+description: Runs the auto-commit skill
 ---
 
 # Role

@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Runs the SPAE planning phase for a task or workstream.
+description: Runs the SPAE planning phase for a task or workstream
 ---
 
 # Role

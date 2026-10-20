@@ -1,6 +1,6 @@
 ---
 name: troubleshoot
-description: Fix issues using the troubleshoot skill.
+description: Fix issues using the troubleshoot skill
 ---
 
 # Role

@@ -1,6 +1,6 @@
 ---
 name: document
-description: Document code.
+description: Document code
 ---
 
 # Role

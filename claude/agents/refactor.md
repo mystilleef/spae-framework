@@ -1,6 +1,6 @@
 ---
 name: refactor
-description: Refactor changes to the project.
+description: Refactor changes to the project
 ---
 
 # Role

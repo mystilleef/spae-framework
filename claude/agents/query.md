@@ -1,6 +1,6 @@
 ---
 name: query
-description: Answer user query in read-only mode.
+description: Answer user query in read-only mode
 ---
 
 # Role

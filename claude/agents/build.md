@@ -1,6 +1,6 @@
 ---
 name: build
-description: Runs one atomic SPAE build task for a task or workstream.
+description: Runs one atomic SPAE build task for a task or workstream
 ---
 
 # Role

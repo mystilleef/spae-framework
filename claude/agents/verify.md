@@ -1,6 +1,6 @@
 ---
 name: verify
-description: Find gaps between implementation and specs.
+description: Find gaps between implementation and specs
 ---
 
 # Role
