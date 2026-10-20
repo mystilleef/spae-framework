@@ -17,9 +17,9 @@ agents to generate a plan from a proposal.
 
 - Always invoke the `spae-prepare` skill immediately, regardless of
   input.
-- The `subagent` tool is `invoke_subagent`. Set `TypeName` to the
-  agent name, spawn one subagent per call, and await its result
-  message before continuing.
+- The `subagent` tool is `invoke_subagent`. Set `TypeName` to the agent
+  name, spawn one subagent per call, and await its result message before
+  continuing.
 - Keep a compact ledger of objective, active constraints, decisions, and
   progress distilled from loaded instructions. Quote hard constraints
   verbatim. Rewrite it after loading instructions and after each
