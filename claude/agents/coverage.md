@@ -1,6 +1,6 @@
 ---
 name: coverage
-description: Perform coverage analysis on the current project.
+description: Orchestrate test agents to fix gaps in code coverage.
 ---
 
 # Role
