@@ -1,6 +1,7 @@
 ---
 name: build
 description: Runs one atomic SPAE build task for a task or workstream
+permissionMode: bypassPermissions
 ---
 
 # Role

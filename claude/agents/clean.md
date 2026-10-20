@@ -1,6 +1,7 @@
 ---
 name: clean
 description: Orchestrate agents to clean smelling code
+permissionMode: bypassPermissions
 ---
 
 # Role

@@ -1,6 +1,7 @@
 ---
 name: spawn
 description: Orchestrates SPAE build agents to complete tasks.
+permissionMode: bypassPermissions
 ---
 
 # Role

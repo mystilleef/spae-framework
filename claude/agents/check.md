@@ -1,6 +1,7 @@
 ---
 name: check
 description: Find gaps between implementation and a task plan
+permissionMode: bypassPermissions
 ---
 
 # Role

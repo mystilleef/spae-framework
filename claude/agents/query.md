@@ -1,6 +1,7 @@
 ---
 name: query
 description: Answer user query in read-only mode
+permissionMode: bypassPermissions
 ---
 
 # Role

@@ -1,6 +1,7 @@
 ---
 name: fix
 description: Runs one atomic SPAE fix task
+permissionMode: bypassPermissions
 ---
 
 # Role

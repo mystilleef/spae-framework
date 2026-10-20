@@ -1,6 +1,7 @@
 ---
 name: work
 description: Complete adhoc tasks.
+permissionMode: bypassPermissions
 ---
 
 # Role

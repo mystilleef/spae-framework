@@ -1,6 +1,7 @@
 ---
 name: coverage
 description: Orchestrate test agents to fix gaps in code coverage.
+permissionMode: bypassPermissions
 ---
 
 # Role

@@ -1,6 +1,7 @@
 ---
 name: orchestrate
 description: Orchestrates SPAE agents for each phase to complete tasks.
+permissionMode: bypassPermissions
 ---
 
 # Role

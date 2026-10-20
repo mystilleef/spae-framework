@@ -1,6 +1,7 @@
 ---
 name: test
 description: Address gaps in code coverage.
+permissionMode: bypassPermissions
 ---
 
 # Role

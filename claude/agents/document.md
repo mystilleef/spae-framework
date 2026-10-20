@@ -1,6 +1,7 @@
 ---
 name: document
 description: Document code
+permissionMode: bypassPermissions
 ---
 
 # Role

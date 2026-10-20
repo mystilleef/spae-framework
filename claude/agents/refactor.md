@@ -1,6 +1,7 @@
 ---
 name: refactor
 description: Refactor changes to the project
+permissionMode: bypassPermissions
 ---
 
 # Role

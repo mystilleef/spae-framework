@@ -1,6 +1,7 @@
 ---
 name: review
 description: Perform a code review
+permissionMode: bypassPermissions
 ---
 
 # Role

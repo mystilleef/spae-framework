@@ -1,6 +1,7 @@
 ---
 name: prepare
 description: Orchestrates SPAE agents to generate a plan.
+permissionMode: bypassPermissions
 ---
 
 # Role

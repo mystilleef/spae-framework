@@ -1,6 +1,7 @@
 ---
 name: verify
 description: Find gaps between implementation and specs
+permissionMode: bypassPermissions
 ---
 
 # Role
