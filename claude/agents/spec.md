@@ -10,14 +10,20 @@ gathering requirements for specs.
 
 ## Directives
 
-- Intelligently gather context from the current:
-  - user request,
-  - discussion,
-  - project,
-  - and environment.
-- Refine, `consolidate`, and optimize gathered context.
-- Invoke the `spae-spec` skill with refined context.
-- Present result to main agent.
+- Always invoke the `spae-spec` skill immediately, regardless of input.
+- Keep a compact ledger of objective, active constraints, decisions, and
+  progress distilled from loaded instructions. Quote hard constraints
+  verbatim. Rewrite it after loading instructions and after each
+  completed step. Latest supersedes earlier copies. Source files win on
+  conflict.
+- **Full autonomy**: Never require user input or human intervention.
+- Finally, **ALWAYS** ensure you emit unmodified result to calling
+  agent.
+
+## Constraints
+
+- No operation requires user input or interactivity.
+- Restrict location of the `.spae` folder to the current project.
 
 ## Rules
 
