@@ -28,14 +28,17 @@ Requires OpenCode with subagent support.
 ## Usage
 
 Invoke any agent with `/run <agent> [argument]`. Only `spec` takes an
-argument—a description of the task. `prepare` and `implement` replace
+argument—a description of the task. `decompose` and `implement` replace
 `plan` and `build` because OpenCode reserves those names for its native
 agents.
+
+> **Breaking change**: `prepare` now names the orchestration agent,
+> matching other harnesses. Use `decompose` for the plan phase.
 
 | Agent       | Invocation                |
 | ----------- | ------------------------- |
 | `spec`      | `/run spec <requirement>` |
-| `prepare`   | `/run prepare`            |
+| `decompose` | `/run decompose`          |
 | `inspect`   | `/run inspect`            |
 | `implement` | `/run implement`          |
 | `check`     | `/run check`              |
@@ -47,13 +50,13 @@ agents.
 | Agent          | Purpose                                           |
 | -------------- | ------------------------------------------------- |
 | `spec`         | Gather context and write `SPEC.md`                |
-| `prepare`      | Decompose `SPEC.md` into an atomic task graph     |
+| `decompose`    | Decompose `SPEC.md` into an atomic task graph     |
 | `inspect`      | Perform gap analysis and optimize `PLAN.md`       |
 | `implement`    | Execute one atomic task from `PLAN.md`            |
 | `check`        | Gate completed task against `PLAN.md`             |
 | `fix`          | Close gaps identified in `FIX.md`                 |
 | `verify`       | Verify implementation against `SPEC.md`           |
-| `coverage`     | Fill test coverage gaps                           |
+| `test`         | Fill test coverage gaps                           |
 | `purify`       | Simplify and optimize code                        |
 | `refactor`     | Improve structure and clarity                     |
 | `review`       | Review for correctness and style                  |
@@ -62,5 +65,19 @@ agents.
 | `work`         | Run ad-hoc tasks in an isolated session           |
 | `query`        | Answer questions or research without side effects |
 | `troubleshoot` | Diagnose and fix issues                           |
+
+## Orchestration agents
+
+These agents require nested subagent support. Orchestration on OpenCode
+remains untested. They spawn `decompose` and `implement` for the `plan`
+and `build` phases.
+
+| Agent         | Purpose                                               |
+| ------------- | ----------------------------------------------------- |
+| `orchestrate` | Run all `SPAE` phases autonomously from current state |
+| `prepare`     | Run preparatory phases only—run spec, plan, inspect   |
+| `spawn`       | Run build phase—cycles build, check, and fix per task |
+| `coverage`    | Spawn test agents to address code coverage gaps       |
+| `clean`       | Run `purify` then `refactor` agents sequentially      |
 
 See the [top-level README](../README.md) for the full workflow.
