@@ -53,7 +53,7 @@ of the task.
 | `check`        | Gate completed task against `PLAN.md`             |
 | `fix`          | Close gaps identified in `FIX.md`                 |
 | `verify`       | Verify implementation against `SPEC.md`           |
-| `coverage`     | Fill test coverage gaps                           |
+| `test`         | Fill test coverage gaps                           |
 | `purify`       | Simplify and optimize code                        |
 | `refactor`     | Improve structure and clarity                     |
 | `review`       | Review for correctness and style                  |
@@ -62,5 +62,18 @@ of the task.
 | `work`         | Run ad-hoc tasks in an isolated session           |
 | `query`        | Answer questions or research without side effects |
 | `troubleshoot` | Diagnose and fix issues                           |
+
+## Orchestration agents
+
+These agents require nested subagent support. Orchestration on Codex
+remains untested.
+
+| Agent         | Purpose                                               |
+| ------------- | ----------------------------------------------------- |
+| `orchestrate` | Run all `SPAE` phases autonomously from current state |
+| `prepare`     | Run preparatory phases only—run spec, plan, inspect   |
+| `spawn`       | Run build phase—cycles build, check, and fix per task |
+| `coverage`    | Spawn test agents to address code coverage gaps       |
+| `clean`       | Run `purify` then `refactor` agents sequentially      |
 
 See the [top-level README](../README.md) for the full workflow.
