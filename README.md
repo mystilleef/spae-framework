@@ -160,6 +160,10 @@ spawns the appropriate `SPAE` agent sequentially until the workflow
 completes or the agent surfaces a blocker. Pass a proposal on first run
 to seed the `spec` phase.
 
+**Resume**—after any agent halts the workflow, for any reason, run
+`/run orchestrate` without a proposal. `orchestrate` reads `STATE.json`
+and picks up where the last agent left off.
+
 **`prepare`** runs the preparatory phases—spec, plan, and
 inspect—autonomously until the workflow reaches the `build` phase. Pass
 a proposal on first run to seed the `spec` phase.
