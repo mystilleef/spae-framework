@@ -48,6 +48,9 @@ passes.
 - **Human oversight**—each phase requires explicit invocation. Use
   orchestration agents to automate on supported harnesses
 
+See [`docs/spae-framework.md`](docs/spae-framework.md) for the complete
+protocol specification, execution guardrails, and lifecycle details.
+
 ---
 
 ## Usage
@@ -296,10 +299,10 @@ The `/run` command orchestrates subagent invocation. Invoke agents as
 
 ## Smoke test
 
-Verify harness setup with [`proposal.md`](proposal.md), a tiny `slug`
+Verify harness setup with [`examples/proposal.md`](examples/proposal.md), a tiny `slug`
 `CLI` project.
 
-1. Copy `proposal.md` to an empty directory outside this repository.
+1. Copy `examples/proposal.md` to an empty directory outside this repository.
 2. Start the harness there.
 3. Seed the workflow:
    - Manual: `/run spec proposal.md`, then each phase in order
