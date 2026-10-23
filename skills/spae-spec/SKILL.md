@@ -77,8 +77,9 @@ Follow this workflow when target `workstream` directory missing.
 5. **VERIFY**—Loop over spec completeness criteria:
    - For each failure: return to `ACT`, fix, then re-enter `VERIFY`.
    - Exit only when spec complete, structure matches
-     `references/SPEC.md`, and every aspect-ledger entry resolves to a
-     named `SPEC.md` disposition—no orphaned aspect.
+     `references/SPEC.md`, every aspect-ledger entry resolves to a named
+     `SPEC.md` disposition—no orphaned aspect—and no **Contradictions**
+     finding survives.
    - Halt only for out-of-scope conditions.
 6. **PERSIST**—Write `SPEC.md`. Point `.spae/current` symlink to
    `.spae/[workstream]`. Update `STATE.json` (`phase: plan`,
@@ -121,8 +122,9 @@ Follow this workflow when target `workstream` directory exists with
 5. **VERIFY**—Loop over spec completeness criteria:
    - For each failure: return to `ACT`, fix, then re-enter `VERIFY`.
    - Exit only when spec complete, structure matches
-     `references/SPEC.md`, and every aspect-ledger entry resolves to a
-     named `SPEC.md` disposition—no orphaned aspect.
+     `references/SPEC.md`, every aspect-ledger entry resolves to a named
+     `SPEC.md` disposition—no orphaned aspect—and no **Contradictions**
+     finding survives.
    - Halt only for out-of-scope conditions.
 6. **PERSIST**—Write `SPEC.md`. Point `.spae/current` symlink to
    `.spae/[workstream]`. Update `STATE.json` (`phase: plan`,
@@ -165,8 +167,8 @@ Follow this workflow when target `workstream` directory exists with
    - Write new `SPEC.md` from scratch; never reuse old spec; assign
      fresh `R-NNN` identifiers; address every item converted from
      `VERIFY.md` hard blocks.
-5. **VERIFY**—Loop over every `VERIFY.md` hard block, plus each accepted
-   item converted under `ACT`:
+5. **VERIFY**—Loop over every `VERIFY.md` hard block, each accepted item
+   converted under `ACT`, and each **Contradictions** finding:
    - For each unaddressed item: return to `ACT`, address it, then
      re-enter `VERIFY`.
    - Exit only when every item resolves and spec matches
@@ -237,6 +239,14 @@ Follow this workflow when target `workstream` directory exists with
 - **Ambiguity**: resolve from codebase evidence first; fall back to a
   documented conservative assumption only when evidence proves
   insufficient; record under **Assumptions** in `SPEC.md`.
+- **Contradictions**: audit `SPEC.md` for internal conflict—mutually
+  exclusive requirements, a requirement an `Out of scope` item forbids,
+  a requirement contradicting `AGENTS.md`, `Assumptions`, or
+  `Testing strategy`, or an assumption contradicting source code.
+  Self-heal by precedence: `AGENTS.md` overrides requirements;
+  requirements override assumptions and testing strategy; source code
+  overrides assumptions. Otherwise apply the **Ambiguity** fallback;
+  never halt on a contradiction.
 - Never introduce fields to `STATE.json` outside schema reference.
 
 ## Verification
@@ -244,8 +254,9 @@ Follow this workflow when target `workstream` directory exists with
 - Ensure `.spae/[workstream]/SPEC.md` contains distilled requirements
   and structure matching `references/SPEC.md` exactly.
 - Confirm each item carries a unique `R-NNN` identifier.
-- Confirm zero requirements mandate git operations, package
-  publishing, or release deployments.
+- Confirm no **Contradictions** finding survives in `SPEC.md`.
+- Confirm zero requirements mandate git operations, package publishing,
+  or release deployments.
 - Confirm no spec item, testing strategy, or assumption in `SPEC.md`
   presumes human execution, an attended or interactive terminal, or
   human presence.

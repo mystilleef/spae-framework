@@ -18,7 +18,8 @@ user-invocable: true
 
 - Tighten the atomic task graph before execution while keeping the
   repository source read-only.
-- Find gaps between `SPEC.md`, `PLAN.md`, and relevant codebase context.
+- Find gaps and contradictions between `SPEC.md`, `PLAN.md`, and
+  relevant codebase context.
 - Fix each classified gap fully; match correction depth to finding
   severity, not diff size.
 - Advance the `workstream` to execution readiness.
@@ -79,6 +80,22 @@ Reading qualifies as content-blocking.
      task's output absent from its own `Dependencies` list, or on a
      dependency's implementation incidental instead of its stated
      `Acceptance` contract, as `Must fix` (hidden-coupling gap).
+   - Flag any task whose `Intent`, `Scope`, `Acceptance`, `Context`, or
+     `Verification` contradicts its `Satisfies` requirements,
+     `## Out of scope`, `## Assumptions`, or `## Testing strategy` as
+     `Must fix` (spec contradiction); rewrite the task to conform—
+     `SPEC.md` wins.
+   - Compare task pairs linked by a dependency edge or sharing `Scope`
+     files or symbols; flag any pair whose `Scope`, `Acceptance`, or
+     `Context` asserts incompatible behavior, contracts, or file states
+     as `Must fix` (task conflict). Reconcile against `SPEC.md`; where
+     `SPEC.md` stays silent, conform the later task to the earlier
+     task's `Acceptance` contract.
+   - Halt on a `SPEC.md`-internal conflict no `PLAN.md` edit can
+     resolve—mutually exclusive requirements, or a requirement an
+     `Out of scope` item forbids; write nothing and report `Failed`.
+     Resolve any other `SPEC.md` tension in favor of its requirements;
+     log it under `Observations`.
    - Flag any task whose Scope, Intent, Context, or Verification
      declares git operations (`git add`, `git commit`, `git tag`,
      `git push`), package releases, or external deployments as
@@ -122,7 +139,8 @@ Reading qualifies as content-blocking.
   gates.
 - Strengthen verification steps with concrete test commands; test
   execution, not just build commands.
-- Route every `workstream` to `/build` after inspection.
+- Route every `workstream` to `/build` after inspection, except on an
+  irreconcilable `SPEC.md`-internal conflict.
 - Ensure `.spae/` stays local execution state and never gets staged or
   committed; never execute git mutations.
 - Consult `references/prose-protocol.md` before editing `PLAN.md`.
@@ -160,6 +178,7 @@ Reading qualifies as content-blocking.
 - No task carries a hidden-coupling gap: an undeclared dependency on
   another task's output, or a reliance on a dependency's implementation
   incidental instead of its declared contract.
+- No task contradicts `SPEC.md` or another task.
 - Every `Satisfies`-bearing task's Acceptance section names testable
   behaviors matching `SPEC.md` requirements (flags missing failure modes
   or edge cases as `Should fix` only when specified in `SPEC.md` or

@@ -130,8 +130,9 @@ The framework distinguishes **Critical Execution State** (`phase`,
 - **Hard Halt Boundaries**: Execution halts exclusively on unparseable
   JSON syntax, unrecognized phase names, completed-task re-entry
   (`"done"` task at entry to build/check/fix), missing task definitions
-  in `PLAN.md`, unmet task dependencies, or unresolvable environment
-  blockers.
+  in `PLAN.md`, unmet task dependencies, unresolvable environment
+  blockers, or a `SPEC.md`-internal conflict no `PLAN.md` edit can
+  resolve (at `/inspect`).
 
 ### 2. `SPEC.md` (The normalized truth)
 
@@ -193,7 +194,9 @@ the plan concludes.
   update the symlink, and initialize state. For existing workstreams,
   abort if `STATE.json` status lacks `revision_required` or `VERIFY.md`
   doesn't exist; otherwise, delete `SPEC.md` and write a new one from
-  scratch using `VERIFY.md` findings and source inspection.
+  scratch using `VERIFY.md` findings and source inspection. Audits the
+  draft for internal contradictions and self-heals them by precedence;
+  never halts on them.
 - **Output**: Writes `SPEC.md`. Resets `STATE.json` (`phase: plan`,
   `status: active`, `cursor: {}`, `tasks: {}`). Updates `.spae/current`.
 - **Write scope**: `SPEC.md`, `STATE.json`, `.spae/current`, and the
@@ -220,8 +223,10 @@ the plan concludes.
 - **Action**: Performs gap analysis. Prioritizes concrete bugs,
   regressions, contract breaks, and verification strength. It must not
   evolve into a heavyweight governance stage. Reports findings as
-  `Must fix`, `Should fix`, or `Observations`. Reads source code for
-  analysis only.
+  `Must fix`, `Should fix`, or `Observations`. Rewrites tasks that
+  contradict `SPEC.md` or each other—`SPEC.md` arbitrates. Halts without
+  writing on a `SPEC.md`-internal conflict no `PLAN.md` edit can
+  resolve. Reads source code for analysis only.
 - **Output**: Overwrites `PLAN.md` with the optimized version. When
   refinement resizes the task set, renumbers to contiguous `T-NNN` IDs,
   updates every in-plan reference, and re-derives the `STATE.json`

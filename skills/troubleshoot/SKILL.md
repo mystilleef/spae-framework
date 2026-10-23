@@ -117,7 +117,6 @@ checklist and diff-only audit scope.
 - Strongest relevant checks pass.
 - No self-introduced cleanup violation remains per
   `references/cleanup-guide.md`.
-- If verification fails, revert the fix and return to step 2.
 - Report remaining risks or skipped checks plainly.
 
 ## Result directives
