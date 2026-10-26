@@ -259,6 +259,9 @@ orchestration. Its agents and install steps live in
 Copy the `skills/` directory to `~/.agents/skills`. Skills carry out
 each phase and work with any compliant harness.
 
+> **Claude Code** ignores `~/.agents/skills`. Copy skills to
+> `~/.claude/skills` instead.
+
 ### Agents
 
 Agents wrap skills in isolated sessions. Each harness requires its own

@@ -5,10 +5,10 @@ Agent definitions and the `/run` command for the
 
 ## Installation
 
-Copy skills to `~/.agents/skills/`:
+Copy skills to `~/.claude/skills/`:
 
 ```sh
-cp -r ../skills/* ~/.agents/skills/
+cp -r ../skills/* ~/.claude/skills/
 ```
 
 Copy agents to `~/.claude/agents/`:
