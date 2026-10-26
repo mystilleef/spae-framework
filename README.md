@@ -250,6 +250,78 @@ directory—add `.spae/` to `.gitignore`.
 
 ## Installation
 
+### Installer
+
+From a local clone:
+
+```sh
+./install.sh <harness>...     # pi claude agy opencode codex gemini, or all
+./install.sh -u <harness>...  # uninstall
+```
+
+- Destinations match the manual tables below.
+- `antigravity` aliases `agy`.
+- `all` installs every harness found in `PATH` except deprecated
+  `gemini`; uninstall `all` covers all six.
+- Pre-flight validates the whole selection before any write.
+- Edited, linked, and foreign files survive; `--force` backs up edited
+  files first.
+
+| Option              | Effect                                       |
+| ------------------- | -------------------------------------------- |
+| `-n`, `--dry-run`   | Report planned actions; write nothing        |
+| `-f`, `--force`     | Back up, then replace or remove edited files |
+| `-u`, `--uninstall` | Remove shipped files                         |
+| `-v`, `--verbose`   | Also report unchanged files                  |
+| `-h`, `--help`      | Show usage                                   |
+
+| Exit | Meaning                        |
+| ---- | ------------------------------ |
+| `0`  | Success                        |
+| `1`  | Pre-flight or runtime failure  |
+| `2`  | Usage error                    |
+| `3`  | Completed; skipped ≥1 conflict |
+
+Each file gets one status line:
+
+| Symbol | Meaning                                                |
+| ------ | ------------------------------------------------------ |
+| `+`    | Installed                                              |
+| `~`    | Backed up and replaced (`--force`)                     |
+| `=`    | Unchanged (`--verbose`)                                |
+| `!`    | Conflict skipped: edited file, symlink, or obstruction |
+| `-`    | Removed; `--force` backs up edited files first         |
+| `?`    | Unshipped file inside a shipped skill directory; kept  |
+
+#### Overrides
+
+| Variable              | Replaces                   |
+| --------------------- | -------------------------- |
+| `CLAUDE_CONFIG_DIR`   | `~/.claude`                |
+| `PI_CODING_AGENT_DIR` | `~/.pi/agent`              |
+| `XDG_CONFIG_HOME`     | `~/.config` (OpenCode)     |
+| `CODEX_HOME`          | `~/.codex`                 |
+| `XDG_STATE_HOME`      | `~/.local/state` (backups) |
+
+- Empty values fall back to defaults; relative values fail pre-flight.
+- Backups land in `<state>/spae/backups/<UTC stamp>/<absolute path>`.
+
+#### Notes
+
+- `~/.agents/skills/` serves `pi`, `opencode`, `codex`, and `gemini`;
+  uninstall keeps it until the selection covers all four.
+- `Pi` needs [pi-subagent](https://github.com/mystilleef/pi-subagent)
+  for `/run`; the installer only prints a reminder.
+- Restart running harness sessions after install or uninstall.
+- OpenCode reads both `~/.claude/skills/` and `~/.agents/skills/`;
+  installing `claude` and `opencode` together places each skill in both.
+  Delete one copy if OpenCode lists duplicates.
+- Renamed or deleted upstream skills, agents, and commands leave old
+  copies behind; the installer never reports or removes them. Delete
+  them manually.
+
+Manual steps below serve as fallback.
+
 Use `Pi` (bold in the tables below) for the full workflow, including
 orchestration. Its agents and install steps live in
 [`pi/README.md`](pi/README.md).

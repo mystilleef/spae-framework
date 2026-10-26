@@ -5,6 +5,10 @@ Agent definitions and the `$run` skill for the
 
 ## Installation
 
+From the repository root, `./install.sh codex` installs the files this
+page documents (see [Installation](../README.md#installation)). Manual
+steps follow as fallback.
+
 Copy shared skills to `~/.agents/skills/`:
 
 ```sh
