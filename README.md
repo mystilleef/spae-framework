@@ -256,11 +256,17 @@ orchestration. Its agents and install steps live in
 
 ### Skills
 
-Copy the `skills/` directory to `~/.agents/skills`. Skills carry out
-each phase and work with any compliant harness.
+Copy the contents of `skills/` to each harness's skills directory.
+Skills carry out each phase and work with any compliant harness.
 
-> **Claude Code** ignores `~/.agents/skills`. Copy skills to
-> `~/.claude/skills` instead.
+| Harness  | Destination                |
+| -------- | -------------------------- |
+| **Pi**   | `~/.agents/skills/`        |
+| Claude   | `~/.claude/skills/`        |
+| `Agy`    | `~/.gemini/config/skills/` |
+| Gemini   | `~/.agents/skills/`        |
+| OpenCode | `~/.agents/skills/`        |
+| Codex    | `~/.agents/skills/`        |
 
 ### Agents
 
