@@ -7,8 +7,9 @@ successor to the deprecated Gemini CLI.
 ## Installation
 
 From the repository root, `./install.sh agy` installs the files this
-page documents (see [Installation](../README.md#installation)). Manual
-steps follow as fallback.
+page documents (see [Installation](../README.md#installation)). On
+Windows, the script runs only under `WSL`. Manual steps follow as
+fallback.
 
 Copy skills to `~/.gemini/config/skills/`:
 

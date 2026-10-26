@@ -263,6 +263,7 @@ From a local clone:
 - `antigravity` aliases `agy`.
 - `all` installs every harness found in `PATH` except deprecated
   `gemini`; uninstall `all` covers all six.
+- On Windows, the script runs only under `WSL`.
 - Pre-flight validates the whole selection before any write.
 - Edited, linked, and foreign files survive; `--force` backs up edited
   files first.
@@ -380,10 +381,12 @@ The `/run` command orchestrates subagent invocation. Invoke agents as
 
 ## Smoke test
 
-Verify harness setup with [`examples/proposal.md`](examples/proposal.md), a tiny `slug`
-`CLI` project.
+Verify harness setup with
+[`examples/proposal.md`](examples/proposal.md), a tiny `slug` `CLI`
+project.
 
-1. Copy `examples/proposal.md` to an empty directory outside this repository.
+1. Copy `examples/proposal.md` to an empty directory outside this
+   repository.
 2. Start the harness there.
 3. Seed the workflow:
    - Manual: `/run spec proposal.md`, then each phase in order

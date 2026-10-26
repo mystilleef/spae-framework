@@ -6,8 +6,9 @@ Agent definitions and the `/run` command for the
 ## Installation
 
 From the repository root, `./install.sh claude` installs the files this
-page documents (see [Installation](../README.md#installation)). Manual
-steps follow as fallback.
+page documents (see [Installation](../README.md#installation)). On
+Windows, the script runs only under `WSL`. Manual steps follow as
+fallback.
 
 Copy skills to `~/.claude/skills/`:
 
