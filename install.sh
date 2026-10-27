@@ -58,6 +58,9 @@ CLONE_DIR="$(cd "${script_dir}" && pwd -P)" || die "cannot resolve clone from ${
 
 # ---- argument parsing ---------------------------------------------------
 
+# Newline-separated lists are walked with quoted parameter expansion, never
+# `done << EOF` loops: shellharden misparses here-docs on compound commands
+# and quotes lone expansions in their bodies, corrupting the data.
 NL='
 '
 DRY_RUN=0
@@ -185,7 +188,11 @@ build_selection() {
     done
     return 0
   fi
-  while IFS= read -r _bs_name || [ "${_bs_name}" != "" ]; do
+  _bs_rest="${SELECTED}"
+  while [ "${_bs_rest}" != "" ]; do
+    _bs_name="${_bs_rest%%"${NL}"*}"
+    _bs_rest="${_bs_rest#"${_bs_name}"}"
+    _bs_rest="${_bs_rest#"${NL}"}"
     if [ "${_bs_name}" = gemini ]; then
       printf '%s: warning: gemini is deprecated\n' "${PROGRAM}" >&2
     fi
@@ -194,9 +201,7 @@ build_selection() {
     else
       printf '%s: warning: %s not found in PATH\n' "${PROGRAM}" "${_bs_name}" >&2
     fi
-  done << EOF
-"${SELECTED}"
-EOF
+  done
 }
 
 build_selection
@@ -604,18 +609,17 @@ preflight_backups() {
   _pfb_src="${1}"
   _pfb_dst="${2}"
   _pfb_files="$(cd "${_pfb_src}" && find . -type f)" || die "preflight: cannot enumerate ${_pfb_src}"
-  while IFS= read -r _pfb_rel || [ "${_pfb_rel}" != "" ]; do
-    if [ "${_pfb_rel}" = "" ]; then
-      continue
-    fi
+  _pfb_rest="${_pfb_files}"
+  while [ "${_pfb_rest}" != "" ]; do
+    _pfb_rel="${_pfb_rest%%"${NL}"*}"
+    _pfb_rest="${_pfb_rest#"${_pfb_rel}"}"
+    _pfb_rest="${_pfb_rest#"${NL}"}"
     _pfb_rel="${_pfb_rel#./}"
     classify_file "${_pfb_src}/${_pfb_rel}" "${_pfb_dst}/${_pfb_rel}"
     if [ "${CLASS}" = different ]; then
       check_backup_path "${_pfb_dst}/${_pfb_rel}"
     fi
-  done << EOF
-"${_pfb_files}"
-EOF
+  done
 }
 
 # Report non-shipped files inside shipped skill directories.
@@ -633,10 +637,11 @@ scan_stale() {
       continue
     fi
     _ss_found="$(cd "${_ss_dir}" && find . -type f)" || die "${ACTION}: cannot enumerate ${_ss_dir}"
-    while IFS= read -r _ss_rel || [ "${_ss_rel}" != "" ]; do
-      if [ "${_ss_rel}" = "" ]; then
-        continue
-      fi
+    _ss_rest="${_ss_found}"
+    while [ "${_ss_rest}" != "" ]; do
+      _ss_rel="${_ss_rest%%"${NL}"*}"
+      _ss_rest="${_ss_rest#"${_ss_rel}"}"
+      _ss_rest="${_ss_rest#"${NL}"}"
       _ss_rel="${_ss_rel#./}"
       _ss_key="${_ss_name}/${_ss_rel}"
       case "${NL}${_ss_files}${NL}" in
@@ -646,9 +651,7 @@ scan_stale() {
           report '?' "${_ss_dir}/${_ss_rel}"
           ;;
       esac
-    done << EOF
-"${_ss_found}"
-EOF
+    done
   done
 }
 
@@ -749,19 +752,18 @@ deploy() {
       ;;
     apply)
       _dp_files="$(cd "${_dp_src}" && find . -type f)" || die "preflight: cannot enumerate ${_dp_src}"
-      while IFS= read -r _dp_rel || [ "${_dp_rel}" != "" ]; do
-        if [ "${_dp_rel}" = "" ]; then
-          continue
-        fi
+      _dp_rest="${_dp_files}"
+      while [ "${_dp_rest}" != "" ]; do
+        _dp_rel="${_dp_rest%%"${NL}"*}"
+        _dp_rest="${_dp_rest#"${_dp_rel}"}"
+        _dp_rest="${_dp_rest#"${NL}"}"
         _dp_rel="${_dp_rel#./}"
         if [ "${UNINSTALL}" = 1 ]; then
           remove_file "${_dp_src}" "${_dp_rel}" "${_dp_dst}"
         else
           handle_file "${_dp_src}" "${_dp_rel}" "${_dp_dst}"
         fi
-      done << EOF
-"${_dp_files}"
-EOF
+      done
       if [ "${_dp_kind}" = skills ]; then
         scan_stale "${_dp_files}" "${_dp_src}" "${_dp_dst}"
         if [ "${UNINSTALL}" = 1 ]; then
@@ -774,7 +776,11 @@ EOF
 }
 
 run_selection() {
-  while IFS= read -r _rs_name || [ "${_rs_name}" != "" ]; do
+  _rs_rest="${SELECTED}"
+  while [ "${_rs_rest}" != "" ]; do
+    _rs_name="${_rs_rest%%"${NL}"*}"
+    _rs_rest="${_rs_rest#"${_rs_name}"}"
+    _rs_rest="${_rs_rest#"${NL}"}"
     case "${_rs_name}" in
       pi) deploy_pi ;;
       claude) deploy_claude ;;
@@ -784,9 +790,7 @@ run_selection() {
       gemini) deploy_gemini ;;
       *) die "internal: unknown selection ${_rs_name}" ;;
     esac
-  done << EOF
-"${SELECTED}"
-EOF
+  done
 }
 
 # ---- whole-selection preflight, then mutation dispatch ------------------

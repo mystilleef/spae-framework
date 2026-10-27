@@ -549,7 +549,7 @@ assert_mode() {
 
 assert_no_temporaries() {
   _ant_hits=$(find "${CASE_HOME}" -name '*.spae-tmp.*' 2> /dev/null || true)
-  if [ -n "${_ant_hits}" ]; then
+  if [ "${_ant_hits}" != "" ]; then
     case_fail "leftover temporaries: ${_ant_hits}"
   fi
 }
@@ -575,13 +575,16 @@ assert_date_calls() {
 
 # ---- snapshots ----------------------------------------------------------
 
+# Newline-separated lists are walked with quoted parameter expansion, never
+# `done << EOF` loops: shellharden misparses here-docs on compound commands
+# and quotes lone expansions in their bodies, corrupting the data.
 NL='
 '
 
 # Registers an external state tree or directory-link referent so snapshot
 # comparisons cover it alongside the HOME/clone contract.
 measure_root() {
-  if [ -z "${MEASURED_ROOTS}" ]; then
+  if [ "${MEASURED_ROOTS}" = "" ]; then
     MEASURED_ROOTS=${1}
   else
     MEASURED_ROOTS="${MEASURED_ROOTS}${NL}${1}"
@@ -616,15 +619,14 @@ snapshot_all() {
   capture_snapshot "${CASE_DIR}/${1}-home" "${CASE_HOME}"
   capture_snapshot "${CASE_DIR}/${1}-clone" "${CASE_CLONE}"
   _sa_no=0
-  while IFS= read -r _sa_root || [ -n "${_sa_root}" ]; do
-    if [ -z "${_sa_root}" ]; then
-      continue
-    fi
+  _sa_rest="${MEASURED_ROOTS}"
+  while [ "${_sa_rest}" != "" ]; do
+    _sa_root="${_sa_rest%%"${NL}"*}"
+    _sa_rest="${_sa_rest#"${_sa_root}"}"
+    _sa_rest="${_sa_rest#"${NL}"}"
     _sa_no=$((_sa_no + 1))
     capture_snapshot "${CASE_DIR}/${1}-extra-${_sa_no}" "${_sa_root}"
-  done << EOF
-${MEASURED_ROOTS}
-EOF
+  done
 }
 
 # Sets CHANGED_TREES to the measured captures whose before/after snapshots
@@ -639,25 +641,24 @@ compare_snapshots() {
     fi
   done
   _cps_no=0
-  while IFS= read -r _cps_root || [ -n "${_cps_root}" ]; do
-    if [ -z "${_cps_root}" ]; then
-      continue
-    fi
+  _cps_rest="${MEASURED_ROOTS}"
+  while [ "${_cps_rest}" != "" ]; do
+    _cps_root="${_cps_rest%%"${NL}"*}"
+    _cps_rest="${_cps_rest#"${_cps_root}"}"
+    _cps_rest="${_cps_rest#"${NL}"}"
     _cps_no=$((_cps_no + 1))
     if cmp -s "${CASE_DIR}/before-extra-${_cps_no}" "${CASE_DIR}/after-extra-${_cps_no}"; then
       :
     else
       CHANGED_TREES="${CHANGED_TREES} extra-${_cps_no}"
     fi
-  done << EOF
-${MEASURED_ROOTS}
-EOF
+  done
 }
 
 assert_tree_unchanged() {
   snapshot_all after
   compare_snapshots
-  if [ -n "${CHANGED_TREES}" ]; then
+  if [ "${CHANGED_TREES}" != "" ]; then
     case_fail "measured trees changed:${CHANGED_TREES}"
   fi
 }
@@ -696,13 +697,13 @@ assert_preflight_failure() {
 
 test_scripts_carry_mode_755() {
   _tcm_hit=$(find "${INSTALLER}" -prune -perm 755)
-  if [ -n "${_tcm_hit}" ]; then
+  if [ "${_tcm_hit}" != "" ]; then
     :
   else
     case_fail "install.sh is not mode 755"
   fi
   _tcm_hit=$(find "${RUNNER}" -prune -perm 755)
-  if [ -n "${_tcm_hit}" ]; then
+  if [ "${_tcm_hit}" != "" ]; then
     :
   else
     case_fail "test-install.sh is not mode 755"
@@ -2300,7 +2301,7 @@ test_preexisting_temporary_collision_preserves_bytes() {
   assert_status 1
   assert_stderr_contains "apply: temporary path already exists"
   _tpc_hit=$(find "${CASE_HOME}" -name 'pi-agent.md.spae-tmp.*')
-  if [ -n "${_tpc_hit}" ]; then
+  if [ "${_tpc_hit}" != "" ]; then
     :
   else
     case_fail "collision file missing"
