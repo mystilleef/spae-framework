@@ -43,7 +43,7 @@ die() {
 CURRENT_TEMP=""
 
 cleanup_temp() {
-  if [ -n "${CURRENT_TEMP}" ]; then
+  if [ "${CURRENT_TEMP}" != "" ]; then
     rm -f "${CURRENT_TEMP}"
   fi
 }
@@ -78,7 +78,7 @@ add_selector() {
     *"${NL}${_as_name}${NL}"*) return 0 ;;
     *) : ;;
   esac
-  if [ -z "${SELECTED}" ]; then
+  if [ "${SELECTED}" = "" ]; then
     SELECTED="${_as_name}"
   else
     SELECTED="${SELECTED}${NL}${_as_name}"
@@ -126,7 +126,7 @@ validate_home() {
 check_override() {
   _co_name="${1}"
   _co_value="${2}"
-  if [ -n "${_co_value}" ]; then
+  if [ "${_co_value}" != "" ]; then
     case "${_co_value}" in
       /*) : ;;
       *) die "${_co_name} is not absolute: ${_co_value}" ;;
@@ -185,7 +185,7 @@ build_selection() {
     done
     return 0
   fi
-  while IFS= read -r _bs_name || [ -n "${_bs_name}" ]; do
+  while IFS= read -r _bs_name || [ "${_bs_name}" != "" ]; do
     if [ "${_bs_name}" = gemini ]; then
       printf '%s: warning: gemini is deprecated\n' "${PROGRAM}" >&2
     fi
@@ -195,13 +195,13 @@ build_selection() {
       printf '%s: warning: %s not found in PATH\n' "${PROGRAM}" "${_bs_name}" >&2
     fi
   done << EOF
-${SELECTED}
+"${SELECTED}"
 EOF
 }
 
 build_selection
 
-if [ -z "${SELECTED}" ]; then
+if [ "${SELECTED}" = "" ]; then
   exit 0
 fi
 
@@ -221,7 +221,7 @@ if [ "${UNINSTALL}" = 1 ]; then
       *) _sr_unselected="${_sr_unselected:+${_sr_unselected}, }${_sr_name}" ;;
     esac
   done
-  if [ -n "${_sr_selected}" ] && [ -n "${_sr_unselected}" ]; then
+  if [ "${_sr_selected}" != "" ] && [ "${_sr_unselected}" != "" ]; then
     SHARED_RETAIN=1
     printf '%s: note: preserving %s; shared with unselected harnesses: %s\n' \
       "${PROGRAM}" "${A}" "${_sr_unselected}" >&2
@@ -300,7 +300,7 @@ preflight_destination() {
   _pd_up="${_pd_path}"
   while :; do
     _pd_up="${_pd_up%/*}"
-    if [ -z "${_pd_up}" ]; then
+    if [ "${_pd_up}" = "" ]; then
       _pd_up=/
     fi
     if [ -L "${_pd_up}" ] && [ ! -d "${_pd_up}" ]; then
@@ -368,7 +368,7 @@ check_path_blocked() {
   _cpb_path="${1}"
   while :; do
     _cpb_path="${_cpb_path%/*}"
-    if [ -z "${_cpb_path}" ]; then
+    if [ "${_cpb_path}" = "" ]; then
       _cpb_path=/
     fi
     if [ -L "${_cpb_path}" ] || [ -e "${_cpb_path}" ]; then
@@ -416,7 +416,7 @@ classify_file() {
 # One UTC stamp per invocation; backups mirror absolute destinations beneath
 # it so preserved bytes stay outside every discovery root.
 ensure_stamp() {
-  if [ -z "${STAMP}" ]; then
+  if [ "${STAMP}" = "" ]; then
     STAMP="$(date -u '+%Y%m%dT%H%M%SZ')" || die "preflight: cannot compute backup stamp"
     BACKUP_BASE="${BACKUP_ROOT}/${STAMP}"
   fi
@@ -434,7 +434,7 @@ resolve_physical() {
     if [ "${_rph_next}" = "${_rph_path}" ]; then
       _rph_next=.
     fi
-    if [ -z "${_rph_next}" ]; then
+    if [ "${_rph_next}" = "" ]; then
       _rph_next=/
     fi
     _rph_suffix="/${_rph_tail}${_rph_suffix}"
@@ -456,12 +456,12 @@ check_backup_placement() {
   _bp_path="${1}"
   resolve_physical "${_bp_path}"
   _bp_phys="${RESOLVED_PHYS}"
-  if [ -z "${_bp_phys}" ]; then
+  if [ "${_bp_phys}" = "" ]; then
     die "preflight: cannot resolve backup location: ${_bp_path}"
   fi
   for _bp_root in "${A}" "${C}" "${P}" "${O}" "${X}" "${G}"; do
     resolve_physical "${_bp_root}"
-    if [ -z "${RESOLVED_PHYS}" ]; then
+    if [ "${RESOLVED_PHYS}" = "" ]; then
       continue
     fi
     case "${_bp_phys}" in
@@ -604,8 +604,8 @@ preflight_backups() {
   _pfb_src="${1}"
   _pfb_dst="${2}"
   _pfb_files="$(cd "${_pfb_src}" && find . -type f)" || die "preflight: cannot enumerate ${_pfb_src}"
-  while IFS= read -r _pfb_rel || [ -n "${_pfb_rel}" ]; do
-    if [ -z "${_pfb_rel}" ]; then
+  while IFS= read -r _pfb_rel || [ "${_pfb_rel}" != "" ]; do
+    if [ "${_pfb_rel}" = "" ]; then
       continue
     fi
     _pfb_rel="${_pfb_rel#./}"
@@ -614,7 +614,7 @@ preflight_backups() {
       check_backup_path "${_pfb_dst}/${_pfb_rel}"
     fi
   done << EOF
-${_pfb_files}
+"${_pfb_files}"
 EOF
 }
 
@@ -633,8 +633,8 @@ scan_stale() {
       continue
     fi
     _ss_found="$(cd "${_ss_dir}" && find . -type f)" || die "${ACTION}: cannot enumerate ${_ss_dir}"
-    while IFS= read -r _ss_rel || [ -n "${_ss_rel}" ]; do
-      if [ -z "${_ss_rel}" ]; then
+    while IFS= read -r _ss_rel || [ "${_ss_rel}" != "" ]; do
+      if [ "${_ss_rel}" = "" ]; then
         continue
       fi
       _ss_rel="${_ss_rel#./}"
@@ -647,7 +647,7 @@ scan_stale() {
           ;;
       esac
     done << EOF
-${_ss_found}
+"${_ss_found}"
 EOF
   done
 }
@@ -734,7 +734,7 @@ deploy() {
     *"${NL}${_dp_key}${NL}"*) return 0 ;;
     *) : ;;
   esac
-  if [ -z "${DEPLOYED}" ]; then
+  if [ "${DEPLOYED}" = "" ]; then
     DEPLOYED="${_dp_key}"
   else
     DEPLOYED="${DEPLOYED}${NL}${_dp_key}"
@@ -749,8 +749,8 @@ deploy() {
       ;;
     apply)
       _dp_files="$(cd "${_dp_src}" && find . -type f)" || die "preflight: cannot enumerate ${_dp_src}"
-      while IFS= read -r _dp_rel || [ -n "${_dp_rel}" ]; do
-        if [ -z "${_dp_rel}" ]; then
+      while IFS= read -r _dp_rel || [ "${_dp_rel}" != "" ]; do
+        if [ "${_dp_rel}" = "" ]; then
           continue
         fi
         _dp_rel="${_dp_rel#./}"
@@ -760,7 +760,7 @@ deploy() {
           handle_file "${_dp_src}" "${_dp_rel}" "${_dp_dst}"
         fi
       done << EOF
-${_dp_files}
+"${_dp_files}"
 EOF
       if [ "${_dp_kind}" = skills ]; then
         scan_stale "${_dp_files}" "${_dp_src}" "${_dp_dst}"
@@ -774,7 +774,7 @@ EOF
 }
 
 run_selection() {
-  while IFS= read -r _rs_name || [ -n "${_rs_name}" ]; do
+  while IFS= read -r _rs_name || [ "${_rs_name}" != "" ]; do
     case "${_rs_name}" in
       pi) deploy_pi ;;
       claude) deploy_claude ;;
@@ -785,7 +785,7 @@ run_selection() {
       *) die "internal: unknown selection ${_rs_name}" ;;
     esac
   done << EOF
-${SELECTED}
+"${SELECTED}"
 EOF
 }
 
