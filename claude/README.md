@@ -1,14 +1,17 @@
-# SPAE — Claude Code
+# State-persistent atomic execution (`SPAE`) for `Claude Code`
 
 Agent definitions and the `/run` command for the
-[Claude Code](https://claude.ai/code) harness.
+[`Claude Code`](https://claude.ai/code) harness.
 
 ## Installation
 
 From the repository root, `./install.sh claude` installs the files this
 page documents (see [Installation](../README.md#installation)). On
-Windows, the script runs only under `WSL`. Manual steps follow as
-fallback.
+`Windows`, the script runs only under `WSL`.
+
+### Manual installation
+
+Manual steps follow as fallback.
 
 Copy skills to `~/.claude/skills/`:
 
@@ -28,7 +31,7 @@ Copy the `/run` command to `~/.claude/commands/`:
 cp -r commands/* ~/.claude/commands/
 ```
 
-Requires Claude Code with subagent support.
+Requires `Claude Code` with subagent support.
 
 ## Agents
 
@@ -53,8 +56,8 @@ Requires Claude Code with subagent support.
 
 ## Orchestration agents
 
-These agents require nested subagent support. Orchestration on Claude
-Code remains untested.
+These agents require nested subagent support. Orchestration on
+`Claude Code` remains untested.
 
 | Agent         | Purpose                                               |
 | ------------- | ----------------------------------------------------- |

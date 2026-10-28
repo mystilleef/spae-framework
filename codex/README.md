@@ -1,14 +1,17 @@
-# SPAE — Codex
+# State-persistent atomic execution (`SPAE`) for `Codex`
 
 Agent definitions and the `$run` skill for the
-[Codex](https://openai.com/codex) harness.
+[`Codex`](https://openai.com/codex) harness.
 
 ## Installation
 
 From the repository root, `./install.sh codex` installs the files this
 page documents (see [Installation](../README.md#installation)). On
-Windows, the script runs only under `WSL`. Manual steps follow as
-fallback.
+`Windows`, the script runs only under `WSL`.
+
+### Manual installation
+
+Manual steps follow as fallback.
 
 Copy shared skills to `~/.agents/skills/`:
 
@@ -28,11 +31,11 @@ Copy agents to `~/.codex/agents/`:
 cp -r agents/* ~/.codex/agents/
 ```
 
-Requires Codex with subagent support.
+Requires `Codex` with subagent support.
 
 ## Usage
 
-Codex does not support custom commands. The `$run` skill replaces the
+`Codex` lacks support for custom commands. The `$run` skill replaces the
 `/run` command. Activate skills with `$`—invoke agents as
 `$run <agent> [argument]`. Only `spec` takes an argument—a description
 of the task.
@@ -70,7 +73,7 @@ of the task.
 
 ## Orchestration agents
 
-These agents require nested subagent support. Orchestration on Codex
+These agents require nested subagent support. Orchestration on `Codex`
 remains untested.
 
 | Agent         | Purpose                                               |

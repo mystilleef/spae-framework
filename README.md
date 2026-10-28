@@ -10,12 +10,12 @@ passes.
 
 **spec → plan → inspect → build → check → fix → verify**
 
-![SPAE Framework Execution Lifecycle](assets/spae-workflow.svg)
+![State-Persistent Atomic Execution (SPAE) framework execution lifecycle](assets/spae-workflow.svg)
 
 > **Official harness**: `Pi` serves as the official and recommended
-> harness for `SPAE`. Orchestration testing covered Pi and `Agy`. Other
-> harnesses run each phase by hand, with orchestration untested. See
-> [Installation](#installation).
+> harness for `SPAE`. Orchestration testing covered `Pi` and `Agy`.
+> Other harnesses run each phase by hand, with orchestration untested.
+> See [Installation](#installation).
 
 ## What `SPAE` does
 
@@ -24,16 +24,16 @@ passes.
 - Decomposing requests into atomic, independently verifiable tasks
 - Persisting state in external artifacts (not conversational memory)
 - Enforcing phase boundaries so each agent reads only what it needs
-- Allowing any harness (Pi, Claude, `Agy`, Gemini, OpenAI, OpenCode,
-  Codex) to resume work at any point
+- Allowing any harness (`Pi`, `Claude`, `Agy`, `Gemini`, `OpenCode`,
+  OpenAI Codex (CODEX)) to resume work at any point
 
 ---
 
 ## Framework design
 
-- **Harness agnostic**—use any combination of Pi, Claude, `Agy`, Gemini,
-  OpenAI, OpenCode, or Codex at each phase, though `Pi` remains
-  recommended
+- **Harness agnostic**—use any combination of `Pi`, `Claude`, `Agy`,
+  `Gemini`, `OpenAI`, `OpenCode`, or `Codex` at each phase, though `Pi`
+  remains recommended
 - **Fresh agent per phase**—every phase invocation spawns a new agent
   with no shared conversation. `.spae/` artifacts carry all state. Pick
   the same or a different provider and model per invocation, for example
@@ -55,7 +55,7 @@ protocol specification, execution guardrails, and lifecycle details.
 
 ## Usage
 
-Invoke any agent with `/run <agent> [argument]` (or `$run` in Codex).
+Invoke any agent with `/run <agent> [argument]` (or `$run` in `Codex`).
 Agents encapsulate skills and carry out each phase. See each agent's
 invocation for its arguments.
 
@@ -69,8 +69,8 @@ invocation for its arguments.
 | `fix`     | `/run fix`             |
 | `verify`  | `/run verify`          |
 
-OpenCode reserves `plan` and `build`, so its agents use `decompose` and
-`implement` instead. See [`opencode/README.md`](opencode/README.md).
+`OpenCode` reserves `plan` and `build`, so its agents use `decompose`
+and `implement` instead. See [`opencode/README.md`](opencode/README.md).
 
 ---
 
@@ -122,7 +122,8 @@ flowchart TD
 | 6     | `/run fix`             | Close gaps found by `/run check`       |
 | 7     | `/run verify`          | Verify code against `SPEC.md`          |
 
-After `/run inspect`, iterate through the task loop:
+The task loop alternates between build, check, and Remediation Fix (FIX)
+cycles:
 
 - `/run build`—executes the active atomic task and sets phase to `check`
 - `/run check`—verifies active task implementation against `PLAN.md`.
@@ -139,8 +140,8 @@ passes.
 
 ## Orchestration (`Pi` and `Agy`)
 
-> **Testing covered Pi and `Agy` only.** Orchestration requires nested
-> subagent support. Pi users must install
+> **Testing covered `Pi` and `Agy` only.** Orchestration requires nested
+> subagent support. `Pi` users must install
 > [`mystilleef/pi-subagent`](https://github.com/mystilleef/pi-subagent).
 > `Agy` ships native nested subagents.
 
@@ -150,7 +151,7 @@ step.
 
 ---
 
-### **SPAE** orchestrators
+### **`SPAE`** orchestrators
 
 | Agent         | Invocation                      | Purpose                   |
 | ------------- | ------------------------------- | ------------------------- |
@@ -177,7 +178,7 @@ advances to `verify`.
 
 ---
 
-### Non-**SPAE** orchestrators
+### Non-**`SPAE`** orchestrators
 
 | Agent      | Invocation      | Purpose                              |
 | ---------- | --------------- | ------------------------------------ |
@@ -202,7 +203,7 @@ implementation. Follow the order below.
 | 4     | `/run review`   | Review for correctness and style |
 | 5     | `/run commit`   | Stage and commit implementation  |
 
-**Tested on Pi and `Agy` only.** `/run coverage` and `/run clean`
+**Tested on `Pi` and `Agy` only.** `/run coverage` and `/run clean`
 operate as orchestration agents. `/run clean` replaces steps 2–3 by
 running `purify` then `refactor` automatically.
 
@@ -250,7 +251,7 @@ directory—add `.spae/` to `.gitignore`.
 
 ## Installation
 
-### Installer
+### Using the installer
 
 From a local clone:
 
@@ -262,15 +263,15 @@ From a local clone:
 - Destinations match the manual tables below.
 - `antigravity` aliases `agy`.
 - `all` installs every harness found in `PATH` except deprecated
-  `gemini`; uninstall `all` covers all six.
-- On Windows, the script runs only under `WSL`.
+  `gemini`. Uninstall `all` covers all six harnesses.
+- On `Windows`, the script runs only under `WSL`.
 - Pre-flight validates the whole selection before any write.
-- Edited, linked, and foreign files survive; `--force` backs up edited
+- Edited, linked, and foreign files survive. `--force` backs up edited
   files first.
 
 | Option              | Effect                                       |
 | ------------------- | -------------------------------------------- |
-| `-n`, `--dry-run`   | Report planned actions; write nothing        |
+| `-n`, `--dry-run`   | Report planned actions without writing       |
 | `-f`, `--force`     | Back up, then replace or remove edited files |
 | `-u`, `--uninstall` | Remove shipped files                         |
 | `-v`, `--verbose`   | Also report unchanged files                  |
@@ -281,18 +282,18 @@ From a local clone:
 | `0`  | Success                        |
 | `1`  | Pre-flight or runtime failure  |
 | `2`  | Usage error                    |
-| `3`  | Completed; skipped ≥1 conflict |
+| `3`  | Completed, skipped ≥1 conflict |
 
 Each file gets one status line:
 
-| Symbol | Meaning                                                |
-| ------ | ------------------------------------------------------ |
-| `+`    | Installed                                              |
-| `~`    | Backed up and replaced (`--force`)                     |
-| `=`    | Unchanged (`--verbose`)                                |
-| `!`    | Conflict skipped: edited file, symlink, or obstruction |
-| `-`    | Removed; `--force` backs up edited files first         |
-| `?`    | Unshipped file inside a shipped skill directory; kept  |
+| Symbol | Meaning                                                 |
+| ------ | ------------------------------------------------------- |
+| `+`    | Installed                                               |
+| `~`    | Backed up and replaced (`--force`)                      |
+| `=`    | Unchanged (`--verbose`)                                 |
+| `!`    | Conflict skipped: edited file, symlink, or obstruction  |
+| `-`    | Removed, `--force` backs up edited files first          |
+| `?`    | _Unshipped_ file inside a shipped skill directory, kept |
 
 #### Overrides
 
@@ -300,26 +301,30 @@ Each file gets one status line:
 | --------------------- | -------------------------- |
 | `CLAUDE_CONFIG_DIR`   | `~/.claude`                |
 | `PI_CODING_AGENT_DIR` | `~/.pi/agent`              |
-| `XDG_CONFIG_HOME`     | `~/.config` (OpenCode)     |
+| `XDG_CONFIG_HOME`     | `~/.config` (`OpenCode`)   |
 | `CODEX_HOME`          | `~/.codex`                 |
 | `XDG_STATE_HOME`      | `~/.local/state` (backups) |
 
-- Empty values fall back to defaults; relative values fail pre-flight.
+- Empty values fall back to defaults. Relative values cause pre-flight
+  errors.
 - Backups land in `<state>/spae/backups/<UTC stamp>/<absolute path>`.
 
 #### Notes
 
-- `~/.agents/skills/` serves `pi`, `opencode`, `codex`, and `gemini`;
-  uninstall keeps it until the selection covers all four.
-- `Pi` needs [pi-subagent](https://github.com/mystilleef/pi-subagent)
-  for `/run`; the installer only prints a reminder.
+- `~/.agents/skills/` serves `pi`, `opencode`, `codex`, and `gemini`.
+  Uninstall operations keep it until the selection covers all four
+  harnesses.
+- `Pi` requires [pi-subagent](https://github.com/mystilleef/pi-subagent)
+  for `/run`, though the installer only prints a reminder.
 - Restart running harness sessions after install or uninstall.
-- OpenCode reads both `~/.claude/skills/` and `~/.agents/skills/`;
-  installing `claude` and `opencode` together places each skill in both.
-  Delete one copy if OpenCode lists duplicates.
+- `OpenCode` reads both `~/.claude/skills/` and `~/.agents/skills/`.
+  Installing `claude` and `opencode` together places each skill in both.
+  Delete one copy if `OpenCode` lists duplicates.
 - Renamed or deleted upstream skills, agents, and commands leave old
-  copies behind; the installer never reports or removes them. Delete
+  copies behind. The installer never reports or removes them, so delete
   them manually.
+
+### Manual installation
 
 Manual steps below serve as fallback.
 
@@ -332,14 +337,14 @@ orchestration. Its agents and install steps live in
 Copy the contents of `skills/` to each harness's skills directory.
 Skills carry out each phase and work with any compliant harness.
 
-| Harness  | Destination                |
-| -------- | -------------------------- |
-| **Pi**   | `~/.agents/skills/`        |
-| Claude   | `~/.claude/skills/`        |
-| `Agy`    | `~/.gemini/config/skills/` |
-| Gemini   | `~/.agents/skills/`        |
-| OpenCode | `~/.agents/skills/`        |
-| Codex    | `~/.agents/skills/`        |
+| Harness    | Destination                |
+| ---------- | -------------------------- |
+| **`Pi`**   | `~/.agents/skills/`        |
+| `Claude`   | `~/.claude/skills/`        |
+| `Agy`      | `~/.gemini/config/skills/` |
+| `Gemini`   | `~/.agents/skills/`        |
+| `OpenCode` | `~/.agents/skills/`        |
+| `Codex`    | `~/.agents/skills/`        |
 
 ### Agents
 
@@ -350,32 +355,32 @@ Shipped agent files inherit model and provider from the parent agent,
 keeping front matter minimal. To mix models, add `model` or `provider`
 fields to your copies on harnesses that support them.
 
-| Harness  | Source                | Destination                  |
-| -------- | --------------------- | ---------------------------- |
-| **Pi**   | `pi/agents/`          | `~/.pi/agent/agents/`        |
-| Claude   | `claude/agents/`      | `~/.claude/agents/`          |
-| `Agy`    | `antigravity/agents/` | `~/.gemini/config/agents/`   |
-| Gemini   | `gemini/agents/`      | `~/.gemini/agents/`          |
-| OpenCode | `opencode/agents/`    | `~/.config/opencode/agents/` |
-| Codex    | `codex/agents/`       | `~/.codex/agents/`           |
+| Harness    | Source                | Destination                  |
+| ---------- | --------------------- | ---------------------------- |
+| **`Pi`**   | `pi/agents/`          | `~/.pi/agent/agents/`        |
+| `Claude`   | `claude/agents/`      | `~/.claude/agents/`          |
+| `Agy`      | `antigravity/agents/` | `~/.gemini/config/agents/`   |
+| `Gemini`   | `gemini/agents/`      | `~/.gemini/agents/`          |
+| `OpenCode` | `opencode/agents/`    | `~/.config/opencode/agents/` |
+| `Codex`    | `codex/agents/`       | `~/.codex/agents/`           |
 
-> **Gemini CLI is deprecated** in favor of `Agy`, the Antigravity CLI.
-> Use the `antigravity/` files for new installs. The `gemini/` files
-> receive no further updates.
+> `Google` deprecated `Gemini CLI` in favor of `Agy`, the Antigravity
+> CLI. Use the `antigravity/` files for new installs. The `gemini/`
+> files receive no further updates.
 
 ### Run command
 
 The `/run` command orchestrates subagent invocation. Invoke agents as
 `/run <agent> [argument]`. Format varies by harness.
 
-| Harness  | Notes                                                             |
-| -------- | ----------------------------------------------------------------- |
-| **Pi**   | Requires `mystilleef/pi-subagent` for built-in `/run`             |
-| Claude   | Copy `claude/commands/` to `~/.claude/commands/`                  |
-| `Agy`    | Copy `antigravity/skills/` to `~/.gemini/config/skills/`          |
-| Gemini   | Copy `gemini/commands/` to `~/.gemini/commands/`                  |
-| OpenCode | Copy `opencode/commands/` to `~/.config/opencode/commands/`       |
-| Codex    | Copy `codex/skills/` to `~/.codex/skills/`; use `$run` for `/run` |
+| Harness    | Notes                                                                 |
+| ---------- | --------------------------------------------------------------------- |
+| **`Pi`**   | Requires `mystilleef/pi-subagent` for built-in `/run`                 |
+| `Claude`   | Copy `claude/commands/` to `~/.claude/commands/`                      |
+| `Agy`      | Copy `antigravity/skills/` to `~/.gemini/config/skills/`              |
+| `Gemini`   | Copy `gemini/commands/` to `~/.gemini/commands/`                      |
+| `OpenCode` | Copy `opencode/commands/` to `~/.config/opencode/commands/`           |
+| `Codex`    | Copy `codex/skills/` to `~/.codex/skills/`, and use `$run` for `/run` |
 
 ---
 
@@ -390,16 +395,16 @@ project.
 2. Start the harness there.
 3. Seed the workflow:
    - Manual: `/run spec proposal.md`, then each phase in order
-   - **Pi** and `Agy`: `/run orchestrate proposal.md` runs every phase
+   - **`Pi`** and `Agy`: `/run orchestrate proposal.md` runs every phase
 4. Confirm `.spae/current/STATE.json` after each phase. Orchestration
    ends at `done`:
 
-| After     | `phase`   | Also confirm                           |
-| --------- | --------- | -------------------------------------- |
-| `spec`    | `plan`    | `SPEC.md` holds `R-NNN` items          |
-| `plan`    | `inspect` | `PLAN.md` holds a task graph           |
-| `inspect` | `build`   | Cursor `active_task_id` reads `T-001`  |
-| `verify`  | `done`    | `status` reads `completed`; tests pass |
+| After     | `phase`   | Also confirm                               |
+| --------- | --------- | ------------------------------------------ |
+| `spec`    | `plan`    | `SPEC.md` holds `R-NNN` items              |
+| `plan`    | `inspect` | `PLAN.md` holds a task graph               |
+| `inspect` | `build`   | Cursor `active_task_id` reads `T-001`      |
+| `verify`  | `done`    | `status` reads `completed`, and tests pass |
 
 Failure at any phase marks a setup gap: agent files, skills, or `/run`
 wiring. See [Installation](#installation).

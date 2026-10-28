@@ -1,14 +1,18 @@
-# SPAE: Pi
+# State-persistent atomic execution (`SPAE`) for `Pi`
 
-Agent definitions for the [Pi](https://github.com/mystilleef/pi)
-harness, the official and recommended harness for `SPAE`. Pi supports
+Agent definitions for the [`Pi`](https://github.com/mystilleef/pi)
+harness, the official and recommended harness for `SPAE`. `Pi` supports
 the orchestration agents below.
 
 ## Installation
 
 From the repository root, `./install.sh pi` installs the files this page
-documents (see [Installation](../README.md#installation)). On Windows,
-the script runs only under `WSL`. Manual steps follow as fallback.
+documents (see [Installation](../README.md#installation)). On `Windows`,
+the script runs only under `WSL`.
+
+### Manual installation
+
+Manual steps follow as fallback.
 
 Copy skills to `~/.agents/skills/`:
 

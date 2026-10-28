@@ -1,13 +1,22 @@
-# SPAE — Gemini CLI
+# State-persistent atomic execution (`SPAE`) for `Gemini CLI`
 
 Agent definitions and commands for the
-[Gemini CLI](https://github.com/google-gemini/gemini-cli) harness.
+[`Gemini CLI`](https://github.com/google-gemini/gemini-cli) harness.
 
-> **Deprecated.** Google replaced Gemini CLI with the Antigravity CLI
-> (`agy`). Use [`antigravity/`](../antigravity/README.md) for new
-> installs. These files receive no further updates.
+> **Deprecated.** `Google` replaced `Gemini CLI` with the
+> `Antigravity CLI` (`agy`). Use
+> [`antigravity/`](../antigravity/README.md) for new installs. These
+> files receive no further updates.
 
 ## Installation
+
+From the repository root, `./install.sh gemini` installs the files this
+page documents (see [Installation](../README.md#installation)). On
+`Windows`, the script runs only under `WSL`.
+
+### Manual installation
+
+Manual steps follow as fallback.
 
 Copy skills to `~/.agents/skills/`:
 
@@ -27,7 +36,7 @@ Copy commands to `~/.gemini/commands/`:
 cp -r commands/* ~/.gemini/commands/
 ```
 
-Requires Gemini CLI with agent and custom command support.
+Requires `Gemini CLI` with agent and custom command support.
 
 ## Agents
 
@@ -52,8 +61,8 @@ Requires Gemini CLI with agent and custom command support.
 
 ## Orchestration agents
 
-These agents require nested subagent support. Orchestration on Gemini
-CLI remains untested.
+These agents require nested subagent support. Orchestration on
+`Gemini CLI` remains untested.
 
 | Agent         | Purpose                                               |
 | ------------- | ----------------------------------------------------- |
@@ -65,9 +74,9 @@ CLI remains untested.
 
 ## Commands
 
-| Command | Purpose                          |
-| ------- | -------------------------------- |
-| `/run`  | Invoke a named SPAE agent        |
-| `/syd`  | Print Gemini's active directives |
+| Command | Purpose                             |
+| ------- | ----------------------------------- |
+| `/run`  | Invoke a named `SPAE` agent         |
+| `/syd`  | Print active directives in `Gemini` |
 
 See the [top-level README](../README.md) for the full workflow.

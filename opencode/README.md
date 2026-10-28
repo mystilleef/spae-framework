@@ -1,14 +1,17 @@
-# SPAE — OpenCode
+# State-persistent atomic execution (`SPAE`) for `OpenCode`
 
 Agent definitions and the `/run` command for the
-[OpenCode](https://opencode.ai) harness.
+[`OpenCode`](https://opencode.ai) harness.
 
 ## Installation
 
 From the repository root, `./install.sh opencode` installs the files
 this page documents (see [Installation](../README.md#installation)). On
-Windows, the script runs only under `WSL`. Manual steps follow as
-fallback.
+`Windows`, the script runs only under `WSL`.
+
+### Manual installation
+
+Manual steps follow as fallback.
 
 Copy skills to `~/.agents/skills/`:
 
@@ -28,27 +31,27 @@ Copy the `/run` command to `~/.config/opencode/commands/`:
 cp -r commands/* ~/.config/opencode/commands/
 ```
 
-Requires OpenCode with subagent support.
+Requires `OpenCode` with subagent support.
 
 ## Usage
 
-Invoke any agent with `/run <agent> [argument]`. Only `spec` takes an
+Invoke any agent with `/run` `<agent> [argument]`. Only `spec` takes an
 argument—a description of the task. `decompose` and `implement` replace
-`plan` and `build` because OpenCode reserves those names for its native
-agents.
+`plan` and `build` because `OpenCode` reserves those names for its
+native agents.
 
 > **Breaking change**: `prepare` now names the orchestration agent,
 > matching other harnesses. Use `decompose` for the plan phase.
 
-| Agent       | Invocation                |
-| ----------- | ------------------------- |
-| `spec`      | `/run spec <requirement>` |
-| `decompose` | `/run decompose`          |
-| `inspect`   | `/run inspect`            |
-| `implement` | `/run implement`          |
-| `check`     | `/run check`              |
-| `fix`       | `/run fix`                |
-| `verify`    | `/run verify`             |
+| Agent       | Invocation                  |
+| ----------- | --------------------------- |
+| `spec`      | `/run` `spec <requirement>` |
+| `decompose` | `/run` `decompose`          |
+| `inspect`   | `/run` `inspect`            |
+| `implement` | `/run` `implement`          |
+| `check`     | `/run` `check`              |
+| `fix`       | `/run` `fix`                |
+| `verify`    | `/run` `verify`             |
 
 ## Agents
 
@@ -73,9 +76,9 @@ agents.
 
 ## Orchestration agents
 
-These agents require nested subagent support. Orchestration on OpenCode
-remains untested. They spawn `decompose` and `implement` for the `plan`
-and `build` phases.
+These agents require nested subagent support. Orchestration on
+`OpenCode` remains untested. They spawn `decompose` and `implement` for
+the `plan` and `build` phases.
 
 | Agent         | Purpose                                               |
 | ------------- | ----------------------------------------------------- |
