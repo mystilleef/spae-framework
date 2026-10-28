@@ -52,8 +52,11 @@ passes.
   the same or a different provider and model per invocation, for example
   a stronger model for `inspect`, `check`, and `verify` (see
   [Agents](#agents))
-- **Zero-knowledge resumption**—any agent resumes any `workstream` by
-  reading artifacts
+- **Fault-tolerant resumption**—`SPAE` saves progress after every phase,
+  so a dropped connection, agent error, or halted orchestration loses no
+  finished work. Resume from any harness:
+  - Rerun the interrupted phase, or
+  - Run `/run orchestrate` to continue autonomously (`Pi`, `Agy`)
 - **Atomic execution**—every task stays small enough to verify in a
   single cycle
 - **Closed loop**—`verify` feeds gaps back to `spec`, and the workflow

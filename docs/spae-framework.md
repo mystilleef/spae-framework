@@ -9,9 +9,12 @@ outcomes before advancing.
 
 ## Core principles
 
-- **Zero-knowledge resumption**: Agents keep no internal state. Every
+- **Fault-tolerant resumption**: Agents keep no internal state. Every
   invocation begins fresh, reading only external artifacts to determine
-  the execution cursor.
+  the execution cursor. The `STATE.json` phase advances only on phase
+  completion, so dropped connections, agent errors, or halted
+  orchestration lose no finished work. Any harness resumes by rerunning
+  the interrupted phase.
 - **Harness agnosticism**: The protocol requires only file `I/O` and
   large language model prompting. It functions independently of specific
   tool wrappers or proprietary memory systems.
