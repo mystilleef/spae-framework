@@ -25,7 +25,7 @@ passes.
 - Persisting state in external artifacts (not conversational memory)
 - Enforcing phase boundaries so each agent reads only what it needs
 - Allowing any harness (`Pi`, `Claude`, `Agy`, `Gemini`, `OpenCode`,
-  OpenAI Codex (CODEX)) to resume work at any point
+  `Codex`, etc.) to resume work at any point
 
 ## Contents
 
@@ -45,24 +45,26 @@ passes.
 ## Framework design
 
 - **Harness agnostic**—use any combination of `Pi`, `Claude`, `Agy`,
-  `Gemini`, `OpenAI`, `OpenCode`, or `Codex` at each phase, though `Pi`
+  `Gemini`, `OpenCode`, `Codex`, etc., at each phase, though `Pi`
   remains recommended
-- **Fresh agent per phase**—every phase invocation spawns a new agent
-  with no shared conversation. `.spae/` artifacts carry all state. Pick
-  the same or a different provider and model per invocation, for example
-  a stronger model for `inspect`, `check`, and `verify` (see
+- **Fresh agent per phase**—each phase starts a new agent with no shared
+  conversation. Mix providers and models per phase, for example a
+  stronger model for `inspect`, `check`, and `verify` (see
   [Agents](#agents))
+- **Human oversight**—run each phase by hand, or automate with
+  orchestration agents (`Pi`, `Agy`)
 - **Fault-tolerant resumption**—`SPAE` saves progress after every phase,
   so a dropped connection, agent error, or halted orchestration loses no
   finished work. Resume from any harness:
   - Rerun the interrupted phase, or
-  - Run `/run orchestrate` to continue autonomously (`Pi`, `Agy`)
+  - Run `/run orchestrate` to continue autonomously
 - **Atomic execution**—every task stays small enough to verify in a
   single cycle
+- **Independent verification**—the agent that writes code never approves
+  it. Separate agents check each task against the plan and the finished
+  work against the spec
 - **Closed loop**—`verify` feeds gaps back to `spec`, and the workflow
   ends only when `verify` passes
-- **Human oversight**—each phase requires explicit invocation. Use
-  orchestration agents to automate on supported harnesses
 
 See [`docs/spae-framework.md`](docs/spae-framework.md) for the complete
 protocol specification, execution guardrails, and lifecycle details.
