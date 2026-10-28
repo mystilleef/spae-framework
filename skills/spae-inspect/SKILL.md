@@ -143,6 +143,10 @@ Reading qualifies as content-blocking.
   irreconcilable `SPEC.md`-internal conflict.
 - Ensure `.spae/` stays local execution state and never gets staged or
   committed; never execute git mutations.
+- Refine and optimize `PLAN.md` for agent consumption: agents read it
+  for varied purposes, with no memory of this run; keep rewritten tasks
+  self-contained, explicit, and token-dense—each task's `Context`
+  supplies every fact its executor needs.
 - Consult `references/prose-protocol.md` before editing `PLAN.md`.
 
 ## Constraints
@@ -200,7 +204,7 @@ Reading qualifies as content-blocking.
 - Keep prose terse while ensuring clarity.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
-- Use lists and sub-lists over paragraphs and long sentences.
+- Use lists and sub-lists for long sentences and dense paragraphs.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
 - Source every `SPAE Status` value from the confirmed re-read, never

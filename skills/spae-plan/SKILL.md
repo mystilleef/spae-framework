@@ -77,7 +77,9 @@ Reading qualifies as content-blocking.
 ## Directives
 
 - Optimize for agent, token, and context efficiency.
-- Keep `PLAN.md` high-signal and minimal.
+- Refine and optimize `PLAN.md` for agent consumption: agents read it
+  for varied purposes, with no memory of this run; keep it
+  self-contained, explicit, token-dense, and minimal.
 - Prefer existing codebase patterns over speculative design.
 - Slice vertically; avoid infrastructure-only tasks unless required.
 - Assume each task executes, reviews, and refines under a stateless
@@ -154,7 +156,7 @@ Reading qualifies as content-blocking.
 - Keep prose terse while ensuring clarity.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
-- Use lists and sub-lists over paragraphs and long sentences.
+- Use lists and sub-lists for long sentences and dense paragraphs.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
 - Source every `SPAE Status` value from the confirmed re-read, never

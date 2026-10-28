@@ -107,7 +107,7 @@ project. Abort with a clear message if none detected.
 - Keep prose terse while ensuring clarity.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
-- Use lists and sub-lists over paragraphs and long sentences.
+- Use lists and sub-lists for long sentences and dense paragraphs.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
 

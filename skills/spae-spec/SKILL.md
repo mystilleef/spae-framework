@@ -199,6 +199,9 @@ Follow this workflow when target `workstream` directory exists with
 - Tag each item with a unique, stable `R-NNN` identifier.
 - Document assumptions explicitly instead of guessing scope.
 - Match level of detail to task size; avoid process bloat.
+- Refine and optimize `SPEC.md` for agent consumption: agents read it
+  for varied purposes, with no memory of this run; keep it
+  self-contained, explicit, and token-dense.
 - Consult `references/prose-protocol.md` before drafting `SPEC.md`.
 - Consult `references/aspect-sweep.md` before running the `New` or
   `Resume` aspect sweep; default to `PHASE_CAP` (4) as a single named
@@ -288,7 +291,7 @@ Follow this workflow when target `workstream` directory exists with
 - Keep prose terse while ensuring clarity.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
-- Use lists and sub-lists over paragraphs and long sentences.
+- Use lists and sub-lists for long sentences and dense paragraphs.
 - Emit result template as live markdown—never in a code fence.
 - Output nothing outside template.
 - Source every `SPAE Status` value from confirmed re-read, never from

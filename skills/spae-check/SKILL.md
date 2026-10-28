@@ -104,7 +104,10 @@ Read:
 - Relegate `unrequested` edge-case coverage, theoretical risks, and
   defensive bloat suggestions to observations; forbid writing them to
   `FIX.md`.
-- Keep gaps concrete, reproducible, enough for `/fix` without `PLAN.md`.
+- Refine and optimize `FIX.md` for agent consumption: agents read it for
+  varied purposes, with no memory of this run; keep it self-contained,
+  explicit, and token-dense.
+- Keep gaps concrete, reproducible, enough to close without `PLAN.md`.
 - Preserve task-plan wording verbatim in `FIX.md` `## Intent`.
 - Write only current actionable gaps to `FIX.md` per
   `references/FIX.md`; report observations in summary only.
@@ -155,7 +158,7 @@ Read:
 - Keep prose terse while ensuring clarity.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, summaries into terse bullet points.
-- Use lists/sub-lists over paragraphs and long sentences.
+- Use lists and sub-lists for long sentences and dense paragraphs.
 - Emit result as live markdown—never in a code fence.
 - Output nothing outside the template.
 - Source every `SPAE Status` value from the confirmed re-read, never

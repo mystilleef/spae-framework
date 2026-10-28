@@ -118,10 +118,13 @@ Read:
 - Confine verification evaluation strictly to documented SPEC.md
   requirements.
 - Prefer existing project verification commands and patterns.
+- Refine and optimize `VERIFY.md` for agent consumption: agents read it
+  for varied purposes, with no memory of this run; keep it
+  self-contained, explicit, and token-dense.
 - Keep `.spae/current/VERIFY.md` findings concrete, reproducible, and
   tied to `.spae/current/SPEC.md` spec items.
-- Include enough detail for `/spec` to rewrite `SPEC.md` from scratch
-  without repeating the full investigation.
+- Include enough detail to rewrite `SPEC.md` from scratch without
+  repeating the full investigation.
 - Draft `VERIFY.md` matching the `references/VERIFY.md` schema.
 - Consult `references/prose-protocol.md` before drafting `VERIFY.md`.
 
@@ -164,7 +167,7 @@ Read:
 - Keep prose terse while ensuring clarity.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
-- Use lists and sub-lists over paragraphs and long sentences.
+- Use lists and sub-lists for long sentences and dense paragraphs.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
 - Source every `SPAE Status` value from the confirmed re-read, never

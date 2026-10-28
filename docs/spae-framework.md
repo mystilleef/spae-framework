@@ -1,14 +1,20 @@
 # State-persistent atomic execution (`SPAE`) framework
 
 The `SPAE` framework provides a high-bandwidth, state-persistent
-protocol for large language model (`LLM`) agents. It enables complex
-technical execution across many sessions, models, and harnesses without
-relying on conversational memory. It enforces rigorous engineering
-practices: reading before writing, slicing work vertically, and proving
-outcomes before advancing.
+protocol for large language model (`LLM`) agents. Agents drive every
+phase: they author, consume, and act on every artifact; humans supply
+intent and receive verified outcomes. It enables complex technical
+execution across many sessions, models, and harnesses without relying on
+conversational memory. It enforces rigorous engineering practices:
+reading before writing, slicing work vertically, and proving outcomes
+before advancing.
 
 ## Core principles
 
+- **Agent-first artifacts**: Agents author and consume every artifact,
+  for varied purposes, with no memory of the authoring run. Refine and
+  optimize each artifact for agent consumption: self-contained,
+  explicit, and token-dense. Human readers come second.
 - **Fault-tolerant resumption**: Agents keep no internal state. Every
   invocation begins fresh, reading only external artifacts to determine
   the execution cursor. The `STATE.json` phase advances only on phase
@@ -175,17 +181,17 @@ deletes this file upon a successful pass.
 
 Created only when `/check` detects gaps between the active task's
 implementation and its `PLAN.md` entry. Contains the task `Intent`, the
-specific gaps found, and pointers to the affected files—full context for
-a `/fix` agent to close them without re-reading the whole plan. `/fix`
-consumes this file to scope its edits, then deletes it upon completion.
+specific gaps found, and pointers to the affected files—full context to
+close them without re-reading the whole plan. `/fix` consumes this file
+to scope its edits, then deletes it upon completion.
 
 ## The execution loop
 
-Users orchestrate the workflow by manually invoking these skills in
-sequence. After `/inspect`, `/build` executes one atomic task, `/check`
-gates it against the plan, and `/fix` closes any gaps `/check` finds.
-The `build`-`check`-`fix` cycle repeats per task until `/check` clears
-it clean, then routes to `/build` for the next task or to `/verify` once
+Users or orchestrating agents invoke these skills in sequence. After
+`/inspect`, `/build` executes one atomic task, `/check` gates it against
+the plan, and `/fix` closes any gaps `/check` finds. The
+`build`-`check`-`fix` cycle repeats per task until `/check` clears it
+clean, then routes to `/build` for the next task or to `/verify` once
 the plan concludes.
 
 ### Step 1: `/spec` (Smart entry & requirements)

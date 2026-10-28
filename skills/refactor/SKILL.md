@@ -167,7 +167,7 @@ checklist and diff-only audit scope.
 - **Minimum** words. **Maximum** signal.
 - Keep prose terse while ensuring clarity.
 - Optimize prose for agent, token, and context efficiency.
-- Use lists and sub-lists over paragraphs and long sentences.
+- Use lists and sub-lists for long sentences and dense paragraphs.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
 

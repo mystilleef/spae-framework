@@ -202,7 +202,7 @@ Gather intent grounding matching the resolved scope:
 - Keep prose terse while ensuring clarity.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions and summaries into terse bullet points.
-- Use lists and sub-lists over paragraphs and long sentences.
+- Use lists and sub-lists for long sentences and dense paragraphs.
 - Omit inapplicable fields.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
