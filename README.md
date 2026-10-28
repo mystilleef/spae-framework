@@ -27,6 +27,19 @@ passes.
 - Allowing any harness (`Pi`, `Claude`, `Agy`, `Gemini`, `OpenCode`,
   OpenAI Codex (CODEX)) to resume work at any point
 
+## Contents
+
+- [Framework design](#framework-design)
+- [Usage](#usage)
+- [Workflow](#workflow)
+- [Orchestration](#orchestration-pi-and-agy)
+- [Post-verification](#post-verification)
+- [Utility agents](#utility-agents)
+- [Artifacts](#artifacts)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Smoke test](#smoke-test)
+
 ---
 
 ## Framework design
