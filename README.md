@@ -350,7 +350,7 @@ Use `Pi` (bold in the tables below) for the full workflow, including
 orchestration. Its agents and install steps live in
 [`pi/README.md`](pi/README.md).
 
-### Skills
+#### Skills
 
 Copy the contents of `skills/` to each harness's skills directory.
 Skills carry out each phase and work with any compliant harness.
@@ -364,7 +364,7 @@ Skills carry out each phase and work with any compliant harness.
 | `OpenCode` | `~/.agents/skills/`        |
 | `Codex`    | `~/.agents/skills/`        |
 
-### Agents
+#### Agents
 
 Agents wrap skills in isolated sessions. Each harness requires its own
 agent files. Every harness ships the same agents.
@@ -386,7 +386,7 @@ fields to your copies on harnesses that support them.
 > CLI. Use the `antigravity/` files for new installs. The `gemini/`
 > files receive no further updates.
 
-### Run command
+#### Run command
 
 The `/run` command orchestrates subagent invocation. Invoke agents as
 `/run <agent> [argument]`. Format varies by harness.
