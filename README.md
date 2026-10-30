@@ -269,7 +269,11 @@ directory—add `.spae/` to `.gitignore`.
 
 ## Installation
 
-### Using the installer
+You can use the installation script _(recommended)_ to install the
+`SPAE` agents, skills, and commands for each, or all, harnesses. Or
+install them manually.
+
+### Using the installation script
 
 From a local clone:
 
