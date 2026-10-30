@@ -198,13 +198,15 @@ advances to `verify`.
 
 ### Non-**`SPAE`** orchestrators
 
-| Agent      | Invocation      | Purpose                              |
-| ---------- | --------------- | ------------------------------------ |
-| `coverage` | `/run coverage` | Spawn test agents for gaps           |
-| `clean`    | `/run clean`    | Run purify and refactor sequentially |
+| Agent       | Invocation       | Purpose                              |
+| ----------- | ---------------- | ------------------------------------ |
+| `coverage`  | `/run coverage`  | Spawn test agents for gaps           |
+| `clean`     | `/run clean`     | Run purify and refactor sequentially |
+| `purity`    | `/run purity`    | Spawn purify agents to optimize code |
+| `structure` | `/run structure` | Spawn refactor agents for structure  |
 
-The `coverage` and `clean` agents execute phases of their subagents
-repeatedly until they achieve the desired outcome.
+The `coverage`, `clean`, `purity`, and `structure` agents execute phases
+of their subagents repeatedly until they achieve the desired outcome.
 
 ---
 
@@ -221,9 +223,10 @@ implementation. Follow the order below.
 | 4     | `/run review`   | Review for correctness and style |
 | 5     | `/run commit`   | Stage and commit implementation  |
 
-**Tested on `Pi` and `Agy` only.** `/run coverage` and `/run clean`
-operate as orchestration agents. `/run clean` replaces steps 2–3 by
-running `purify` then `refactor` automatically.
+**Tested on `Pi` and `Agy` only.** `/run coverage`, `/run clean`,
+`/run purity`, and `/run structure` operate as orchestration agents.
+`/run clean` replaces steps 2–3 by running `purify` then `refactor`
+automatically.
 
 ---
 

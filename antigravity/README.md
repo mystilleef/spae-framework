@@ -68,6 +68,8 @@ tool in `Agy`.
 | `spawn`       | Run build phase—cycles build, check, and fix per task |
 | `coverage`    | Spawn test agents to address code coverage gaps       |
 | `clean`       | Run `purify` then `refactor` agents sequentially      |
+| `purity`      | Spawn `purify` agents to optimize and simplify code   |
+| `structure`   | Spawn `refactor` agents to improve code structure     |
 
 ## Commands
 
