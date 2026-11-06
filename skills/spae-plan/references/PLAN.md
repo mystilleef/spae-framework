@@ -1,5 +1,5 @@
 ````md
-# PLAN: [workstream — goal title]
+# PLAN: [workstream—goal title]
 
 ## Goal
 
@@ -10,7 +10,8 @@
 ## Assumptions
 
 - **Assumption**: [assumption]
-- **Out of scope**: [excluded item — note: git staging, commits, tags, and releases lie strictly outside the plan]
+- **Out of scope**: [excluded item—note: git staging, commits, tags, and
+  releases lie strictly outside the plan]
 
 ## Task graph
 
@@ -29,15 +30,15 @@ flowchart TD
 - **Dependencies**: [none | T-00N, T-00M]
 - **Satisfies**: [R-001, R-003 | none (enabling task, see Context)]
 - **Intent**: [One line: the goal this task serves and why it matters]
-- **Context**: [Target files, current behavior, seams, and any fact a
-  stateless executor needs—never a detail available only from planning
+- **Context**: [Target files, current behavior, seams, and every fact a
+  stateless executor needs, including facts surfaced only while planning
   this task]
 - **Scope**:
   - [Atomic change 1]
   - [Atomic change 2]
 - **Acceptance**:
-  - [Expected behavior — outcome when inputs are valid]
-  - [Failure mode / Edge case — if specified in SPEC.md or required by
+  - [Expected behavior—outcome under valid inputs]
+  - [Failure mode / Edge case—if specified in SPEC.md or required by
     task logic]
 - **Verification**:
   - `[test command covering acceptance criteria above]`
@@ -46,6 +47,7 @@ flowchart TD
 ## Risk notes
 
 - [Risk, data loss potential, or fallback path]
+- [Residual risk carried from `SPEC.md`]
 
 ## Source audit notes
 

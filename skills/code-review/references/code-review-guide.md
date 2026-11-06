@@ -2,9 +2,9 @@
 
 ## Mission
 
-Defensively review local repository changes for incorrect behavior,
-data loss, security vulnerabilities, or crashes. Emit no other findings.
-Use source evidence and isolated local checks; don't develop weaponized
+Defensively review local repository changes for incorrect behavior, data
+loss, security vulnerabilities, or crashes. Emit no other findings. Use
+source evidence and isolated local checks; don't develop weaponized
 exploits, probe live systems, or bypass safeguards.
 
 ## Scope
@@ -144,9 +144,9 @@ Omit items out of scope, plus:
   emit in active `findings`.
 - **Evidence threshold**: Establish a concrete trigger scenario,
   reachable code path, and material impact. Source evidence suffices;
-  don't require exploit construction or live-system reproduction.
-  Assess exploitability only for security findings, within the app
-  threat model; judge other defects by observable failure and impact.
+  don't require exploit construction or live-system reproduction. Assess
+  exploitability only for security findings, within the app threat
+  model; judge other defects by observable failure and impact.
 
 ## Calibration
 

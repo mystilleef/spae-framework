@@ -5,7 +5,7 @@
 - Trace every proposal claim to a `SPEC.md` disposition before
   `PERSIST`.
 - Guard against buried requirements in dense or long input.
-- Apply to `New` and `Resume` workflows only.
+- Apply to the `Draft` path only.
 - Skip on `Revision` (`Revision` consumes `VERIFY.md` `R-NNN` findings
   directly).
 
@@ -25,29 +25,38 @@
 | Integration     | External code or `workstream`   | `R-NNN` / `Assumptions` |
 | `Uncategorized` | Ambiguous or unclassified claim | Fit or `Out of scope`   |
 
-- Rotate heightened-focus category per phase
-  (`((phase - 1) mod 8) + 1`). Scan all eight categories each phase.
+- Phase `N` carries heightened focus on category `N` in table order.
+  Scan all eight categories each phase.
 
 ## Sweep mechanics
 
-- **`PHASE_CAP`**: `4` (saturation typically occurs within two phases.
-  Cap guards against pathological input).
+- **`PHASE_COUNT`**: `8`, matching the category count.
 - **Signature**: `category:section-ref:slug`.
   - `section-ref`: nearest markdown heading path
     (`##Auth/###Refresh-Flow`) or paragraph ordinal (`p12`).
   - `slug`: kebab-case, ≤6 words.
 - **Ledger**: append new candidates after each phase, pruning duplicates
   by signature.
-- **Halt**: first zero-new-candidate phase or `PHASE_CAP` (4), whichever
-  arrives first.
+- **Completion**: run all `PHASE_COUNT` phases; a phase with zero new
+  candidates never ends the sweep.
 
 ## Resume seeding
 
-- Reverse-map draft `SPEC.md` entries (`R-NNN`, `Out of scope`,
-  `Assumptions`, `Testing strategy`) into pre-seeded ledger signatures
-  before phase one.
+- When the target holds a `SPEC.md`, reverse-map its entries (`R-NNN`,
+  `Out of scope`, `Assumptions`, `Testing strategy`) into pre-seeded
+  ledger signatures before phase one.
 - Mark pre-seeded signatures as covered.
-- Sweep uncovered aspects only.
+- Still scan the full proposal each phase; pre-seeded signatures only
+  remove duplicates.
+
+## Section coverage at VERIFY
+
+- List every `section-ref` the proposal yields: each heading, plus each
+  paragraph outside any heading.
+- Map each one to a ledger signature or mark it `no claim`; pre-seeded
+  signatures count.
+- Treat an unmapped `section-ref` as an unmet `VERIFY` criterion. The
+  ledger alone can't reveal a claim it never recorded.
 
 ## Disposition at VERIFY
 
@@ -58,3 +67,6 @@
     failure.
 - Treat orphaned ledger entries as unmet `VERIFY` criteria. Forbid
   silent drops.
+- Route `Validation` entries per `verification-guide.md`: practical
+  automated evidence → `Testing strategy`; none → `Out of scope`
+  residual risk.

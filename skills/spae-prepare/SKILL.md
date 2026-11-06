@@ -1,13 +1,14 @@
 ---
 name: spae-prepare
 description: >-
-  Orchestrate SPAE subagents sequentially through the spec, plan, and
-  inspect phases of the structured workflow.
+  Preparation Orchestrator for the `SPAE` framework. Spawns the `spec`,
+  `plan`, and `inspect` subagents until the `workstream` reaches `phase:
+  build`.
 user-invocable: false
 argument-hint: "[optional-proposal]"
 ---
 
-# Prepare `SPAE`
+# Prepare (`SPAE`)
 
 ## When to use
 
@@ -16,21 +17,18 @@ argument-hint: "[optional-proposal]"
 
 ## Goal
 
-- Spawn `spec`, `plan`, and `inspect` subagents sequentially based on
-  `STATE.json` status and phase.
-- Halt successfully when the `workstream` reaches `phase: build`, or
-  halt immediately on errors.
+- Spawn the subagent matching the current `STATE.json` phase, looped
+  until the `workstream` reaches `phase: build`.
 
 ## Input
 
-Read `.spae/current/STATE.json` to resolve the current execution phase
-and cursor. Accept an optional argument, the proposal, during initial
-execution.
+Read `.spae/current/STATE.json` to resolve the current phase. Accept an
+optional argument, the proposal, during initial execution.
 
 ## `STATE.json`
 
-See `references/STATE.md` for the field reference, directives, and
-phase snapshots.
+See `references/STATE.md` for the field reference, directives, and phase
+snapshots.
 
 ## Phase-agent map
 
@@ -45,65 +43,57 @@ regardless of phase:
 
 ## Workflow
 
+After each read, check the exit first; halt on any **Halt conditions**
+entry after every non-exit read and every spawn.
+
 1. **Resolve Workstream**:
-   - Locate `.spae/current/STATE.json`.
-   - Missing, no proposal argument: halt.
-   - Missing, proposal provided: spawn `spec` with the proposal; await
+   - `.spae/current/STATE.json` present: proceed to step 2; list an
+     unused proposal argument under `Findings`.
+   - Absent, proposal provided: spawn `spec` with the proposal; await
      completion; proceed to step 2.
-   - Present: proceed to step 2 without spawning.
 2. **Dispatch Loop**:
-   - Re-read `.spae/current/STATE.json`; record `phase`.
+   - Read `.spae/current/STATE.json`; record `phase`.
    - Exit on `phase: "build"`.
-   - Halt immediately if `phase` matches none of the phase-agent map's
-     rows.
-   - Spawn the subagent the map names for the recorded `phase`, no
-     arguments.
-   - Await completion; halt immediately on `Failed` status or any
-     process failure (crash, timeout, `AgentError`).
-   - Re-read `.spae/current/STATE.json`; halt immediately if `phase`
-     matches the value recorded at the start of this iteration.
+   - Spawn the subagent the map names for `phase`, no arguments; await
+     completion.
    - Repeat step 2.
-3. **Finalize**: Emit the execution summary.
+3. **Report**: emit the result per **Result directives**:
+   - `Result`: `Completed` on an exit; `Halted` when a subagent reports
+     `Failed` or leaves `phase` unchanged; `Failed` on any other **Halt
+     conditions** entry.
 
 ## Directives
 
 - Always use the subagent tool for subagent invocation.
-- Rely only on `STATE.json` for all orchestration decisions.
-- Operate strictly in read-only mode; make no file writes.
-- Trust the machine-readable state file over subagent output text.
+- Route only from `STATE.json` `phase`; trust it over subagent output
+  text.
+- Spawn only the subagents the phase-agent map names.
 - Pass the proposal argument verbatim to the bootstrap `spec` spawn
   only; never reuse it on later iterations, and never read or expand
   file-path arguments.
-- Halt immediately on subagent `Failed` status or any process failure
-  (crash, timeout, `AgentError`).
-- List of agents permitted to invoke:
-  - `spec`
-  - `plan`
-  - `inspect`
 
 ## Constraints
 
-- Perform orchestration only; never edit codebase files, tests, or
-  documentation.
-- Restrict your activities to:
-  - Using the `subagent` tool to spawn relevant agents.
-  - Reading `STATE.json` to orchestrate the workflow.
-- Never run `subagents` in parallel or concurrently.
-- Never activate skills.
-- Never invoke agents outside the permitted list.
-- Never prompt the user for decisions mid-run; let failures halt
-  execution.
-- Never perform activities beyond subagent invocation, state tracking,
-  and reporting.
+- Restrict activities to spawning subagents, reading
+  `.spae/current/STATE.json`, and reporting; never write files, run git
+  operations, activate skills, or prompt the user mid-run.
+- Never run subagents in parallel or concurrently.
+- **Halt conditions**: halt immediately; report per **Report** with
+  `Halted at` and `Reason`:
+  - `.spae/current/STATE.json` absent at start, with no proposal
+    argument.
+  - `STATE.json` missing at a loop read, or holding unparseable JSON
+    syntax.
+  - `phase` matching no phase-agent map row.
+  - `phase` unchanged since the previous spawn.
+  - A subagent `Failed` result or process failure (crash, timeout,
+    `AgentError`).
 
 ## Verification
 
-- Confirm every spawned subagent's phase matches the phase-agent map at
-  spawn time.
-- Confirm `phase` changes on every iteration; halt on a stalled phase.
-- Confirm sequential spawning of `spec`, `plan`, and `inspect` agents.
-- Confirm the `workstream` reaches `phase: build` upon completion.
-- Confirm zero project writes from the orchestration agent itself.
+- Every spawn matched the phase-agent map row for the recorded `phase`.
+- The run ended on an exit or a **Halt conditions** entry.
+- The orchestrator wrote no file.
 
 ## Result directives
 
@@ -126,14 +116,14 @@ regardless of phase:
 - **Files**:
   - [Terse list of files affected by spawned subagents]
 - **Findings**:
-  - [Terse list of findings from spawned subagent]
+  - [Terse list of findings from spawned subagents]
 - **Summary**:
   - [Terse list of summary from spawned subagents]
 
 > **`SPAE` Prepare** • `[workstream]`
 > **Result**: [Completed | Halted | Failed]
-> **Halted at**: `[Phase]`  _(if halted)_
-> **Reason**: [Terse explanation]     _(if halted)_
+> **Halted at**: `[Phase]`  _(unless completed)_
+> **Reason**: [Terse explanation]     _(unless completed)_
 > **Impact**: [Terse impact statement]
 ```
 <!-- prettier-ignore-end -->

@@ -10,10 +10,8 @@ user-invocable: true
 
 ## When to use
 
-- `SPEC.md` exists and needs an execution plan.
-- `STATE.json` reports `phase: plan`.
-- A revision cycle re-enters planning after `/spec` reprocesses
-  findings.
+- `STATE.json` reads `phase: plan`: decompose `SPEC.md` into an
+  execution plan.
 
 ## Goal
 
@@ -28,51 +26,51 @@ user-invocable: true
 Use only relevant context from:
 
 - `.spae/current/SPEC.md`.
-- `.spae/current/STATE.json` (consult `references/STATE.md` for field
-  reference, directives, and phase snapshots).
-- Repository source patterns, read only for codebase fit.
+- `.spae/current/STATE.json`; `references/STATE.md` holds field
+  reference, directives, and snapshots.
+- Repository source, for codebase fit.
 
-**Never read `.spae/current/VERIFY.md`**—not an input to this phase.
-Reading qualifies as content-blocking.
+Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 
 ## Workflow
 
-1. **GATE**—Read `.spae/current/STATE.json`; self-heal metadata: inject
-   missing `version` (`"1.0"`), `workstream` (from symlink or directory
-   path), and `status` (`"active"`). Confirm `.spae/current/SPEC.md`
-   exists and `STATE.json` reports `phase: plan`. Halt immediately on
-   _unparseable_ JSON, missing `SPEC.md`, or `phase ≠ plan`; report
-   failure and make no changes.
-2. **ORIENT**—Extract goal, requirements, testing strategy, out-of-scope
-   items, and assumptions from `SPEC.md`. Capture every `R-NNN` item
-   into an in-memory coverage checklist. Gather only the source patterns
-   needed for codebase fit; never edit repository files.
-3. **PLAN**—Decompose work to cover the spec without over-splitting.
-4. **ACT**—Delete `.spae/current/PLAN.md` (ignore if absent) and clear
-   the `tasks` registry in `.spae/current/STATE.json` to empty —
-   unconditionally. Read the template from `references/PLAN.md`; consult
-   `references/prose-protocol.md` before drafting task prose. Decompose
-   work into atomic tasks numbered from `T-001`. Set each task's
-   `Satisfies` to the `R-NNN` IDs it implements and its `Intent` to a
-   one-line distillation of the goal those requirements serve—or, for an
-   enabling task, the structural purpose it serves toward the plan
-   `## Goal`. Sort tasks by dependency, risk, and vertical value; each
-   task must leave the system working.
-5. **VERIFY**—Loop over every plan validity criterion:
-   - For any `R-NNN` gap: return to `ACT`, add the missing task, then
-     re-enter `VERIFY`. Treat `Satisfies: none` as intentional; flag
-     empty or missing `Satisfies` as a scope-creep observation.
-   - For any graph violation—cycle or forward-order failure: return to
-     `ACT`, correct it, then re-enter `VERIFY`.
-   - Exit only when all `R-NNN` items map to tasks and the graph has no
-     violations.
-   - Fail only for out-of-scope conditions.
-6. **PERSIST**—Write `.spae/current/PLAN.md`. Initialize all task IDs as
-   `todo` in `.spae/current/STATE.json`. Clear `cursor` to `{}`. Set
-   `phase: inspect`. Write once, atomically. Re-read `STATE.json` after
-   writing; on a field mismatch, rewrite and re-read before `REPORT`.
-7. **REPORT**—Emit the result following the result directives and using
-   the result template.
+1. **GATE**—Make no writes:
+   - Parse `.spae/current/STATE.json`; self-heal missing metadata:
+     `version` (`"1.0"`), `workstream` (target directory name), `status`
+     (`"active"`); `PERSIST` writes the healed fields.
+   - Halt on any **Halt conditions** entry.
+2. **ORIENT**—State goal in one sentence:
+   - Source code and `SPEC.md` stay unmodified.
+   - Reset prior cycle unconditionally—the sole write before `PERSIST`;
+     reruns repeat it safely:
+     - Delete `PLAN.md` when present.
+     - Set `STATE.json` `tasks: {}`.
+   - Read `SPEC.md`; extract goal, requirements, testing strategy,
+     out-of-scope items, and assumptions; capture every `R-NNN` into a
+     coverage checklist.
+3. **PLAN**—Identify source patterns needed for codebase fit.
+4. **ACT**—Draft `PLAN.md`:
+   - Read source narrowly; widen only on uncertainty.
+   - Follow `references/PLAN.md`; number tasks from `T-001`.
+   - Set `Satisfies` to the `R-NNN` IDs a task implements and `Intent`
+     to a one-line distillation of the goal they serve.
+   - Enabling task: `Satisfies: none`; `Intent` names its structural
+     purpose toward the plan `## Goal`.
+   - Order tasks by dependency, risk, and vertical value.
+   - Apply **Directives** and **Constraints**.
+5. **VERIFY**—Loop over **Verification** criteria for `PLAN.md`:
+   - For each failure: return to `ACT`, fix, then re-enter `VERIFY`:
+     - Uncovered `R-NNN`: add a task.
+     - Task serving no requirement and no enabling purpose: remove it.
+   - Exit only when every criterion passes.
+   - Never halt on requirement content.
+6. **PERSIST**—Write in order:
+   - Write `PLAN.md`.
+   - Write `STATE.json` per `references/STATE.md` exit snapshot.
+   - Re-read `STATE.json`; on a mismatch against **Verification** state
+     criteria, rewrite and re-read before `REPORT`.
+7. **REPORT**—Emit result following result directives and using result
+   template.
 
 ## Directives
 
@@ -80,75 +78,71 @@ Reading qualifies as content-blocking.
 - Refine and optimize `PLAN.md` for agent consumption: agents read it
   for varied purposes, with no memory of this run; keep it
   self-contained, explicit, token-dense, and minimal.
-- Prefer existing codebase patterns over speculative design.
-- Slice vertically; avoid infrastructure-only tasks unless required.
+- Align with existing codebase patterns; avoid speculative design.
+- Slice vertically; avoid infrastructure-only tasks unless required;
+  leave the system working after each task.
 - Assume each task executes, reviews, and refines under a stateless
   agent with no memory beyond `PLAN.md` text and resulting source; write
-  `Context` to supply every fact that agent needs—never a detail
-  available only from planning the task.
+  `Context` to supply every fact that agent needs, including facts
+  surfaced only while planning.
 - Write acceptance criteria as observable outcomes; name testable
   behaviors for a `Satisfies`-bearing task (include failure modes and
   edge cases only when specified in `SPEC.md` or required by task
   logic); state structural assurances for a `Satisfies: none` enabling
   task.
-- Write verification as concrete test commands and deterministic checks;
-  every task's Verification section must include test execution.
-- Reject verification steps that presume human execution, an attended or
-  interactive terminal, or human presence; flag as a spec defect instead
-  of encoding them in `PLAN.md`.
-- Never add `SPAE` artifacts beyond core files and ephemeral
-  `VERIFY.md`.
-- Never generate tasks for git operations (staging, commits, tags,
-  branches) or release deployment. The plan scope concludes when local
-  tests pass against verified source code.
-- Never stage or commit `.spae/` artifacts or execute git mutations.
+- Write `Verification` as concrete, deterministic commands, including
+  test execution, per `references/verification-guide.md`; bind each step
+  to tooling available now or installed by a dependency task; schedule
+  new tooling as its own task; carry `SPEC.md` residual risks into
+  `Risk notes`.
 - Consult `references/prose-protocol.md` before drafting `PLAN.md`.
 
 ## Constraints
 
-- **Write scope**: `.spae/current/PLAN.md` and
-  `.spae/current/STATE.json`.
-- **Forbidden writes**: source code, tests, configuration files, docs,
-  `SPEC.md`, `VERIFY.md`, and any non-`SPAE` project file.
-- **Scope boundary**: Never create tasks for git mutations, package
-  publishing, or release workflows.
-- **Read-only source**: inspect repository code only for fit.
-- **Phase boundary**: hand off to `/inspect`; don't execute tasks.
-- **Autonomy**: Never ask users for input or clarification
-  mid-execution; halts and failures stop autonomously.
-- **Full autonomy**: Never write a task whose Verification section
-  depends on human execution, an attended or interactive terminal, or
-  human presence.
-- Never introduce fields to `STATE.json` outside the schema reference.
+- **Write scope**: write only `.spae/current/PLAN.md` and
+  `.spae/current/STATE.json`; forbid all other writes. Read source code
+  only for codebase fit.
+- **Phase boundary**: hand off work to `/inspect`; don't execute tasks.
+- **Version control and release**: never create tasks for version
+  control (git staging, commits, branches, tags) or release operations
+  (package publishing, deployments); plan scope ends when local tests
+  pass. Never stage or commit `.spae/` or execute git mutations.
+- **Autonomy**: never ask users for input or clarification
+  mid-execution; halts and failures stop autonomously. Never write a
+  task step presuming human execution, an attended or interactive
+  terminal, or human presence; translate such a need into automated
+  evidence, else record it in `Risk notes` as a residual risk.
+- **State schema**: never introduce `STATE.json` fields outside
+  `references/STATE.md`.
+- **Halt conditions**: halt without writing; report `Failed` with a
+  diagnostic under `Findings`:
+  - `.spae/current` missing or dangling.
+  - `STATE.json` missing or holds unparseable JSON syntax.
+  - `STATE.json` `phase` other than `plan`.
+  - `SPEC.md` missing.
 
 ## Verification
 
-- `.spae/current/PLAN.md` contains atomic, acyclic, dependency-ordered
-  tasks—no cycles; every `Dependencies` ID numerically precedes its
-  declaring task.
-- Every task includes dependencies, acceptance criteria, and
-  verification steps.
-- Zero tasks mandate git commands, commits, tags, package releases, or
-  external deployments.
-- Every `Satisfies`-bearing task's Acceptance section names testable
-  behaviors (includes failure modes and edge cases when specified in
-  `SPEC.md` or required by task logic); a `Satisfies: none` task's
-  Acceptance states structural assurances provided instead.
-- Every task's Verification section includes test execution commands.
-- No task's Verification section depends on human execution, an attended
-  or interactive terminal, or human presence.
-- Every task includes an `Intent` line distilled from the requirements
-  it satisfies, or—for an enabling task—its structural purpose toward
-  the plan `## Goal`.
-- `.spae/current/PLAN.md` structures tasks and metadata matching
+- `PLAN.md` holds atomic tasks in structure matching
   `references/PLAN.md` exactly.
-- Every `T-NNN` reference in `PLAN.md` — `Task graph` edges, the
-  dependency overview list, and `Dependencies` fields—resolves to a
-  defined task.
-- `.spae/current/STATE.json` task registry matches `PLAN.md` task IDs.
 - Every `SPEC.md` requirement maps to at least one task's `Satisfies`.
-- `.spae/current/STATE.json` contains `phase: "inspect"`.
-- No files outside the allowed `SPAE` write scope changed.
+- Every task carries an `Intent` distilled from the requirements it
+  satisfies, or—for a `Satisfies: none` enabling task—its structural
+  purpose toward the plan `## Goal`.
+- Every `Dependencies` ID numerically precedes its declaring task; every
+  `T-NNN` reference—`Task graph` edges, the overview list, and
+  `Dependencies` fields—resolves to a defined task.
+- Every `Satisfies`-bearing task's `Acceptance` names testable behaviors
+  (failure modes and edge cases when `SPEC.md` specifies them or task
+  logic requires them); every enabling task's `Acceptance` states
+  structural assurances.
+- Every task's `Verification` includes test execution; no step presumes
+  human execution, an attended or interactive terminal, or human
+  presence.
+- Zero tasks mandate version control or release operations.
+- `STATE.json` specifies `phase: "inspect"`, `status: "active"`,
+  `cursor: {}`, and `tasks` mapping every `PLAN.md` task ID to `"todo"`.
+- No files outside **Write scope** changed.
 
 ## Result directives
 
@@ -157,10 +151,10 @@ Reading qualifies as content-blocking.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
-- Emit the result template as live markdown—never in a code fence.
-- Output nothing outside the template.
-- Source every `SPAE Status` value from the confirmed re-read, never
-  from working memory of intent.
+- Emit result template as live markdown—never in a code fence.
+- Output nothing outside template.
+- Source every `SPAE Status` value from confirmed re-read, never from
+  working memory of intent.
 
 ### Result template
 
@@ -179,10 +173,9 @@ Reading qualifies as content-blocking.
 
 > **`SPAE` Status** • `[workstream-name]`
 > **Result**: [Plan Complete | Failed]
-> **Phase Complete**: `/plan`
-> **Next Phase**: `/inspect`
+> **Next Phase**: `/inspect`  _(unless failed)_
 > **Impact**: [Terse impact statement]
 >
-> _Run `/inspect` to optimize and verify `PLAN.md`._
+> _Run `/inspect` to optimize and verify `PLAN.md`._  _(unless failed)_
 ```
 <!-- prettier-ignore-end -->

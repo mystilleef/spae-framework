@@ -1,5 +1,5 @@
 ```md
-# SPEC: [workstream — goal title]
+# SPEC: [workstream—goal title]
 
 ## Goal
 
@@ -14,19 +14,19 @@
 
 ## Testing strategy
 
-- **Approach**: [unit | integration | e2e | manual—list all that apply;
-  manual means agent-executed, unattended inspection, never human
-  execution or an interactive terminal]
+- **Approach**: [unit | integration | e2e | automated inspection—list
+  all that apply; follow `verification-guide.md`]
 - **Expected behavior**: [What succeeds under valid inputs]
-- **Failure modes**: [What fails, errors, or rejects — if applicable]
-- **Edge cases**: [Boundary, empty, nil, or zero-value conditions — if
+- **Failure modes**: [What fails, errors, or rejects—if applicable]
+- **Edge cases**: [Boundary, empty, nil, or zero-value conditions—if
   applicable]
-- **Exclusions**: [What to skip — if applicable]
+- **Exclusions**: [What to skip—if applicable]
 
 ## Out of scope
 
-- [Excluded item — reason]
-- Git repository management and release deployments — SPAE governs
+- [Excluded item—reason]
+- [Outcome lacking practical automated evidence—residual risk]
+- Git repository management and release deployments—SPAE governs
   verified local source and test modifications only
 
 ## Assumptions

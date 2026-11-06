@@ -2,38 +2,33 @@
 
 ## Field reference
 
-| Field                   | Type   | Valid values                                                                                       | Category           | `/fix` notes                                                        |
-| ----------------------- | ------ | -------------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------- |
-| `version`               | string | `"1.0"`                                                                                            | Derivable Metadata | Fixed; inject `"1.0"` when omitted                                  |
-| `workstream`            | string | kebab-case slug                                                                                    | Derivable Metadata | Infer from path or symlink target when omitted                      |
-| `phase`                 | string | `"spec"` \| `"plan"` \| `"inspect"` \| `"build"` \| `"check"` \| `"fix"` \| `"verify"` \| `"done"` | Execution State    | Enter `fix`; exit `check` on success only                           |
-| `status`                | string | `"active"` \| `"revision_required"` \| `"completed"`                                               | Derivable Metadata | Preserve; default to `"active"`; `/fix` writes no status transition |
-| `cursor.active_task_id` | string | `"T-NNN"`                                                                                          | Execution State    | Must name the active in-progress task; never move it                |
-| `tasks`                 | object | `{ "T-NNN": "todo" \| "in_progress" \| "done" }`                                                   | Execution State    | Active task must read `in_progress`; `/fix` never changes it        |
+| Field                   | Type   | Valid values                                                                                       | Category           | Notes                                                                                                        |
+| ----------------------- | ------ | -------------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `version`               | string | `"1.0"`                                                                                            | Derivable Metadata | Fixed; default `"1.0"` when omitted                                                                          |
+| `workstream`            | string | kebab-case slug                                                                                    | Derivable Metadata | Infer from path or symlink target when omitted                                                               |
+| `phase`                 | string | `"spec"` \| `"plan"` \| `"inspect"` \| `"build"` \| `"check"` \| `"fix"` \| `"verify"` \| `"done"` | Execution State    | Phase to run next; `"done"` ends the `workstream`                                                            |
+| `status`                | string | `"active"` \| `"revision_required"` \| `"completed"`                                               | Derivable Metadata | Default `"active"`; `"revision_required"` only with `phase: "spec"`, `"completed"` only with `phase: "done"` |
+| `cursor.active_task_id` | string | `"T-NNN"`                                                                                          | Execution State    | Active task ID; `cursor: {}` while `phase` reads `"spec"`, `"plan"`, or `"inspect"`                          |
+| `tasks`                 | object | `{ "T-NNN": "todo" \| "in_progress" \| "done" }`                                                   | Execution State    | Maps every task ID to its progress; `tasks: {}` while `phase` reads `"spec"` or `"plan"`                     |
 
 ## Directives
 
-- **Entry**: read `STATE.json` at start; confirm `phase: "fix"` and an
-  active task. Self-heal metadata: inject missing `version: "1.0"`,
-  `workstream` (from path or symlink target), and `status: "active"`.
-  Self-heal state drift: if `tasks[`active_task_id`]` reads `"todo"` or
-  lacks an entry, correct it to `"in_progress"` and write `STATE.json`
-  to disk before proceeding. Halt on state drift: if
-  `tasks[`active_task_id`]` reads `"done"`, halt and report; make no
-  further `STATE.json` write. Halt on _unparseable_ JSON, unrecognized
-  `phase`, or missing `FIX.md`.
-- **Success**: write `phase: "check"` only. Preserve `status`, `cursor`,
-  `tasks`, `version`, and `workstream` exactly.
-- **Failure**: make no `STATE.json` write. Leave `FIX.md` and every
-  field untouched; halt and report the failure in the result only.
-- Write `STATE.json` once, atomically, and only on success.
-- Maintain consistent `workstream` and `version` fields.
-- Confirm the write with a fresh read before treating the write as done;
-  a field mismatch counts as an unmet `VERIFY` criterion, not a finished
-  write.
-- A forgotten write—not a task failure—stalls orchestrator dispatch and
-  corrupts manual resumption; the write here gates automation, not
-  bookkeeping.
+- Read `STATE.json` at entry; require `phase: "fix"`. Self-heal missing
+  metadata: `version: "1.0"`, `workstream` (target directory name), and
+  `status: "active"`; self-heal a `"todo"` or missing
+  `tasks[active_task_id]` to `"in_progress"`. Halt on _unparseable_ JSON
+  syntax, any other `phase`, or `tasks[active_task_id]` reading
+  `"done"`.
+- Write `STATE.json` once, at `PERSIST`, before deleting `FIX.md`; never
+  mutate it earlier.
+- **Exit**: write `phase: "check"`; keep the cursor and
+  `tasks[active_task_id]: "in_progress"`.
+- **Halt**: write nothing; `phase` stays `"fix"`.
+- Confirm every write with a fresh read before treating the write as
+  done; on a field mismatch, rewrite and re-read.
+- A forgotten or partial write—not a task failure—stalls orchestrator
+  dispatch and corrupts manual resumption; every write here gates
+  automation, not bookkeeping.
 
 ## Snapshots
 
@@ -50,7 +45,7 @@
 }
 ```
 
-**Exit — success**:
+**Exit—success**:
 
 ```json
 {
@@ -63,4 +58,4 @@
 }
 ```
 
-**Exit — failure**: no write occurs. State remains identical to entry.
+**Exit—failure**: no write; state matches **Entry**.

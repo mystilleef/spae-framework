@@ -78,10 +78,15 @@ checklist and diff-only audit scope.
    - When scope includes test files, read
      `references/test-pruning-guide.md` and detect bloat using its smell
      catalog.
-   - Exit immediately if the survey finds none of: dead code, redundant
-     abstractions, unused helpers, over-engineered constructs,
-     non-idiomatic patterns, hygiene debt, or test-suite bloat. Emit
-     `Result: No Changes` via the template below and halt.
+   - Record one detection line per category: `KISS`, `YAGNI`,
+     `Idiomatic`, `Hygiene`, and test-suite bloat when scope includes
+     test files. Each line names code examined (or why none applies) and
+     violations found.
+   - Once every category carries a line, exit if the survey finds none
+     of: dead code, redundant abstractions, unused helpers,
+     over-engineered constructs, non-idiomatic patterns, hygiene debt,
+     or test-suite bloat. Emit `Result: No Changes` via the template
+     below and halt.
    - When detected waste carries high regression risk resisting safe
      verification under existing tests: record in `Findings`, omit
      edits, and emit `Result: No Changes`.
@@ -133,6 +138,9 @@ checklist and diff-only audit scope.
 - Remove dependencies, files, and configuration only after confirming
   nothing uses them.
 - Optimize measurable or visible waste; avoid speculative tuning.
+- Surface detection as one `Actions` line (for example,
+  `detection: 4/4 categories; 1 found`); keep per-category detail out of
+  the result.
 
 ## Constraints
 
@@ -180,6 +188,8 @@ checklist and diff-only audit scope.
 
 ## Verification
 
+- Every detection line names code examined or why none applies—restating
+  the category never counts.
 - Relevant tests pass with no new failures.
 - Code compiles or type-checks where applicable.
 - Coverage protects modified behavior or documented gaps remain.

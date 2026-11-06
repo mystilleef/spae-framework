@@ -1,42 +1,34 @@
 ---
 name: spae-build
 description:
-  Atomic execution for the project framework. Executes exactly one
-  atomic task from `PLAN.md`.
+  Atomic Execution for the `SPAE` framework. Executes exactly one atomic
+  task from `PLAN.md`.
 user-invocable: true
 ---
 
-# Build
+# Build (`SPAE`)
 
 ## When to use
 
-- `STATE.json` has `phase: build`.
-- The work stream needs the next planned task completed.
+- `STATE.json` reads `phase: build`: implement the active `PLAN.md`
+  task.
 
 ## Goal
 
-- Execute exactly one task from `PLAN.md`, mutating source/tests plus
-  `STATE.json`, while preserving the framework execution cursor.
-- Complete the active task with minimal production code that meets
-  exhaustive tests, serves its `Intent` and the plan `## Goal`, and
-  leaves seams for downstream tasks.
-- Meet the task acceptance criteria through exhaustive tests and task
-  verification steps.
-- Hand off to `/check` for the `done` transition and cursor advance;
-  never claim either.
+- Implement exactly the active `PLAN.md` task, test-first, so it meets
+  every `Acceptance` criterion, serves its `Intent` and the plan
+  `## Goal`, and leaves seams for forward tasks.
+- Advance the `workstream` to `phase: check`.
 
 ## Input
 
-Read:
+Read only what the active task requires:
 
-- `.spae/current/STATE.json` for phase, cursor, and task registry
-  (consult `references/STATE.md` for field reference, directives, and
-  phase snapshots).
-- `.spae/current/PLAN.md` for the plan `## Goal`, the active task, its
-  `Intent`, acceptance criteria, and verification steps; they carry all
-  the goal context build needs.
-- Relevant project source, tests, docs, and configuration needed for the
-  active task.
+- `.spae/current/STATE.json`; `references/STATE.md` holds field
+  reference, directives, and snapshots.
+- `.spae/current/PLAN.md`; it carries all goal context.
+- Repository source, tests, docs, and configuration the active task
+  touches.
 
 ## Testing
 
@@ -50,145 +42,130 @@ checklist and diff-only audit scope.
 
 ## Workflow
 
-1. **GATE**—Read `.spae/current/STATE.json`; confirm `phase: build` and
-   an active task cursor. Self-heal metadata: inject missing `version`
-   (`"1.0"`), `workstream` (from symlink or directory path), and
-   `status` (`"active"`). Halt on state drift: if
-   `tasks[`active_task_id`]` reads `"done"`, halt; report and make no
-   changes. Halt on _unparseable_ JSON, unrecognized phase, or active
-   task missing from `PLAN.md`. Read the plan `## Goal` and active task
-   section — including its `Intent` — from `.spae/current/PLAN.md`. Read
-   dependent and forward task titles plus acceptance criteria to map
-   seams, not build them. Verify every task ID in the active task's
-   `Dependencies` field carries status `"done"` in `tasks` registry in
-   `STATE.json`; fail the task for any incomplete dependency.
-2. **ORIENT**—State the goal in one sentence: execute the active task
-   and hand off to `/check`. Name what won't change: `PLAN.md`,
-   `SPEC.md`, and forward-task seams. Capture pre-task baseline snapshot
-   per `references/cleanup-guide.md`. **Task status update**: set
-   `tasks[`active_task_id`]` to `"in_progress"` in
-   `.spae/current/STATE.json`.
-3. **PLAN**—Declare the full implementation path that satisfies every
-   acceptance criterion, advances the task `Intent` and plan `## Goal`,
-   and leaves seams for forward tasks. Read
-   `references/testing-guide.md`, `references/shell-command-guide.md`,
-   and `references/cleanup-guide.md`. Map the test surface per
-   criterion: expected behaviors, failure modes, and edge cases. Choose
-   among valid implementations by goal fit, not local convenience.
-4. **ACT**—Iterate over every acceptance criterion:
+1. **GATE**—Make no writes:
+   - Parse `.spae/current/STATE.json`; self-heal missing metadata:
+     `version` (`"1.0"`), `workstream` (target directory name), `status`
+     (`"active"`); `PERSIST` writes the healed fields.
+   - Halt on any **Halt conditions** entry.
+2. **ORIENT**—State goal in one sentence:
+   - `PLAN.md` stays unmodified; forward tasks stay unbuilt.
+   - Read the plan `## Goal` and the active task in full; read the
+     `Acceptance` of its `Dependencies` tasks as the contracts it may
+     rely on, and of forward tasks as seams to keep open.
+   - Capture the pre-task baseline per `references/cleanup-guide.md`.
+   - Mark in progress—the sole write before `PERSIST`; reruns repeat it
+     safely: set `STATE.json` `tasks[active_task_id]` to
+     `"in_progress"`.
+3. **PLAN**—Declare the implementation path:
+   - Read `references/testing-guide.md` and
+     `references/shell-command-guide.md`.
+   - Map the test surface per `Acceptance` criterion: expected
+     behaviors, failure modes, and edge cases.
+   - Choose among valid implementations by fit to the task `Intent`, the
+     plan `## Goal`, and forward seams, not local convenience.
+   - Halt on any **Halt conditions** entry.
+4. **ACT**—Per `Acceptance` criterion, repeat `test→implement` until it
+   passes:
    - Write a failing test: expected behavior, failure modes, and edge
      cases.
-   - Write minimal code to pass it.
-   - Drive green; repeat `test→implement` until the criterion passes.
-
-   Stop when all criteria have exhaustive passing test coverage. Never
-   write production code before its test exists. Edit only source,
-   tests, docs, or configuration files required by the task.
-
-5. **VERIFY**—Loop over every acceptance criterion and verification
-   command listed for the active task:
-   - Audit every added or updated test file against CI Parity rules in
-     `references/testing-guide.md`; fix any violation before proceeding.
+   - Write the minimal code that passes it.
+   - Apply **Directives** and **Constraints**.
+5. **VERIFY**—Loop over **Verification** criteria for the active task:
    - Audit task edits against the pre-task baseline using the
      Self-cleanup checklist in `references/cleanup-guide.md`; remove
      every self-introduced artifact before proceeding.
-   - For each unmet criterion or failing command: return to `ACT`,
-     execute, then re-enter `VERIFY`.
-   - Exit only when all criteria pass and all commands succeed.
-   - Fail only for out-of-scope conditions: infeasible acceptance
-     criterion, plan/spec defect, or broken external dependency.
-6. **PERSIST**—Set `.spae/current/STATE.json` `phase: check`. `/check`
-   owns the `done` transition and cursor advance. Re-read `STATE.json`
-   after writing; on a field mismatch, rewrite and re-read before
-   `REPORT`.
-7. **REPORT**—Emit the result following the result directives and using
-   the result template.
+   - For each failure: return to `ACT`, fix, then re-enter `VERIFY`.
+   - Exit only when every criterion passes.
+   - Halt only on a **Halt conditions** entry.
+6. **PERSIST**—Write in order:
+   - Write `STATE.json` per `references/STATE.md` exit snapshot.
+   - Re-read `STATE.json`; on a mismatch against **Verification** state
+     criteria, rewrite and re-read before `REPORT`.
+7. **REPORT**—Emit result following result directives and using result
+   template:
+   - `Result`: `Implemented, pending check` after `PERSIST`, else
+     `Failed`.
+   - List under `Findings`: each assumption made and each forward task
+     designed around.
 
 ## Directives
 
-- Optimize all operations for agent, token, and context efficiency.
-- Consult `references/shell-command-guide.md` for command safety,
-  timeouts, redirects, and non-interactive environment directives.
-- Consult `references/cleanup-guide.md` for self-introduced-artifact
-  scope, baseline snapshotting, and checklist directives.
-- Execute exactly one atomic task per invocation.
-- Prefer existing project patterns over new design.
-- Keep production code minimal, local, and test-driven; never reduce
-  test scope.
-- Look ahead, don't act ahead: read forward tasks to avoid foreclosing
-  them; never build beyond the active task. Name any forward task you
-  designed around in the result.
-- Tests drive every task; write them first, exhaustively, before any
-  production code. Implementation serves tests, never the reverse.
-- Write every category of test the task demands: unit, integration,
-  end-to-end, or otherwise. Cover expected behavior, failure modes, and
-  edge cases exhaustively.
+- Optimize for agent, token, and context efficiency.
+- Align with existing codebase patterns; avoid speculative design.
+- Never write production code before its test exists; write every test
+  category the task demands—unit, integration, end-to-end.
+- Treat a failing test or check as ordinary build work; drive it green.
 - When the task legitimately changes a contract, update the tests it
-  invalidates to the new contract; never weaken, skip, or delete a test
-  to force green.
-- Run task verification before changing `.spae/current/STATE.json`.
-- Drive verification green; treat red as ordinary build work. Fail the
-  task only when verification can't pass within task scope: infeasible
-  acceptance criterion, plan/spec defect, or broken external dependency;
-  never to escape fixing your own code, never by gaming a test or
-  editing the plan.
-- Fail the task when it as written logically contradicts the plan
-  `## Goal`, the task `Intent`, or a downstream task—an undeniable
-  conflict, not a subjective doubt. Report it in the result; make no
-  `.spae/current/STATE.json` write. Leave ambiguous interpretation to
-  `/verify`; never ship a locally correct, globally wrong
-  implementation.
-- When task requirements lack detail, choose the assumption most
-  consistent with the task `Intent` and plan `## Goal`, record it in the
-  result under Findings, and proceed.
+  invalidates to the new contract.
+- Execute `Verification` steps as planned per
+  `references/verification-guide.md`; never discover, install, or
+  calibrate tooling ad hoc.
+- Resolve underspecified requirements with the assumption most
+  consistent with the task `Intent` and the plan `## Goal`, then
+  proceed; never ship a locally correct, globally wrong implementation.
 
 ## Constraints
 
-- Exercise exclusive authority to edit source code, tests,
-  documentation, configuration, and other non-framework project files
-  during this phase.
-- Never edit `.spae/current/PLAN.md` during `/build`.
-- Never edit `.spae/current/SPEC.md` during `/build`.
-- Never execute more than one task.
-- Never execute git mutations (staging, commits, branches, tags, pushes,
-  or releases); never stage or commit `.spae/` artifacts.
-- Avoid incidental refactoring, cleanup, formatting, or dependency churn
-  outside the active task; never delete pre-existing uncommitted files
-  or edit outside active-task scope.
-- **Autonomy**: Never ask users for input or clarification
-  mid-execution; halts and failures stop autonomously.
-- **Full autonomy**: Never perform or request human execution, an
-  attended or interactive terminal, or human presence to meet a
-  verification step; treat any such dependency as an out-of-scope
-  failure (plan/spec defect).
-- Never introduce fields to `STATE.json` outside the schema reference.
-- No hacks, workarounds, or shortcuts.
-- Forbid laziness; fix issues properly, correctly, and idiomatically.
-- Never edit build or tool configuration files as a workaround; build
-  and tool configuration changes only apply when the active task's
-  acceptance criteria explicitly require them.
-- Never suppress or turn off compiler or linter diagnostics; for
-  example, `@ts-ignore`, `eslint-disable`, `@SuppressWarnings`,
-  `# type: ignore`.
-- Never weaken type contracts to silence errors; for example, `as any`,
-  `!` non-null assertions, or broadening union types.
+- **Write scope**: edit only the source, tests, docs, and configuration
+  the active task requires, plus `.spae/current/STATE.json`; forbid all
+  other writes. Byproducts of a command run for evidence, such as a
+  formatter's rewrites, never count as this phase's writes; never run a
+  command for its write effect outside this scope. Never delete
+  pre-existing uncommitted files.
+- **Phase boundary**: execute exactly one task; hand off work to
+  `/check`; never mark a task `"done"` or move the cursor.
+- **Version control and release**: never execute git mutations (staging,
+  commits, branches, tags, pushes) or release operations. Never stage or
+  commit `.spae/`.
+- **Autonomy**: never ask users for input or clarification
+  mid-execution; halts and failures stop autonomously. Never perform or
+  request human execution, an attended or interactive terminal, or human
+  presence.
+- **State schema**: never introduce `STATE.json` fields outside
+  `references/STATE.md`.
+- **Halt conditions**: halt with no further `STATE.json` write; report
+  `Failed` with a diagnostic under `Findings`:
+  - `.spae/current` missing or dangling.
+  - `STATE.json` missing or holds unparseable JSON syntax.
+  - `STATE.json` `phase` other than `build`.
+  - `PLAN.md` missing, `cursor.active_task_id` missing, or the active
+    task absent from `PLAN.md`.
+  - `tasks[active_task_id]` reads `"done"`.
+  - A `Dependencies` task not `"done"` in `tasks`.
+  - The task can't pass within its scope: an infeasible `Acceptance`
+    criterion, a broken external dependency, an unrunnable planned
+    `Verification` step, a step requiring human presence, or the task as
+    written contradicting the plan `## Goal`, its `Intent`, or a forward
+    task—an undeniable conflict, not a subjective doubt.
+- **Scope control**: no incidental refactoring, cleanup, formatting, or
+  dependency churn outside the active task.
+- **Integrity**: fix issues properly and idiomatically; no hacks,
+  workarounds, or shortcuts:
+  - Never suppress compiler or linter diagnostics—for example,
+    `@ts-ignore`, `eslint-disable`, `@SuppressWarnings`,
+    `# type: ignore`.
+  - Never weaken type contracts to silence errors—for example, `as any`,
+    `!` non-null assertions, or broadened union types.
+  - Never edit build or tool configuration as a workaround; change it
+    only when an `Acceptance` criterion requires it.
+  - Never weaken, skip, delete, or game a test to force a pass.
 
 ## Verification
 
-- Active task acceptance criteria pass.
-- All task verification steps pass.
+- Every `Acceptance` criterion passes.
+- Every task `Verification` step passes.
 - Relevant project tests pass with no new failures.
 - Task tests cover expected behavior, failure modes, and edge cases
   exhaustively; no thin-coverage shortcuts.
-- All added or updated tests pass CI Parity audit in
+- Every added or updated test passes the CI parity rules in
   `references/testing-guide.md`.
-- No self-introduced cleanup violation remains per
-  `references/cleanup-guide.md`.
-- Implementation advances the task `Intent` and plan `## Goal`; no
+- No self-introduced artifact remains per `references/cleanup-guide.md`.
+- Implementation advances the task `Intent` and the plan `## Goal`; no
   forward-task work performed.
-- `.spae/current/STATE.json` shows `phase: check`; the active task stays
-  `in_progress`; cursor remains untouched.
-- `.spae/current/PLAN.md` and `.spae/current/SPEC.md` remain unchanged.
+- The task diff breaks no **Integrity** rule.
+- `STATE.json` specifies `phase: "check"`,
+  `tasks[active_task_id]: "in_progress"`, and the entry cursor.
+- This phase wrote no file outside **Write scope**.
 
 ## Result directives
 
@@ -197,10 +174,10 @@ checklist and diff-only audit scope.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
-- Emit the result template as live markdown—never in a code fence.
-- Output nothing outside the template.
-- Source every `SPAE Status` value from the confirmed re-read, never
-  from working memory of intent.
+- Emit result template as live markdown—never in a code fence.
+- Output nothing outside template.
+- Source every `SPAE Status` value from confirmed re-read, never from
+  working memory of intent.
 
 ### Result template
 
@@ -213,16 +190,16 @@ checklist and diff-only audit scope.
 - **Files**:
   - [Terse list of affected files]
 - **Tests**:
-  - [Terse list of tests written — behaviors, failure modes, and edge cases covered]
+  - [Terse list of tests written—behaviors, failure modes, and edge cases covered]
 - **Findings**:
   - [Terse list of notable findings]
 - **Summary**:
   - [Terse list of summary of changes]
 
 > **`SPAE` Status** • `[workstream-name]`
+> **Result**: [Implemented, pending check | Failed]
 > **Active Task**: `T-XXX` - [Task title]
-> **Status**: Implemented, pending check
 >
-> _Run `/check` to verify the completed task._
+> _Run `/check` to verify the completed task._  _(unless failed)_
 ```
 <!-- prettier-ignore-end -->

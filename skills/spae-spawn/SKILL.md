@@ -1,12 +1,13 @@
 ---
 name: spae-spawn
 description: >-
-  Executes the build phase of the SPAE structured workflow autonomously,
-  cycling build, check, and fix per task.
+  Execution Orchestrator for the `SPAE` framework. Spawns the `build`,
+  `check`, and `fix` subagents per task until the `workstream` reaches
+  `phase: verify`.
 user-invocable: false
 ---
 
-# Spawn
+# Spawn (`SPAE`)
 
 ## When to use
 
@@ -16,8 +17,7 @@ user-invocable: false
 ## Goal
 
 - Spawn the subagent matching the current `STATE.json` phase, looped
-  until every task completes.
-- Ensure `phase: verify` in `STATE.json` once the loop exits.
+  until the `workstream` reaches `phase: verify`.
 
 ## Input
 
@@ -41,59 +41,48 @@ regardless of phase:
 
 ## Workflow
 
-1. **Validate State**: Confirm `STATE.json` has `phase` in `"build"`,
-   `"check"`, `"fix"` and a populated `cursor.active_task_id`. Halt on
-   _unparseable_ JSON, missing `STATE.json`, or an unrecognized `phase`.
-2. **Dispatch Loop**:
-   - Re-read `.spae/current/STATE.json`; record `phase`.
+After each read, check the exit first; halt on any **Halt conditions**
+entry after every non-exit read and every spawn.
+
+1. **Dispatch Loop**:
+   - Read `.spae/current/STATE.json`; record `phase`.
    - Exit on `phase: "verify"`.
-   - Halt immediately if `phase` matches none of the phase-agent map's
-     rows.
-   - Spawn the subagent the map names for the recorded `phase`, no
-     arguments.
-   - Await completion; halt immediately on `Failed` status or any
-     process failure (crash, timeout, `AgentError`).
-   - Re-read `.spae/current/STATE.json`; halt immediately if `phase`
-     matches the value recorded at the start of this iteration.
-   - Repeat step 2.
-3. **Finalize Phase**: Confirm `STATE.json` shows `phase: "verify"`.
-   Emit the final completion feedback.
+   - Spawn the subagent the map names for `phase`, no arguments; await
+     completion.
+   - Repeat step 1.
+2. **Report**: emit the result per **Result directives**:
+   - `Result`: `Completed` on an exit; `Halted` when a subagent reports
+     `Failed` or leaves `phase` unchanged; `Failed` on any other **Halt
+     conditions** entry.
 
 ## Directives
 
-- Limit actions entirely to orchestration.
 - Always use the subagent tool for subagent invocation.
-- Trust `STATE.json` over subagent result.
-- Halt immediately on subagent `Failed` status or any process failure
-  (crash, timeout, `AgentError`).
-- List of agents permitted to invoke:
-  - `build`
-  - `check`
-  - `fix`
+- Route only from `STATE.json` `phase`; trust it over subagent output
+  text.
+- Spawn only the subagents the phase-agent map names.
 
 ## Constraints
 
-- Restrict your activities to:
-  - Reading `.spae/current/STATE.json`.
-  - Using the subagent tool to spawn agents the phase-agent map names.
-- Never write to any project file.
-- Never activate skills.
-- Never invoke agents outside the permitted list.
-- Never execute git mutations (staging, commits, tags, pushes, or releases).
-- Never run `subagents` in parallel or concurrently.
-- Never prompt the user for decisions mid-run; let failures halt
-  execution.
-- Never perform activities beyond subagent invocation, state tracking,
-  and reporting.
+- Restrict activities to spawning subagents, reading
+  `.spae/current/STATE.json`, and reporting; never write files, run git
+  operations, activate skills, or prompt the user mid-run.
+- Never run subagents in parallel or concurrently.
+- **Halt conditions**: halt immediately; report per **Report** with
+  `Halted at` and `Reason`:
+  - `STATE.json` missing at a loop read, or holding unparseable JSON
+    syntax.
+  - `phase` matching no phase-agent map row.
+  - `cursor.active_task_id` missing.
+  - `phase` unchanged since the previous spawn.
+  - A subagent `Failed` result or process failure (crash, timeout,
+    `AgentError`).
 
 ## Verification
 
-- Confirm every spawned subagent's phase matches the phase-agent map at
-  spawn time.
-- Confirm `phase` changes on every iteration; halt on a stalled phase.
-- Confirm all tasks show `done` state upon completion.
-- Confirm the `workstream` advanced to `phase: verify`.
-- Confirm zero project writes from the orchestration agent itself.
+- Every spawn matched the phase-agent map row for the recorded `phase`.
+- The run ended on an exit or a **Halt conditions** entry.
+- The orchestrator wrote no file.
 
 ## Result directives
 
@@ -116,14 +105,15 @@ regardless of phase:
 - **Files**:
   - [Terse list of files affected by spawned subagents]
 - **Findings**:
-  - [Terse list of findings from spawned subagent]
+  - [Terse list of findings from spawned subagents]
 - **Summary**:
   - [Terse list of summary from spawned subagents]
 
 > **`SPAE` Spawn** • `[workstream]`
 > **Result**: [Completed | Halted | Failed]
-> **Halted at**: `[Task ID]`  _(if halted)_
-> **Remaining**: [Y] tasks    _(if halted)_
+> **Halted at**: `[Task ID]`  _(unless completed)_
+> **Reason**: [Terse explanation]     _(unless completed)_
+> **Remaining**: [Y] tasks    _(unless completed)_
 > **Impact**: [Terse impact statement]
 ```
 <!-- prettier-ignore-end -->

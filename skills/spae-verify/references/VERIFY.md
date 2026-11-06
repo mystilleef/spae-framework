@@ -1,9 +1,9 @@
 ```md
-# Verify: [workstream — goal title]
+# Verify: [workstream—goal title]
 
 ## Hard blocks
 
-- **[R-NNN]**
+- **[R-NNN | none]**
   - **File**: `path:line`
   - **Expected**: [expected result]
   - **Actual**: [actual result]
@@ -11,12 +11,12 @@
 
 ## Soft findings
 
-- **[R-NNN]**
+- **[R-NNN | none]**
   - **File**: `path:line`
   - **Concern**: [concern]
   - **Evidence**: [evidence]
 
 ## Observations
 
-- [note — no verdict impact]
+- [note—no verdict impact]
 ```

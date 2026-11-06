@@ -95,4 +95,5 @@ another skill's diff (for example, `/check`):
 - No _untracked_ file created during the task invocation survives
   outside declared Scope/Files.
 - No dependency added during this task goes unused.
-- Pre-existing uncommitted files outside task scope remain unmodified.
+- Task edits leave pre-existing uncommitted files outside task scope
+  unmodified.

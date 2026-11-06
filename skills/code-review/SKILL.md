@@ -73,21 +73,22 @@ Gather intent grounding matching the resolved scope:
      `DESIGN.md`), nearby code, and tests for grounding.
    - Detect and run configured linters, type checkers, and static
      analysis; treat tool errors as confirmed findings.
-   - Sweep up to `PHASE_CAP` (7) phases against a running ledger; stop
-     the first phase that contributes zero new candidates:
+   - Sweep all `PHASE_COUNT` (8) phases against a running ledger; a
+     phase with zero new candidates never ends the sweep:
      - Each phase scans every category below in full before consulting
        the ledger—produce the complete candidate list first, then
        dedupe. Skipping already-covered ground before scanning defeats
        the sweep.
-     - Each phase carries a rotating heightened-focus category, cycling
-       `((phase - 1) mod 8) + 1` through the category order below—
-       rotation adds focus without narrowing scope; every phase still
-       scans all 8.
+     - Phase `N` carries heightened focus on category `N` in the order
+       below—focus adds attention without narrowing scope; every phase
+       still scans all 8.
      - Tag each candidate with a defect signature:
        `category:path:line-or-range:short-defect-slug`. Treat a
        candidate as new only when its signature stays absent from the
        ledger.
-     - Append new candidates to the ledger after each phase.
+     - Append new candidates to the ledger after each phase, then record
+       one phase line: focus category, code traced for it (or why none
+       applies), and new-candidate count.
    - Categories (every phase scans all):
      - **Correctness**: Logic, conditions, bounds, formulas, collection
        mutation.
@@ -133,10 +134,9 @@ Gather intent grounding matching the resolved scope:
   - Emit `Nit` only when trivially co-located with a higher-severity
     finding.
 - Verdict: `Request Changes` (any confirmed Critical/High with a
-  concrete trigger scenario and material impact) · `Comment`
-  (Medium/Low only) · `Approve` (no
-  findings). Derive verdict from `findings` only—`suppressed_findings`
-  never shifts it.
+  concrete trigger scenario and material impact) · `Comment` (Medium/Low
+  only) · `Approve` (no findings). Derive verdict from `findings`
+  only—`suppressed_findings` never shifts it.
 - Filter candidate findings against the app threat model, `KISS`, and
   `YAGNI`; reject defensive bloat, ungrounded guardrails, and
   theoretical defects outside realistic execution paths.
@@ -144,16 +144,17 @@ Gather intent grounding matching the resolved scope:
 - Suggest targeted, scope-appropriate fixes; don't rewrite the patch.
 - Omit empty categories and "none found" sections.
 - Verify findings against `AGENTS.md` before reporting.
-- Default to `PHASE_CAP` (7) phases as a single named constant—never
-  scatter phase-count literals across the workflow.
-- Surface phases run in the result `Actions` list (for example,
-  `ran 3/7 phases, stopped on saturation`).
+- Keep `PHASE_COUNT` (8) equal to the category count as a single named
+  constant—never scatter phase-count literals across the workflow.
+- Surface each phase line in the result `Actions` list (for example,
+  `phase 3 (Concurrency): traced usage cache writes; 1 new`), then the
+  total (`ran 8/8 phases`); state the cause of any shortfall.
 
 ## Constraints
 
 - No finding without direct code evidence.
-- Preserve security coverage: trace trust boundaries, assess impact,
-  and recommend fixes. Don't develop weaponized exploits, access live
+- Preserve security coverage: trace trust boundaries, assess impact, and
+  recommend fixes. Don't develop weaponized exploits, access live
   systems, or bypass safeguards to validate findings.
 - No praise, broad commentary, or unrelated cleanup requests.
 - No large raw tool output; summarize diagnostics.
@@ -193,8 +194,10 @@ Gather intent grounding matching the resolved scope:
 - Ledger dedup keys off the defect signature
   (`category:path:line-or-range:slug`)—no phase counts a finding new
   without a fresh signature.
-- Phase sweep halts on the first zero-new-finding phase, or at
-  `PHASE_CAP` (7), whichever comes first.
+- Phase sweep ran all `PHASE_COUNT` (8) phases; no zero-new-candidate
+  phase ended it.
+- Every phase line names concrete code traced for its focus category or
+  why none applies—restating the category never counts.
 
 ## Result directives
 

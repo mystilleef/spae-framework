@@ -62,11 +62,15 @@ checklist and diff-only audit scope.
    - Read `references/cleanup-guide.md`.
    - Read relevant production code, adjacent tests, and test commands.
    - Confirm automated test suite passes before touching code.
-   - Detect `antipatterns` using the violation catalog in
-     `references/refactoring-guide.md`.
-   - **Short-circuit**: halt and emit `Result: No Changes` if none
-     detected: duplicated logic, long methods, large classes,
-     `primitive` obsession, `SOLID` violations.
+   - Detect `antipatterns` using the `DRY`, `SRP`, `OCP`, `LSP`, `ISP`,
+     `DIP`, and `Structure` sections of the violation catalog in
+     `references/refactoring-guide.md`, plus long methods and
+     `primitive` obsession.
+   - Record one detection line for each section and one for those
+     remaining smells: code examined (or why none applies) and
+     violations found.
+   - **Short-circuit**: once every line exists, halt and emit
+     `Result: No Changes` if none found a violation.
    - When detected smells carry high regression risk resisting safe
      atomic extraction under existing tests: record in `Findings`, omit
      edits, and emit `Result: No Changes`.
@@ -106,6 +110,9 @@ checklist and diff-only audit scope.
   responsibility boundary; batch related transformations internally
   under sequential test verification rather than micro-slicing single
   methods.
+- **Detection lines**: Surface them as one `Actions` line (for example,
+  `detection: 8/8 lines; 1 found`); keep per-section detail out of the
+  result.
 - **Two Hats**: Never add features or new tests while refactoring.
   Extracting internal functions, modules, or cohesive units under
   existing test suites satisfies Two Hats without requiring new test
@@ -150,6 +157,8 @@ checklist and diff-only audit scope.
 
 ## Verification
 
+- Every detection line names code examined or why none applies—restating
+  the section never counts.
 - Full test suite passes 100% with no new failures or errors.
 - Code compiles without warnings or missing dependencies.
 - Complexity metrics (class size, method length, parameter count) show

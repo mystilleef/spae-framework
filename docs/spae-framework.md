@@ -36,6 +36,12 @@ before advancing.
   automated waits—polling, `backoff`, timeouts—don't count as human
   intervention. An unverifiable-without-a-human requirement classifies
   as a spec defect, not a valid testing or verification path.
+- **Practical verification**: Prove outcomes with automated evidence an
+  agent produces unattended; never replicate manual human testing for
+  its own sake. Settle feasibility before execution, isolate runs from
+  the user's live environment, and record outcomes lacking practical
+  evidence as residual risks. `verification-guide.md` defines the
+  evidence ladder and phase roles.
 
 ## Execution guardrails
 
@@ -55,11 +61,14 @@ framework must enforce these constraints:
 - **Prohibit `.spae` commits**: Never stage or commit the `.spae/`
   directory. These artifacts maintain local execution state and don't
   belong in version control.
-- **Enforce phase write boundaries**: `/spec`, `/plan`, `/inspect`, and
-  `/check` may read repository code for context, but they may only write
-  their designated `SPAE` artifacts. Only `/build` and `/fix` may edit
-  source code, tests, configuration files, docs, or any other non-`SPAE`
-  project file.
+- **Enforce phase write boundaries**: `/spec`, `/plan`, `/inspect`,
+  `/check`, and `/verify` may read repository code for context, but they
+  may only write their designated `SPAE` artifacts. Only `/build` and
+  `/fix` may edit source code, tests, configuration files, docs, or any
+  other non-`SPAE` project file. Byproducts of a command run for
+  evidence, such as a formatter's rewrites, never count as a phase's
+  writes; no phase runs a command for its write effect outside its
+  boundary.
 - **Fail forward, not sideways**: A task or phase failure in `/build`,
   `/check`, or `/fix` halts orchestration immediately; it never reroutes
   to `/spec` or any other phase. Only `/verify`'s no-pass verdict
@@ -136,12 +145,23 @@ The framework distinguishes **Critical Execution State** (`phase`,
   metadata automatically upon reading (injecting `version: "1.0"`,
   inferring `workstream` from the symlink target or working directory,
   and defaulting `status: "active"`).
-- **Hard Halt Boundaries**: Execution halts exclusively on unparseable
-  JSON syntax, unrecognized phase names, completed-task re-entry
-  (`"done"` task at entry to build/check/fix), missing task definitions
-  in `PLAN.md`, unmet task dependencies, unresolvable environment
-  blockers, or a `SPEC.md`-internal conflict no `PLAN.md` edit can
-  resolve (at `/inspect`).
+- **Hard Halt Boundaries**: Every halt leaves `phase` unchanged, writes
+  no further `STATE.json` change, and reports `Result: Failed`.
+  Execution halts only on:
+  - `.spae/current` missing or dangling; `STATE.json` missing or holding
+    unparseable JSON syntax; a `phase` other than the running phase.
+  - A missing or malformed input: `SPEC.md`, `PLAN.md`, `VERIFY.md` (at
+    `/spec` revision), `cursor.active_task_id`, the active task's
+    `PLAN.md` entry, or `FIX.md` (absent, naming another task, or
+    listing no gap).
+  - Completed-task re-entry (`"done"` task at entry to build/check/fix),
+    or a task not `"done"` at entry to `/verify`.
+  - Unmet task dependencies.
+  - A defect no source edit closes: an infeasible criterion, an
+    unrunnable planned step, or a need for human presence.
+  - Unresolvable environment blockers.
+  - A `SPEC.md`-internal conflict no `PLAN.md` edit can resolve (at
+    `/inspect`).
 
 ### 2. `SPEC.md` (The normalized truth)
 
@@ -151,7 +171,7 @@ codebase first to ensure the spec fits existing patterns.
 - **What**: Core goal.
 - **Requirements**: Specific, testable conditions.
 - **Testing strategy**: Global validation plan.
-- **Out of scope**: Explicit boundaries.
+- **Out of scope**: Explicit boundaries and residual risks.
 - **Assumptions**: Explicitly stated assumptions.
 
 ### 3. `PLAN.md` (The atomic task graph)
@@ -201,11 +221,11 @@ the plan concludes.
 - **Action**: Resolve `workstream` using explicit argument or
   `.spae/current` target. For new workstreams, create the directory,
   update the symlink, and initialize state. For existing workstreams,
-  abort if `STATE.json` status lacks `revision_required` or `VERIFY.md`
-  doesn't exist; otherwise, delete `SPEC.md` and write a new one from
-  scratch using `VERIFY.md` findings and source inspection. Audits the
-  draft for internal contradictions and self-heals them by precedence;
-  never halts on them.
+  resume an interrupted draft (`phase: spec`, `status: active`), or, on
+  `status: revision_required` with `VERIFY.md` present, write a new
+  `SPEC.md` from scratch using `VERIFY.md` findings and source
+  inspection; halt otherwise. Audits the draft for internal
+  contradictions and self-heals them by precedence; never halts on them.
 - **Output**: Writes `SPEC.md`. Resets `STATE.json` (`phase: plan`,
   `status: active`, `cursor: {}`, `tasks: {}`). Updates `.spae/current`.
 - **Write scope**: `SPEC.md`, `STATE.json`, `.spae/current`, and the
@@ -239,30 +259,29 @@ the plan concludes.
 - **Output**: Overwrites `PLAN.md` with the optimized version. When
   refinement resizes the task set, renumbers to contiguous `T-NNN` IDs,
   updates every in-plan reference, and re-derives the `STATE.json`
-  `tasks` registry to match. Updates `STATE.json` phase to `build`,
-  which signals execution readiness for `/build`.
+  `tasks` registry to match. Sets `cursor.active_task_id: T-001` and
+  updates `STATE.json` phase to `build`, which signals execution
+  readiness for `/build`.
 - **Write scope**: `PLAN.md` and `STATE.json`.
 - **Forbidden writes**: Source code, tests, configuration files, docs,
   `SPEC.md`, and any other non-`SPAE` project file.
 
 ### Step 4: `/build` (Atomic execution)
 
-- **Input**: `STATE.json` (cursor) + `PLAN.md` (plan `Goal` + active
-  task
-  - `Intent`) + source code.
+- **Input**: `STATE.json` (cursor), `PLAN.md` (plan `Goal`, active task,
+  its `Intent`), and source code.
 - **Action**: Executes exactly one atomic task. Halts on state drift at
   entry. Writes exhaustive tests first—expected behavior, failure modes,
   and edge cases—then writes the minimal code that satisfies them. Runs
   project checks. Reads forward tasks to avoid foreclosing them but
-  never implements beyond the active task. Holds exclusive authority to
-  edit source code and other non-`SPAE` project files. Drives task
-  verification to green by iterating test→implement, treating a failing
-  check as ordinary work rather than a stop signal. Fails the task only
-  when it can't pass within its scope—an infeasible acceptance
-  criterion, a plan or spec defect, or a broken external
-  dependency—never by gaming a test or editing the plan. When a task
-  legitimately changes a contract, updates the tests it invalidates to
-  match; never weakens, skips, or deletes a test to force a pass.
+  never implements beyond the active task. Drives task verification to
+  green by iterating test→implement, treating a failing check as
+  ordinary work rather than a stop signal. Fails the task only when it
+  can't pass within its scope—an infeasible acceptance criterion, a plan
+  or spec defect, or a broken external dependency—never by gaming a test
+  or editing the plan. When a task legitimately changes a contract,
+  updates the tests it invalidates to match; never weakens, skips, or
+  deletes a test to force a pass.
 - **Output**: Mutates source code. Leaves the active task `in_progress`
   in the `tasks` registry—`/check` owns the `done` transition and cursor
   advance. Updates `STATE.json` phase to `check`. The agent never edits
@@ -285,16 +304,17 @@ the plan concludes.
 - **Output (Gaps found)**: Writes `FIX.md` with the findings. Updates
   `STATE.json` phase to `fix`. The active task stays `in_progress`.
 - **Output (Clean)**: Marks the active task `done` in the `tasks`
-  registry and advances the cursor. Updates `STATE.json` phase to
-  `build` if tasks remain, or `verify` if the plan concludes.
+  registry. With tasks remaining, advances the cursor to the next `todo`
+  task and updates `STATE.json` phase to `build`; on the final task,
+  keeps the cursor and updates phase to `verify`.
 - **Write scope**: `FIX.md` and `STATE.json`.
 - **Forbidden writes**: Source code, tests, configuration files, docs,
   `SPEC.md`, `PLAN.md`, and any other non-`SPAE` project file.
 
 ### Step 6: `/fix` (Gap remediation)
 
-- **Input**: `STATE.json` (cursor) + `FIX.md` (gaps) + `PLAN.md` (active
-  task `Intent`) + source code.
+- **Input**: `STATE.json` (cursor), `FIX.md` (task, `Intent`, and gaps),
+  and source code; `FIX.md` carries all task context.
 - **Action**: Addresses exactly the gaps `FIX.md` lists—nothing beyond
   their scope. Holds the same source-editing authority as `/build`.
   Self-heals metadata (injects missing `version`, `workstream`,
@@ -304,23 +324,26 @@ the plan concludes.
   stop signal. Fails the task only when a gap can't close within
   scope—an infeasible finding, a plan or spec defect, or a broken
   external dependency.
-- **Output**: Mutates source code. Deletes `FIX.md`. Updates
-  `STATE.json` phase to `check`. The active task stays `in_progress`;
+- **Output**: Mutates source code. Updates `STATE.json` phase to
+  `check`, then deletes `FIX.md`. The active task stays `in_progress`;
   the agent never marks it `done` or edits `PLAN.md`.
 
 ### Step 7: `/verify` (The arbiter)
 
-- **Input**: `SPEC.md` + source code.
+- **Input**: `STATE.json`, `SPEC.md`, `PLAN.md` (task IDs and `Scope`),
+  and source code.
 - **Action**: Compares implementation strictly against explicit
-  `SPEC.md` requirements. Restricts fail verdicts exclusively to hard
-  block requirement failures, regressions, or check breaks; relegates
+  `SPEC.md` requirements. Restricts `Revision required` verdicts to hard
+  blocks—requirement failures, regressions, or check breaks; relegates
   theoretical edge cases to observations. Acts as the final arbiter of
   `workstream` completion.
-- **Output (Fail)**: Creates `VERIFY.md` with detailed findings. Updates
-  `STATE.json` with `status: revision_required`, `phase: spec`,
-  `cursor: {}`, and `tasks: {}`.
-- **Output (Pass)**: Deletes `VERIFY.md`. Removes `.spae/current`.
-  Updates `STATE.json` with `status: completed` and `phase: done`.
+- **Output (Revision required)**: Creates `VERIFY.md` with detailed
+  findings. Updates `STATE.json` with `status: revision_required`,
+  `phase: spec`, `cursor: {}`, and `tasks: {}`.
+- **Output (Pass)**: Updates `STATE.json` with `status: completed` and
+  `phase: done`, then deletes `VERIFY.md` and removes `.spae/current`.
+- **Output (Failed)**: Writes nothing; `phase` stays `verify`. Covers
+  missing inputs, unfinished tasks, and environment failures.
 - **Write scope**: `VERIFY.md`, `STATE.json`, and `.spae/current`.
 - **Forbidden writes**: Source code, tests, configuration files, docs,
   `SPEC.md`, `PLAN.md`, and any other non-`SPAE` project file.
@@ -332,81 +355,125 @@ completion. This ensures consistent communication and clear next steps.
 
 ### 1. Execution summary
 
-Provide a terse, three-point summary of the work performed.
+Provide a terse summary of the work performed; omit inapplicable fields.
 
-```markdown
+<!-- prettier-ignore-start -->
+```md
 ### Execution Summary
 
-- **Actions**: [Terse description of actions taken]
-- **Files**: [List of modified or created files]
-- **Findings**: [Key technical findings, bugs, or failures]
+- **Actions**:
+  - [Terse list of actions taken]
+- **Files**:
+  - [Terse list of affected files]
+- **Findings**:
+  - [Terse list of notable findings]
+- **Summary**:
+  - [Terse list of summary of changes]
 ```
+<!-- prettier-ignore-end -->
 
 ### 2. SPAE status blocks
 
 Use Markdown `blockquotes` to display the current `workstream` state and
-the required next command.
+the required next command:
+
+- Put `Result` directly after the status line.
+- On `Failed`, omit `Next Phase` and the next-step line; report the
+  diagnostic under `Findings`.
 
 #### A. Task Implementation Feedback (After `/build`)
 
-```markdown
-> **SPAE Status** • `workstream-name` **Active Task**: `T-XXX` - [Task
-> title] **Status**: Implemented, pending check
+<!-- prettier-ignore-start -->
+```md
+> **`SPAE` Status** • `[workstream-name]`
+> **Result**: Implemented, pending check
+> **Active Task**: `T-XXX` - [Task title]
 >
 > _Run `/check` to verify the completed task._
 ```
+<!-- prettier-ignore-end -->
 
 #### B. Gap Found Feedback (After `/check`, gaps found)
 
-```markdown
-> **SPAE Status** • `workstream-name` **Active Task**: `T-XXX` - [Task
-> title] **Result**: Gaps found, `FIX.md` written
+<!-- prettier-ignore-start -->
+```md
+> **`SPAE` Status** • `[workstream-name]`
+> **Result**: Gaps found, `FIX.md` written
+> **Active Task**: `T-XXX` - [Task title]
 >
 > _Run `/fix` to close the gaps._
 ```
+<!-- prettier-ignore-end -->
 
 #### C. Fix Applied Feedback (After `/fix`)
 
-```markdown
-> **SPAE Status** • `workstream-name` **Active Task**: `T-XXX` - [Task
-> title] **Result**: Gaps addressed, `FIX.md` removed
+<!-- prettier-ignore-start -->
+```md
+> **`SPAE` Status** • `[workstream-name]`
+> **Result**: Gaps addressed, `FIX.md` removed
+> **Active Task**: `T-XXX` - [Task title]
 >
 > _Run `/check` to re-verify the task._
 ```
+<!-- prettier-ignore-end -->
 
 #### D. Task Clear Feedback (After `/check`, clean, tasks remain)
 
-```markdown
-> **SPAE Status** • `workstream-name` **Progress**: Task [X] of [Y] ([Z]
-> remaining) **Completed**: `T-XXX` - [Task title] **Next Task**:
-> `T-YYY` - [Next task title]
+<!-- prettier-ignore-start -->
+```md
+> **`SPAE` Status** • `[workstream-name]`
+> **Result**: Clear, tasks remain
+> **Progress**: Task [X] of [Y] ([Z] remaining)
+> **Completed**: `T-XXX` - [Task title]
+> **Next Task**: `T-YYY` - [Next task title]
 >
 > _Run `/build` to execute the next task._
 ```
+<!-- prettier-ignore-end -->
 
 #### E. Plan Completion Feedback (After `/check` clears the final task)
 
-```markdown
-> **SPAE Status** • `workstream-name` **Progress**: All [X] tasks
-> completed **Completed**: `T-001` through `T-XXX` **Next Phase**:
-> `/verify`
+<!-- prettier-ignore-start -->
+```md
+> **`SPAE` Status** • `[workstream-name]`
+> **Result**: Clear, final task
+> **Progress**: All [X] tasks completed
+> **Completed**: `T-001` through `T-XXX`
+> **Next Phase**: `/verify`
 >
-> _Run `/verify` to validate the implementation against the
-> specification._
+> _Run `/verify` to validate the implementation against the specification._
 ```
+<!-- prettier-ignore-end -->
 
 #### F. Phase Transition Feedback (After `/spec`, `/plan`, or `/inspect`)
 
-```markdown
-> **SPAE Status** • `workstream-name` **Phase Complete**:
-> `/[current-phase]` **Next Phase**: `/[next-phase]`
+<!-- prettier-ignore-start -->
+```md
+> **`SPAE` Status** • `[workstream-name]`
+> **Result**: [Phase outcome]
+> **Next Phase**: `/[next-phase]`
+> **Impact**: [Terse impact statement]
 >
 > _Run `/[next-phase]` to [brief description of next phase goal]._
 ```
+<!-- prettier-ignore-end -->
 
-#### G. Workstream completion feedback (After successful `/verify`)
+#### G. Verdict Feedback (After `/verify`)
 
-```markdown
-> **SPAE Status** • `workstream-name` **Phase Complete**: `/verify`
-> (Pass) **Result**: Workstream completed successfully.
+<!-- prettier-ignore-start -->
+```md
+> **`SPAE` Status** • `[workstream-name]`
+> **Result**: [Pass | Revision required]
+> **Next Phase**: `/spec`  _(if revision required)_
 ```
+<!-- prettier-ignore-end -->
+
+#### H. Failed Feedback (Any phase halt)
+
+<!-- prettier-ignore-start -->
+```md
+> **`SPAE` Status** • `[workstream-name]`
+> **Result**: Failed
+> **Active Task**: `T-XXX` - [Task title]  _(build, check, fix)_
+```
+<!-- prettier-ignore-end -->

@@ -1,9 +1,9 @@
 ---
 name: spae-check
-description: >-
-  Per-task verification gate for SPAE. Compares active task Intent,
-  Acceptance, and Verification against repo evidence; routes gaps to
-  /fix or advances a clear task.
+description:
+  Task Verification Gate for the `SPAE` framework. Compares the active
+  `PLAN.md` task's `Intent`, `Acceptance`, and `Verification` against
+  repository evidence; routes gaps to `/fix` or advances the task.
 user-invocable: true
 ---
 
@@ -11,158 +11,159 @@ user-invocable: true
 
 ## When to use
 
-- `STATE.json` reports `phase: check`.
-- Cursor names active task.
+- `STATE.json` reads `phase: check`: verify the active `PLAN.md` task
+  against repository evidence.
 
 ## Goal
 
-- Compare active task implementation against PLAN.md Intent, Acceptance,
-  and Verification.
-- Route gaps to /fix or advance clear task.
+- Judge the active task's implementation against its `Intent`,
+  `Acceptance`, and `Verification`; record every gap in `FIX.md`.
+- Advance the `workstream` to `phase: fix` on a gap; else mark the task
+  `done` and advance to `phase: build` or `phase: verify`.
 
 ## Input
 
-Read:
+Read only what the check requires:
 
-- `.spae/current/STATE.json` (consult `references/STATE.md` for field
-  reference, directives, and phase snapshots)
-- Active task section from `.spae/current/PLAN.md` (`Intent`,
-  `Acceptance`, `Verification`)
-- Source files and test logs scoped to active task
+- `.spae/current/STATE.json`; `references/STATE.md` holds field
+  reference, directives, and snapshots.
+- `.spae/current/PLAN.md`: the active task in full, plus task titles and
+  order.
+- Repository source, tests, docs, configuration, and logs the active
+  task touches, for analysis.
 
 ## Workflow
 
-1. **GATE**—Read `.spae/current/STATE.json`; confirm `phase: check` and
-   `active_task_id`. Self-heal metadata: inject missing `version`
-   (`"1.0"`), `workstream` (from symlink or directory path), and
-   `status` (`"active"`). Self-heal state drift: if
-   `tasks[`active_task_id`]` reads `"todo"` or lacks an entry, set it to
-   `"in_progress"` and write `STATE.json` before proceeding. Halt on
-   state drift: if `tasks[`active_task_id`]` reads `"done"`, halt. Read
-   active `PLAN.md` task section; confirm title, `Intent`, `Acceptance`,
-   `Verification`. Halt on _unparseable_ JSON, unrecognized phase, or
-   active task absent from `PLAN.md`; report and make no changes.
-2. **ORIENT**—Verify active task; hand off to `/fix`, `/build`, or
-   `/verify`. Leave source, tests, `config`, docs, `PLAN.md`, `SPEC.md`,
-   task scope, and `workstream` completion untouched.
-3. **PLAN**—List active-task `Acceptance` outcomes and `Verification`
-   steps. Map evidence for declared `Intent`; scope source/test reads to
-   active task. Never read `SPEC.md`.
-4. **ACT**—Execute:
-   - Run active-task verification steps and project checks. Without
-     automation, inspect source, logs, or scripted probes for observable
-     behavior.
-   - Confirm every `Acceptance` outcome and `Intent` against evidence.
-   - Label findings with exactly two tags:
-     - **Gap**: unmet `Acceptance`, failed `Verification`, `Intent`
-       mismatch, speculative abstraction, _unrequested_ complexity,
-       defensive bloat beyond task `Scope`, or a task-introduced cleanup
-       violation within declared task scope per
-       `references/cleanup-guide.md`. Include unmet item, file:line,
-       expected vs actual, reproducible evidence. Blocks a clear result.
-       Never flag pre-existing uncommitted files or edits outside task
-       scope as gaps.
-     - **Observation**: minor concern outside task scope, `unrequested`
-       edge-case coverage, theoretical risk, or pre-existing uncommitted
-       files outside task scope. Report only; never write to `FIX.md` or
-       affect the verdict.
-   - Draft gaps per `references/FIX.md` schema; consult
-     `references/prose-protocol.md`.
-5. **VERIFY**—Reconcile every `Acceptance`, `Verification`, and `Intent`
-   against evidence. Clear verdict only with zero gaps. Confirm drafted
-   `FIX.md` matches `references/FIX.md` structure.
-6. **PERSIST**—Apply one verdict:
-   - **Gap found**: create/overwrite `.spae/current/FIX.md` per
-     `references/FIX.md`. Write `STATE.json`: `phase: fix`; preserve
-     status, cursor, task registry, version, workstream. Active task
-     stays `in_progress`.
-   - **Task clear, tasks remain**: write `STATE.json`: mark active task
-     `done`, advance cursor to next `"todo"` task, `phase: build`.
-   - **Final task clear**: write `STATE.json`: mark active task `done`,
-     retain cursor active task ID, `phase: verify`.
-   - **All branches**: re-read `STATE.json` after writing; on a field
-     mismatch, rewrite and re-read before `REPORT`.
-7. **REPORT**—Emit result per directives. Template B after gap, D after
-   clear _nonfinal_ task, E after clear final task. Observations under
-   Findings only.
+1. **GATE**—Make no writes:
+   - Parse `.spae/current/STATE.json`; self-heal missing metadata:
+     `version` (`"1.0"`), `workstream` (target directory name), `status`
+     (`"active"`); `PERSIST` writes the healed fields.
+   - Self-heal state drift: treat a `"todo"` or missing
+     `tasks[active_task_id]` as `"in_progress"` until `PERSIST`.
+   - Halt on any **Halt conditions** entry.
+2. **ORIENT**—State goal in one sentence:
+   - `PLAN.md` stays unmodified; directly modify no source or tests;
+     write nothing before `PERSIST`.
+   - Read the active task in full, plus `PLAN.md` task titles and order.
+3. **PLAN**—Declare the evidence map:
+   - Read `references/verification-guide.md` and
+     `references/shell-command-guide.md`.
+   - Map each `Acceptance` outcome, each `Verification` step, and the
+     `Intent` to the evidence that proves it.
+   - Halt on any **Halt conditions** entry.
+4. **ACT**—Gather evidence and label findings:
+   - Run every task `Verification` step and the project checks.
+   - Read the task diff with the scoped audit command in
+     `references/cleanup-guide.md`.
+   - Judge each `Acceptance` outcome and the `Intent` against step
+     output, the diff, and source.
+   - Label each finding with exactly one tag:
+     - **Gap**—blocks a clear verdict; cite reproducible evidence, never
+       a hypothetical risk or stylistic preference:
+       - An unmet `Acceptance` outcome, a failing `Verification` step,
+         or behavior diverging from the `Intent`.
+       - A project-check failure the task diff causes.
+       - Speculative abstraction, _unrequested_ complexity, or defensive
+         bloat the diff adds beyond the task `Scope`.
+       - A task-written test breaking
+         `references/verification-guide.md`.
+       - **Gap** covers only task-introduced violations within the
+         active task's declared scope: debug output, dead code, an
+         orphan file, a commented-out block, a superseded duplicate, an
+         unused dependency, or stray build/cache output this task's own
+         diff introduces and leaves behind. Never flag pre-existing
+         uncommitted files outside task scope as gaps.
+     - **Observation**—never a verdict input: a concern outside task
+       scope, _unrequested_ edge-case coverage, a defensive-code
+       suggestion, or a theoretical risk.
+   - On any `Gap`, draft `FIX.md` per `references/FIX.md`.
+   - Apply **Directives** and **Constraints**.
+5. **VERIFY**—Loop over **Verification** criteria for the verdict and
+   the `FIX.md` draft:
+   - For each failure: return to `ACT`, complete the evaluation, then
+     re-enter `VERIFY`.
+   - Exit only when every criterion passes.
+   - Halt only on a **Halt conditions** entry.
+6. **PERSIST**—Write in order:
+   - On a `Gap` verdict, write `.spae/current/FIX.md`, replacing any
+     prior copy.
+   - Write `STATE.json` per the `references/STATE.md` exit snapshot
+     matching the verdict.
+   - Re-read `STATE.json`; on a mismatch against **Verification** state
+     criteria, rewrite and re-read before `REPORT`.
+7. **REPORT**—Emit result following result directives and using result
+   template:
+   - Status block by re-read `phase`: `fix`→`Gap found`,
+     `build`→`Clear, tasks remain`, `verify`→`Clear, final task`; a
+     halt→`Failed`.
+   - List each `Gap`, then each `Observation`, under `Findings`.
 
 ## Directives
 
 - Optimize for agent, token, and context efficiency.
-- Consult `references/shell-command-guide.md` for command safety,
-  timeouts, redirects, and environment directives.
-- Consult `references/cleanup-guide.md` for self-introduced-artifact
-  scope, checklist, and uncommitted working-tree safety directives.
-- Follow canonical `SPAE` Step 5 `/check` contract on conflicts.
-- Focus on active-task evidence; prefer existing project checks.
-- Treat pre-existing uncommitted files and modifications outside active
-  task scope strictly as external baseline.
-- Enforce `KISS` and `YAGNI`; flag `Intent` mismatches over speculative
-  scope or defensive bloat.
-- Ground bloat findings in the diff; never flag hypothetical future
-  risk, stylistic preference, or _unshipped_ edge case.
-- Relegate `unrequested` edge-case coverage, theoretical risks, and
-  defensive bloat suggestions to observations; forbid writing them to
-  `FIX.md`.
 - Refine and optimize `FIX.md` for agent consumption: agents read it for
   varied purposes, with no memory of this run; keep it self-contained,
-  explicit, and token-dense.
-- Keep gaps concrete, reproducible, enough to close without `PLAN.md`.
-- Preserve task-plan wording verbatim in `FIX.md` `## Intent`.
-- Write only current actionable gaps to `FIX.md` per
-  `references/FIX.md`; report observations in summary only.
+  explicit, and token-dense; make each gap closable without `PLAN.md`.
 - Consult `references/prose-protocol.md` before drafting `FIX.md`.
 
 ## Constraints
 
-- Read source, tests, `config`, docs, logs only; write only
-  `.spae/current/FIX.md` and `.spae/current/STATE.json`.
-- Never read/edit `.spae/current/SPEC.md`; never edit
-  `.spae/current/PLAN.md`.
-- Never edit source, tests, `config`, docs, or non-`SPAE` project files.
-- Never flag, write to `FIX.md`, or request deletion of pre-existing
-  uncommitted files outside active-task scope.
-- Never claim `workstream` completion (only `/verify` holds that
-  authority).
-- Never add artifacts beyond canonical `SPAE` files or fields beyond
-  `STATE.json` schema.
-- Never execute git mutations (staging, commits, branches, tags, pushes,
-  or releases); never stage or commit `.spae/` artifacts.
-- **Autonomy**: Never ask users for input or clarification
-  mid-execution; halts and failures stop autonomously.
-- **Full autonomy**: Never ask for human execution, attended terminal,
-  interactive session, or human presence. Surface any such dependency as
-  a `Gap`.
+- **Write scope**: write only `.spae/current/FIX.md` and
+  `.spae/current/STATE.json`; forbid all other writes. Byproducts of a
+  command run for evidence, such as a formatter's rewrites, never count
+  as this phase's writes; never run a command for its write effect
+  outside this scope. Read source code only for analysis.
+- **Phase boundary**: judge exactly one task; hand off work to `/fix`,
+  `/build`, or `/verify`.
+- **Version control and release**: never execute git mutations (staging,
+  commits, branches, tags, pushes) or release operations. Never stage or
+  commit `.spae/`.
+- **Autonomy**: never ask users for input or clarification
+  mid-execution; halts and failures stop autonomously. Never perform or
+  request human execution, an attended or interactive terminal, or human
+  presence.
+- **State schema**: never introduce `STATE.json` fields outside
+  `references/STATE.md`.
+- **Halt conditions**: halt without writing; report `Failed` with a
+  diagnostic under `Findings`:
+  - `.spae/current` missing or dangling.
+  - `STATE.json` missing or holds unparseable JSON syntax.
+  - `STATE.json` `phase` other than `check`.
+  - `PLAN.md` missing, `cursor.active_task_id` missing, or the active
+    task absent from `PLAN.md`.
+  - `tasks[active_task_id]` reads `"done"`.
+  - A planned `Verification` step can't run for a cause outside the task
+    diff: missing tooling, a broken external dependency, or a need for
+    human presence.
+- **Scope control**: ignore pre-existing uncommitted files and
+  modifications outside the active task's declared scope; they yield no
+  finding.
 
 ## Verification
 
-- `STATE.json` enters with `phase: check` and matching active
-  in-progress task.
-- Every `Acceptance`, `Verification`, and `Intent` reviewed against
-  evidence.
-- Only `Gap`/`Observation` labels used; every unmet item flagged `Gap`.
-- Gap run writes `FIX.md` matching schema, verbatim intent, actionable
-  evidence; active task stays `in_progress`; phase → `fix`.
-- No speculative abstraction, _unrequested_ complexity, defensive bloat
-  beyond task `Scope`, or self-introduced cleanup violation per
-  `references/cleanup-guide.md` survives _unflagged_.
-- Clear run marks one task `done`, routes to `build` or `verify` with
-  correct cursor state.
-- `SPEC.md`, `PLAN.md`, source, tests, `config`, docs, unrelated files
-  unchanged.
-- Output uses template B, D, or E verbatim.
+- Every `Acceptance` outcome, `Verification` step, and the `Intent`
+  judged against cited evidence.
+- Every defect matching a `Gap` item—diff bloat and cleanup violations
+  included—carries `Gap`; every other finding carries `Observation`.
+- Verdict reads clear only with zero `Gap` findings.
+- On a `Gap` verdict, the `FIX.md` draft matches `references/FIX.md`:
+  `## Intent` verbatim from `PLAN.md`; every `Gap` with `File`,
+  `Expected`, `Actual`, and reproducible `Evidence`; no `Observation`.
+- `STATE.json` matches the `references/STATE.md` exit snapshot for the
+  verdict.
+- This phase wrote no file outside **Write scope**.
 
 ## Result directives
 
 - **Minimum** words. **Maximum** signal.
 - Keep prose terse while ensuring clarity.
 - Optimize prose for agent, token, and context efficiency.
-- Split actions, findings, summaries into terse bullet points.
+- Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
-- Emit result as live markdown—never in a code fence.
-- Output nothing outside the template.
-- Source every `SPAE Status` value from the confirmed re-read, never
-  from working memory of intent.
+- Emit result template as live markdown—never in a code fence.
+- Output nothing outside template.
+- Source every `SPAE Status` value from confirmed re-read, never from
+  working memory of intent.
 
 ### Result template
 
@@ -181,14 +182,15 @@ Read:
 ```
 <!-- prettier-ignore-end -->
 
-Emit exactly one, matching the verdict.
+Emit exactly one status block below, matching the outcome.
 
 ### Gap found
 
 <!-- prettier-ignore-start -->
 ```md
-> **SPAE Status** • `workstream-name` **Active Task**: `T-XXX` - [Task
-> title] **Result**: Gaps found, `FIX.md` written
+> **`SPAE` Status** • `[workstream-name]`
+> **Result**: Gaps found, `FIX.md` written
+> **Active Task**: `T-XXX` - [Task title]
 >
 > _Run `/fix` to close the gaps._
 ```
@@ -198,9 +200,11 @@ Emit exactly one, matching the verdict.
 
 <!-- prettier-ignore-start -->
 ```md
-> **SPAE Status** • `workstream-name` **Progress**: Task [X] of [Y] ([Z]
-> remaining) **Completed**: `T-XXX` - [Task title] **Next Task**:
-> `T-YYY` - [Next task title]
+> **`SPAE` Status** • `[workstream-name]`
+> **Result**: Clear, tasks remain
+> **Progress**: Task [X] of [Y] ([Z] remaining)
+> **Completed**: `T-XXX` - [Task title]
+> **Next Task**: `T-YYY` - [Next task title]
 >
 > _Run `/build` to execute the next task._
 ```
@@ -210,11 +214,22 @@ Emit exactly one, matching the verdict.
 
 <!-- prettier-ignore-start -->
 ```md
-> **SPAE Status** • `workstream-name` **Progress**: All [X] tasks
-> completed **Completed**: `T-001` through `T-XXX` **Next Phase**:
-> `/verify`
+> **`SPAE` Status** • `[workstream-name]`
+> **Result**: Clear, final task
+> **Progress**: All [X] tasks completed
+> **Completed**: `T-001` through `T-XXX`
+> **Next Phase**: `/verify`
 >
-> _Run `/verify` to validate the implementation against the
-> specification._
+> _Run `/verify` to validate the implementation against the specification._
+```
+<!-- prettier-ignore-end -->
+
+### Failed
+
+<!-- prettier-ignore-start -->
+```md
+> **`SPAE` Status** • `[workstream-name]`
+> **Result**: Failed
+> **Active Task**: `T-XXX` - [Task title]
 ```
 <!-- prettier-ignore-end -->

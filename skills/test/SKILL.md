@@ -74,11 +74,12 @@ Audit targets across four canonical categories:
    `references/shell-command-guide.md`, and
    `references/cleanup-guide.md`. Inspect production code, adjacent
    tests, and coverage commands. Catalog existing test assertions to
-   prevent duplication. List every net-new gap across applicable
-   categories per behavioral-surface target. Map each proposed test to
-   an unasserted branch, edge condition, or error path.
-   - **Short-circuit**: zero gaps found → emit `Result: No Gaps` and
-     halt.
+   prevent duplication. List every behavioral-surface target and record
+   a result per category for each: net-new gap, already asserted, or not
+   applicable. Map each proposed test to an unasserted branch, edge
+   condition, or error path.
+   - **Short-circuit**: once every target carries all four results, zero
+     gaps → emit `Result: No Gaps` and halt.
 4. **ACT**—Write tests for every enumerated net-new gap. Cover all
    applicable categories per target before declaring completion.
    - Add tests to the existing test file for established units; create a
@@ -106,6 +107,9 @@ Audit targets across four canonical categories:
 - Optimize all operations for agent, token, and context efficiency.
 - Audit all applicable categories per behavioral-surface target; cover
   only unverified, applicable paths before declaring coverage complete.
+- Surface the audit as one `Actions` line (for example,
+  `audited 6 targets across 4 categories; 2 gaps`); keep per-target
+  detail out of the result.
 - Use coverage tooling when available; when absent, use static analysis.
 - Keep tests focused, deterministic, and close to the behavior under
   test.
@@ -144,8 +148,8 @@ Audit targets across four canonical categories:
 
 - Production code unchanged;
 - Entire test suite passes with no failures.
-- All applicable categories audited per target on the behavioral
-  surface.
+- Every behavioral-surface target carries a recorded result for all four
+  categories; each `not applicable` states why.
 - If coverage tool present: no meaningful uncovered lines or branches
   remain; if absent: all applicable categories confirmed through direct,
   agent-executed inspection, no critical gaps.

@@ -24,61 +24,48 @@ argument-hint: "[optional: files or focus area]"
 
 ## Workflow
 
+Halt on any **Halt conditions** entry after every spawn.
+
 1. **Purification Loop**:
-   - Immediately use the `subagent` tool to spawn a `purify` `subagent`
-     (pass optional arguments).
-   - Await purification result.
-   - If `subagent` returns `No Changes` status, exit loop and proceed.
-   - On `Failed` status or any process failure, halt immediately and
-     surface the error.
-   - Loop back to spawn another `purify` `subagent` if the previous pass
-     returns `Complete`.
+   - Spawn a `purify` subagent with the optional argument; await its
+     result.
+   - `Complete`: repeat step 1.
+   - `No Changes`: proceed to step 2.
 2. **Refactoring Loop**:
-   - Immediately use the `subagent` tool to spawn a `refactor`
-     `subagent` (pass optional arguments).
-   - Await refactoring result.
-   - If `subagent` returns `No Changes` status, exit loop and finish.
-   - On `Failed` status or any process failure, halt immediately and
-     surface the error.
-   - Loop back to spawn another `refactor` `subagent` if the previous
-     pass returns `Complete`.
+   - Spawn a `refactor` subagent with the optional argument; await its
+     result.
+   - `Complete`: repeat step 2.
+   - `No Changes`: proceed to step 3.
+3. **Report**: emit the result per **Result directives**:
+   - `Result`: `Completed` when the workflow reaches **Report** without
+     a halt; `Halted` when a subagent reports `Failed`; `Failed` on any
+     other **Halt conditions** entry.
 
 ## Directives
 
 - Always use the subagent tool for subagent invocation.
-- Pass the optional argument verbatim to both subagents; never read or
-  expand file-path arguments.
-- Rely on `subagent` status blocks to direct the loop.
-- Halt immediately on subagent `Failed` status or any process failure
-  (crash, timeout, `AgentError`).
-- List of agents permitted to invoke:
-  - `purify`
-  - `refactor`
+- Pass the argument verbatim to each subagent; never read or expand
+  file-path arguments.
+- Route only from each subagent's `Result` value.
+- Spawn only the subagents the workflow names.
 
 ## Constraints
 
-- Restrict your activities to:
-  - Using the `subagent` tool to spawn agents.
-  - Using agent results to direct the loop or advance the workflow.
-- Perform orchestration only; never edit codebase files, tests, or
-  documentation.
-- Operate strictly in read-only mode.
-- Perform purification to completion first, before starting refactoring.
-- Never interleave purification with refactoring.
-- Never run `subagents` in parallel or concurrently.
-- Never activate skills.
-- Never invoke agents outside the permitted list.
-- Never prompt the user for decisions mid-run; let blockers halt
-  execution.
-- Never perform activities beyond subagent invocation, state tracking,
-  and reporting.
+- Restrict activities to spawning subagents, reading their results, and
+  reporting; never write files, run git operations, activate skills, or
+  prompt the user mid-run.
+- Never run subagents in parallel or concurrently.
+- **Halt conditions**: halt immediately; report per **Report**, listing
+  the diagnostic under `Findings`:
+  - A subagent `Failed` result.
+  - A subagent result missing or outside the workflow's literals.
+  - A process failure (crash, timeout, `AgentError`).
 
 ## Verification
 
-- Confirm sequential execution of `purify` and `refactor` `subagents`.
-- Confirm loop termination when `subagents` return `No Changes`.
-- Confirm immediate halt when a `subagent` returns `Failed`.
-- Confirm zero writes from the orchestration agent itself.
+- Subagents ran one at a time, in workflow order.
+- Every run, halted or not, ended in **Report**.
+- The orchestrator wrote no file.
 
 ## Result directives
 

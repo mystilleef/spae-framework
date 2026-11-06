@@ -1,5 +1,5 @@
 ```md
-# Fix: T-XXX — [task title]
+# Fix: T-XXX—[task title]
 
 ## Intent
 
