@@ -52,10 +52,12 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 4. **ACT**—Draft `PLAN.md`:
    - Read source narrowly; widen only on uncertainty.
    - Follow `references/PLAN.md`; number tasks from `T-001`.
-   - Set `Satisfies` to the `R-NNN` IDs a task implements and `Intent`
-     to a one-line distillation of the goal they serve.
-   - Enabling task: `Satisfies: none`; `Intent` names its structural
-     purpose toward the plan `## Goal`.
+   - Set `Satisfies` to the `R-NNN` IDs a task implements and its own
+     `Verification` proves, and `Intent` to a one-line distillation of
+     the goal they serve.
+   - Enabling task—tooling setup or a final verification gate:
+     `Satisfies: none`; `Intent` names its structural purpose toward the
+     plan `## Goal`.
    - Order tasks by dependency, risk, and vertical value.
    - Apply **Directives** and **Constraints**.
 5. **VERIFY**—Loop over **Verification** criteria for `PLAN.md`:
@@ -90,11 +92,16 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
   edge cases only when specified in `SPEC.md` or required by task
   logic); state structural assurances for a `Satisfies: none` enabling
   task.
-- Write `Verification` as concrete, deterministic commands, including
-  test execution, per `references/verification-guide.md`; bind each step
-  to tooling available now or installed by a dependency task; schedule
-  new tooling as its own task; carry `SPEC.md` residual risks into
-  `Risk notes`.
+- Write `Verification` as concrete, deterministic, proportional
+  commands, including test execution, per
+  `references/verification-guide.md`:
+  - Bind each step to tooling available now or installed by a dependency
+    task.
+  - Schedule a tooling task only for tooling the `SPEC.md`
+    `Testing strategy` admits; verify it with one smoke run, never its
+    own test suite.
+  - Never re-prove in a later task logic an earlier task's tests cover.
+  - Carry `SPEC.md` residual risks into `Risk notes`.
 - Consult `references/prose-protocol.md` before drafting `PLAN.md`.
 
 ## Constraints
@@ -136,9 +143,12 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
   (failure modes and edge cases when `SPEC.md` specifies them or task
   logic requires them); every enabling task's `Acceptance` states
   structural assurances.
-- Every task's `Verification` includes test execution; no step presumes
-  human execution, an attended or interactive terminal, or human
-  presence.
+- Every `Satisfies` ID names a requirement the task implements and its
+  own `Verification` proves.
+- Every task's `Verification` includes test execution—one smoke run for
+  an enabling tooling task—and follows
+  `references/verification-guide.md`; no step presumes human execution,
+  an attended or interactive terminal, or human presence.
 - Zero tasks mandate version control or release operations.
 - `STATE.json` specifies `phase: "inspect"`, `status: "active"`,
   `cursor: {}`, and `tasks` mapping every `PLAN.md` task ID to `"todo"`.
@@ -151,6 +161,13 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
+- **Result contract**: orchestrating agents parse `Result`; a missing,
+  altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, abort, or halt—with the
+  result template as the final message; never end on progress narration.
+- Set `Result` to exactly one template literal, verbatim; report an
+  abort or halt lacking its own literal as `Failed`, with the reason
+  under `Findings`.
 - Emit result template as live markdown—never in a code fence.
 - Output nothing outside template.
 - Source every `SPAE Status` value from confirmed re-read, never from

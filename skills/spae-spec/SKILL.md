@@ -110,6 +110,9 @@ Select path by target state:
   `unrequested` scope, speculative design, or theoretical complexity.
   File YAGNI-discarded ledger aspects under `Out of scope` with a
   one-line rationale, never a silent drop.
+  - Filter verification breadth too: carry a proposal's verification
+    request as the outcomes it protects, never its recipe, rig, or case
+    matrix.
 - Write observable, testable, and implementation-neutral requirements;
   tag each with a unique, stable `R-NNN` identifier.
 - Match level of detail to task size; avoid process bloat:
@@ -119,10 +122,18 @@ Select path by target state:
     constraints exist.
   - Never invent exclusions, assumptions, edge cases, or failure modes;
     keep section headers intact.
-- Consult `references/verification-guide.md`; decide what evidence
-  proves each requirement, translate manual checks into automated
-  evidence, and record outcomes lacking practical evidence as
-  `Out of scope` residual risks.
+- Consult `references/verification-guide.md`; decide the cheapest
+  evidence proving each requirement:
+  - Translate manual checks and proposal verification recipes into the
+    outcomes they protect.
+  - Route each proposal item marked unverified, untested, or open to the
+    cheapest evidence proving it; never widen it into broader
+    verification.
+  - An explicit request admits new tooling only for outcomes no existing
+    rung reaches; it never overrides proportionality or the calibration
+    rule.
+  - Record outcomes lacking admissible, calibration-free evidence as
+    `Out of scope` residual risks.
 - Consult `references/prose-protocol.md` before drafting `SPEC.md`.
 - Refine and optimize `SPEC.md` for agent consumption: agents read it
   for varied purposes, with no memory of this run; keep it
@@ -192,6 +203,10 @@ Select path by target state:
 - Confirm testing strategy covers expected behavior; require failure
   modes and edge cases only for complex proposals; allow single-target
   verification on single-behavior specs.
+- Confirm `Testing strategy` pairs each requirement with its cheapest
+  proving evidence; no rig, recipe, coordinate, calibration step,
+  inadmissible tooling, or re-proof of logic cheaper evidence covers
+  survives.
 - Confirm section depth matches task size; no invented edge case,
   failure mode, or exclusion on a single-behavior spec.
 - Confirm every `Draft` aspect-ledger entry resolves to an `R-NNN`,
@@ -220,6 +235,13 @@ Select path by target state:
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
+- **Result contract**: orchestrating agents parse `Result`; a missing,
+  altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, abort, or halt—with the
+  result template as the final message; never end on progress narration.
+- Set `Result` to exactly one template literal, verbatim; report an
+  abort or halt lacking its own literal as `Failed`, with the reason
+  under `Findings`.
 - Emit result template as live markdown—never in a code fence.
 - Output nothing outside template.
 - Source every `SPAE Status` value from confirmed re-read, never from

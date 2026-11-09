@@ -67,6 +67,7 @@
     failure.
 - Treat orphaned ledger entries as unmet `VERIFY` criteria. Forbid
   silent drops.
-- Route `Validation` entries per `verification-guide.md`: practical
-  automated evidence → `Testing strategy`; none → `Out of scope`
-  residual risk.
+- Route `Validation` entries per `verification-guide.md`: translate each
+  into the outcome it protects; cheapest admissible evidence →
+  `Testing strategy`; none → `Out of scope` residual risk. Never carry
+  recipes, rigs, coordinates, or case matrices.

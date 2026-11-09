@@ -168,6 +168,13 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
+- **Result contract**: orchestrating agents parse `Result`; a missing,
+  altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, abort, or halt—with the
+  result template as the final message; never end on progress narration.
+- Set `Result` to exactly one template literal, verbatim; report an
+  abort or halt lacking its own literal as `Failed`, with the reason
+  under `Findings`.
 - Emit result template as live markdown—never in a code fence.
 - Output nothing outside template.
 - Source every `SPAE Status` value from confirmed re-read, never from

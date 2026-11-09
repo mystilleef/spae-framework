@@ -29,7 +29,7 @@ Abort if no scope exists.
 
 _Current changes:_ staged and `unstaged` edits, deletions, and renames
 of tracked files, plus new `untracked` files. Requires a versioned
-project. Abort with a clear message if none detected.
+project. Abort if none detected.
 
 ## Testing
 
@@ -70,7 +70,7 @@ Audit targets across four canonical categories:
    changes. Abort immediately if none.
 2. **ORIENT**—Goal: cover all behavioral gaps in scope. Production code
    unchanged.
-3. **PLAN**—Read `references/testing-guide.md`,
+3. **PLAN**—Read `TESTING.md`, `references/testing-guide.md`,
    `references/shell-command-guide.md`, and
    `references/cleanup-guide.md`. Inspect production code, adjacent
    tests, and coverage commands. Catalog existing test assertions to
@@ -168,6 +168,13 @@ Audit targets across four canonical categories:
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
+- **Result contract**: orchestrating agents parse `Result`; a missing,
+  altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, abort, or halt—with the
+  result template as the final message; never end on progress narration.
+- Set `Result` to exactly one template literal, verbatim; report an
+  abort or halt lacking its own literal as `Failed`, with the reason
+  under `Findings`.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
 

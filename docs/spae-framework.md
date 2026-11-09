@@ -41,7 +41,20 @@ before advancing.
   its own sake. Settle feasibility before execution, isolate runs from
   the user's live environment, and record outcomes lacking practical
   evidence as residual risks. `verification-guide.md` defines the
-  evidence ladder and phase roles.
+  evidence ladder; **Verification roles** assigns each phase its part.
+
+## Verification roles
+
+Each phase skill states its own role; skills never carry this table.
+
+| Phase            | Role                                                                                                                                     |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `/spec`          | Decide the cheapest evidence proving each requirement; record outcomes lacking practical evidence under `Out of scope`.                  |
+| `/plan`          | Bind each step to tooling confirmed available now; schedule admitted new tooling as a task; carry residual risks to `Risk notes`.        |
+| `/inspect`       | Challenge each step's feasibility, isolation, and proportionality; rewrite failing steps or demote them to `Risk notes`.                 |
+| `/build`, `/fix` | Execute steps as planned; never discover, install, or calibrate tooling ad hoc; fail fast on an unrunnable step.                         |
+| `/check`         | Run planned steps; fail an unrunnable planned step as a plan defect; flag a task-written test breaking `verification-guide.md` as a gap. |
+| `/verify`        | Judge from automated evidence; treat residual risks as observations, never verdict inputs.                                               |
 
 ## Execution guardrails
 

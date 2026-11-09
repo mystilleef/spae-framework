@@ -14,8 +14,8 @@
 
 ## Testing strategy
 
-- **Approach**: [unit | integration | e2e | automated inspection—list
-  all that apply; follow `verification-guide.md`]
+- **Approach**: [unit | integration | e2e | automated inspection—the
+  cheapest proving the requirements; follow `verification-guide.md`]
 - **Expected behavior**: [What succeeds under valid inputs]
 - **Failure modes**: [What fails, errors, or rejects—if applicable]
 - **Edge cases**: [Boundary, empty, nil, or zero-value conditions—if

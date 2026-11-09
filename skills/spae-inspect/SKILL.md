@@ -70,6 +70,13 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
      to the dependency's stated `Acceptance` contract.
    - Unjustified enabling task: state its rationale in `Context`, else
      remove it.
+   - Disproportionate or infeasible `Verification` step—re-proving
+     covered logic, needing calibration or inadmissible tooling, or
+     exceeding sufficient isolation: trim it to the cheapest evidence,
+     or demote it to `Risk notes`.
+   - Tooling test suite: replace it with one smoke run.
+   - `Satisfies` overclaim: drop the ID; add or extend a task when
+     coverage drops.
    - Granularity: split a non-atomic task; merge a merge candidate.
    - Version control or release step: strip it; remove a task left
      empty.
@@ -104,10 +111,10 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
   self-contained, explicit, and token-dense; write each task's `Context`
   to supply every fact a stateless executor needs, including facts
   surfaced only during inspection.
-- Strengthen each task's `Verification` with concrete, deterministic
-  test-execution commands per `references/verification-guide.md`;
-  challenge each step's feasibility and isolation; rewrite a failing
-  step or demote it to `Risk notes`.
+- Make each task's `Verification` concrete, deterministic, and
+  proportional per `references/verification-guide.md`; challenge each
+  step's feasibility, isolation, and proportionality; rewrite a failing
+  step, trim an excessive one, or demote it to `Risk notes`.
 - Consult `references/prose-protocol.md` before editing `PLAN.md`.
 
 ## Constraints
@@ -147,6 +154,8 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 - **`Must fix`** criteria—failure breaks a requirement, contract,
   safety, or verification:
   - Every `SPEC.md` requirement maps to at least one task's `Satisfies`.
+  - Every `Satisfies` ID names a requirement the task implements and its
+    own `Verification` proves.
   - Every task carries an `Intent` line.
   - Task IDs run contiguously from `T-001`; every `T-NNN`
     reference—`Task graph` edges, the overview list, and `Dependencies`
@@ -171,7 +180,12 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
   - Every `Satisfies`-bearing task's `Acceptance` names testable
     behaviors, with failure modes and edge cases when `SPEC.md`
     specifies them or task logic requires them.
-  - Every task's `Verification` includes test execution commands.
+  - Every task's `Verification` includes test execution commands—one
+    smoke run for an enabling tooling task.
+  - Every `Verification` step follows
+    `references/verification-guide.md`: no re-proof of covered logic,
+    calibration, inadmissible tooling, or isolation beyond the
+    sufficient level.
   - `Task graph` edges mirror per-task `Dependencies` fields.
   - Every `Satisfies: none` task's `Context` states a credible enabling
     rationale.
@@ -187,6 +201,13 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
+- **Result contract**: orchestrating agents parse `Result`; a missing,
+  altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, abort, or halt—with the
+  result template as the final message; never end on progress narration.
+- Set `Result` to exactly one template literal, verbatim; report an
+  abort or halt lacking its own literal as `Failed`, with the reason
+  under `Findings`.
 - Emit result template as live markdown—never in a code fence.
 - Output nothing outside template.
 - Source every `SPAE Status` value from confirmed re-read, never from

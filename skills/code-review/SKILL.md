@@ -44,7 +44,7 @@ Determine scope from the first available source:
 - Current changes in the repository: staged, `unstaged`, and `untracked`
   files in a versioned project.
 
-Abort with a clear message if no scope detected.
+Abort if no scope detected.
 
 Gather intent grounding matching the resolved scope:
 
@@ -207,6 +207,13 @@ Gather intent grounding matching the resolved scope:
 - Split actions and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
 - Omit inapplicable fields.
+- **Result contract**: orchestrating agents parse `Result`; a missing,
+  altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, abort, or halt—with the
+  result template as the final message; never end on progress narration.
+- Set `Result` to exactly one template literal, verbatim; report an
+  abort or halt lacking its own literal as `Failed`, with the reason
+  under `Findings`.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
 

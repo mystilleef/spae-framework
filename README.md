@@ -31,6 +31,7 @@ passes.
 
 - [Framework design](#framework-design)
 - [Usage](#usage)
+- [Proposal](#proposal-optional)
 - [Workflow](#workflow)
 - [Orchestration](#orchestration-pi-and-agy)
 - [Post-verification](#post-verification)
@@ -89,6 +90,32 @@ invocation for its arguments.
 
 `OpenCode` reserves `plan` and `build`, so its agents use `decompose`
 and `implement` instead. See [`opencode/README.md`](opencode/README.md).
+
+---
+
+## Proposal (optional)
+
+`proposal` ships as a skill, not an agent. It drafts a reviewable
+`./<slug>-proposal.md`—design, decisions, rejected alternatives,
+accepted limits, and verification—for any agent taking a `<proposal>`:
+`spec`, `orchestrate`, or `prepare`.
+
+Draft one either way:
+
+- **Discuss first**: settle requirements with an agent, then have it
+  draft the proposal with the `proposal` skill.
+- **Direct**: pass the requirement as the skill's argument.
+
+| Harness    | Direct invocation               |
+| ---------- | ------------------------------- |
+| **`Pi`**   | `/skill:proposal <requirement>` |
+| `Claude`   | `/proposal <requirement>`       |
+| `Agy`      | `/proposal <requirement>`       |
+| `Codex`    | `$proposal <requirement>`       |
+| `OpenCode` | Ask an agent to use the skill   |
+
+Then seed the workflow, for example `/run spec <slug>-proposal.md` or
+`/run orchestrate <slug>-proposal.md`.
 
 ---
 
@@ -239,7 +266,7 @@ point to avoid polluting the main conversation context.
 | ------------------- | ------------------------------------------------- |
 | `/run work`         | Run ad-hoc tasks in an isolated session           |
 | `/run query`        | Answer questions or research without side effects |
-| `/run troubleshoot` | Diagnose and fix issues                           |
+| `/run troubleshoot` | Diagnose issues into a fix-ready report           |
 
 ---
 

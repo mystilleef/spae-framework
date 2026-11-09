@@ -21,12 +21,8 @@ user-invocable: false
 
 ## Input
 
-Read `.spae/current/STATE.json` for phase, cursor, and task registry.
-
-## `STATE.json`
-
-See `references/STATE.md` for the field reference, directives, and phase
-snapshots.
+Read `.spae/current/STATE.json` for `phase`, `workstream`, `cursor`, and
+`tasks`.
 
 ## Phase-agent map
 
@@ -57,16 +53,21 @@ entry after every non-exit read and every spawn.
 
 ## Directives
 
-- Always use the subagent tool for subagent invocation.
+- **Spawn first**: open with the subagent tool, preceded only by the
+  `STATE.json` read; skip all preflight—context gathering, environment
+  discovery, path checks, guide or knowledge-base reads, and plan
+  reviews.
 - Route only from `STATE.json` `phase`; trust it over subagent output
   text.
 - Spawn only the subagents the phase-agent map names.
+- Prompt every spawn with `No arguments`; add no context, summaries, or
+  instructions—each subagent gathers its own.
 
 ## Constraints
 
-- Restrict activities to spawning subagents, reading
-  `.spae/current/STATE.json`, and reporting; never write files, run git
-  operations, activate skills, or prompt the user mid-run.
+- Limit tool calls to the subagent tool and `.spae/current/STATE.json`
+  reads; run nothing else—no other reads, file writes, listings,
+  searches, shell or git commands, skill activation, or user prompts.
 - Never run subagents in parallel or concurrently.
 - **Halt conditions**: halt immediately; report per **Report** with
   `Halted at` and `Reason`:
@@ -82,7 +83,7 @@ entry after every non-exit read and every spawn.
 
 - Every spawn matched the phase-agent map row for the recorded `phase`.
 - The run ended on an exit or a **Halt conditions** entry.
-- The orchestrator wrote no file.
+- Every tool call spawned a subagent or read `STATE.json`.
 
 ## Result directives
 
@@ -91,6 +92,13 @@ entry after every non-exit read and every spawn.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
+- **Result contract**: orchestrating agents parse `Result`; a missing,
+  altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, abort, or halt—with the
+  result template as the final message; never end on progress narration.
+- Set `Result` to exactly one template literal, verbatim; report an
+  abort or halt lacking its own literal as `Failed`, with the reason
+  under `Findings`.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
 
@@ -103,7 +111,7 @@ entry after every non-exit read and every spawn.
 - **Actions**:
   - [Terse list of actions from spawned subagents]
 - **Files**:
-  - [Terse list of files affected by spawned subagents]
+  - [Terse list of files from spawned subagent results]
 - **Findings**:
   - [Terse list of findings from spawned subagents]
 - **Summary**:

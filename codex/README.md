@@ -69,7 +69,7 @@ of the task.
 | `commit`       | Stage and commit the implementation               |
 | `work`         | Run ad-hoc tasks in an isolated session           |
 | `query`        | Answer questions or research without side effects |
-| `troubleshoot` | Diagnose and fix issues                           |
+| `troubleshoot` | Diagnose issues into a fix-ready report           |
 
 ## Orchestration agents
 
@@ -85,5 +85,13 @@ remains untested.
 | `clean`       | Run `purify` then `refactor` agents sequentially      |
 | `purity`      | Spawn `purify` agents to optimize and simplify code   |
 | `structure`   | Spawn `refactor` agents to improve code structure     |
+
+## Proposal skill
+
+`proposal` ships as a skill, not an agent. It optionally drafts
+`<slug>-proposal.md` for `spec`, `orchestrate`, or `prepare`. Settle
+requirements with an agent, then have it use the skill, or run
+`$proposal <requirement>`. See
+[Proposal](../README.md#proposal-optional).
 
 See the [top-level README](../README.md) for the full workflow.
