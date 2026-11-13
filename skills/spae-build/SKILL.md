@@ -37,8 +37,8 @@ mocking, assertion, and performance standards.
 
 ## Cleanup
 
-See `references/cleanup-guide.md` for the self-introduced-artifact
-checklist and diff-only audit scope.
+See `references/cleanup-guide.md` for the Self-cleanup checklist and
+diff-only audit scope.
 
 ## Workflow
 
@@ -61,8 +61,10 @@ checklist and diff-only audit scope.
      `references/shell-command-guide.md`.
    - Map the test surface per `Acceptance` criterion: expected
      behaviors, failure modes, and edge cases.
-   - Choose among valid implementations by fit to the task `Intent`, the
-     plan `## Goal`, and forward seams, not local convenience.
+   - `PLAN.md` fixes outcomes, `Scope`, and `Context` decisions, never
+     method; choose among valid implementations by fit to the task
+     `Intent`, the plan `## Goal`, and forward seams, not local
+     convenience.
    - Halt on any **Halt conditions** entry.
 4. **ACT**—Per `Acceptance` criterion, repeat `test→implement` until it
    passes:
@@ -108,10 +110,12 @@ checklist and diff-only audit scope.
 
 - **Write scope**: edit only the source, tests, docs, and configuration
   the active task requires, plus `.spae/current/STATE.json`; forbid all
-  other writes. Byproducts of a command run for evidence, such as a
-  formatter's rewrites, never count as this phase's writes; never run a
-  command for its write effect outside this scope. Never delete
-  pre-existing uncommitted files.
+  other writes. Write incidental run outputs—logs, reports, experiment
+  files—to scratch: a private temporary directory outside the project,
+  removed when the run ends. Scratch writes and byproducts of a command
+  run for evidence, such as a formatter's rewrites, never count as this
+  phase's writes; never run a command for its write effect outside this
+  scope. Never delete pre-existing uncommitted files.
 - **Phase boundary**: execute exactly one task; hand off work to
   `/check`; never mark a task `"done"` or move the cursor.
 - **Version control and release**: never execute git mutations (staging,

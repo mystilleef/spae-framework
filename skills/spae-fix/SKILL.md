@@ -26,8 +26,8 @@ Read only what the `## Gaps` items require:
 - `.spae/current/STATE.json`; `references/STATE.md` holds field
   reference, directives, and snapshots.
 - `.spae/current/FIX.md`; it carries all task context: the task ID and
-  title in its heading, `## Intent`, and `## Gaps` items with `File`,
-  `Expected`, `Actual`, and `Evidence`.
+  title in its heading, `## Intent`, an optional `## Context`, and
+  `## Gaps` items with `File`, `Expected`, `Actual`, and `Evidence`.
 - Repository source, tests, docs, and configuration the `## Gaps` items
   touch.
 
@@ -38,8 +38,8 @@ mocking, assertion, and performance standards.
 
 ## Cleanup
 
-See `references/cleanup-guide.md` for the self-introduced-artifact
-checklist and diff-only audit scope.
+See `references/cleanup-guide.md` for the Self-cleanup checklist and
+diff-only audit scope.
 
 ## Workflow
 
@@ -107,10 +107,12 @@ checklist and diff-only audit scope.
 - **Write scope**: edit only the source, tests, docs, and configuration
   the `## Gaps` items require, plus `.spae/current/STATE.json` and the
   `.spae/current/FIX.md` deletion, both at `PERSIST`; forbid all other
-  writes. Byproducts of a command run for evidence, such as a
-  formatter's rewrites, never count as this phase's writes; never run a
-  command for its write effect outside this scope. Never delete
-  pre-existing uncommitted files.
+  writes. Write incidental run outputs—logs, reports, experiment
+  files—to scratch: a private temporary directory outside the project,
+  removed when the run ends. Scratch writes and byproducts of a command
+  run for evidence, such as a formatter's rewrites, never count as this
+  phase's writes; never run a command for its write effect outside this
+  scope. Never delete pre-existing uncommitted files.
 - **Phase boundary**: remediate exactly one task; hand off work to
   `/check`; never mark a task `"done"` or move the cursor.
 - **Version control and release**: never execute git mutations (staging,
@@ -132,12 +134,12 @@ checklist and diff-only audit scope.
   - `FIX.md` missing, naming a task other than `cursor.active_task_id`,
     or listing no `## Gaps` item.
   - A gap can't close within its scope: an `Expected` result infeasible
-    or contradicting the `## Intent` or another gap, a broken external
-    dependency, an unrunnable `Evidence` command or project check, or a
-    need for human presence.
+    or contradicting the `## Intent`, `## Context`, or another gap, a
+    broken external dependency, an unrunnable `Evidence` command or
+    project check, or a need for human presence.
 - **Scope control**: close each `## Gaps` item as written and change
-  nothing else; `## Intent` guides design, never scope. No incidental
-  refactoring, cleanup, formatting, or dependency churn.
+  nothing else; `## Intent` and `## Context` shape design, never scope.
+  No incidental refactoring, cleanup, formatting, or dependency churn.
 - **Integrity**: fix issues properly and idiomatically; no hacks,
   workarounds, or shortcuts:
   - Never suppress compiler or linter diagnostics—for example,

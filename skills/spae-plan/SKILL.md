@@ -64,6 +64,7 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
    - For each failure: return to `ACT`, fix, then re-enter `VERIFY`:
      - Uncovered `R-NNN`: add a task.
      - Task serving no requirement and no enabling purpose: remove it.
+     - Granularity: split a non-atomic task; merge a merge candidate.
    - Exit only when every criterion passes.
    - Never halt on requirement content.
 6. **PERSIST**—Write in order:
@@ -80,21 +81,25 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 - Refine and optimize `PLAN.md` for agent consumption: agents read it
   for varied purposes, with no memory of this run; keep it
   self-contained, explicit, token-dense, and minimal.
+- Keep each task self-contained and isolated per
+  `references/outcome-guide.md` **Self-contained units**: fresh,
+  isolated agents holding only the task's `PLAN.md` text and the
+  repository can build, test, and verify it, each in a separate run;
+  write `Context` to supply every fact they need and can't derive,
+  including facts surfaced only while planning.
+- Slice vertically into atomic tasks with no merge candidate, per
+  **Verification**.
 - Align with existing codebase patterns; avoid speculative design.
-- Slice vertically; avoid infrastructure-only tasks unless required;
-  leave the system working after each task.
-- Assume each task executes, reviews, and refines under a stateless
-  agent with no memory beyond `PLAN.md` text and resulting source; write
-  `Context` to supply every fact that agent needs, including facts
-  surfaced only while planning.
-- Write acceptance criteria as observable outcomes; name testable
-  behaviors for a `Satisfies`-bearing task (include failure modes and
-  edge cases only when specified in `SPEC.md` or required by task
-  logic); state structural assurances for a `Satisfies: none` enabling
-  task.
-- Write `Verification` as concrete, deterministic, proportional
-  commands, including test execution, per
-  `references/verification-guide.md`:
+- Write acceptance criteria as observable outcomes, contracts, and
+  preserved behaviors at risk; name testable behaviors for a
+  `Satisfies`-bearing task (include failure modes and edge cases only
+  when specified in `SPEC.md` or required by task logic); state
+  structural assurances for a `Satisfies: none` enabling task.
+- Write `Verification` as project commands or existing test targets,
+  including test execution, each mapped to the outcomes it proves; keep
+  each step concrete, deterministic, and proportional per
+  `references/verification-guide.md`; never name invocation mechanics,
+  test design, or review procedures:
   - Bind each step to tooling available now or installed by a dependency
     task.
   - Schedule a tooling task only for tooling the `SPEC.md`
@@ -102,13 +107,19 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
     own test suite.
   - Never re-prove in a later task logic an earlier task's tests cover.
   - Carry `SPEC.md` residual risks into `Risk notes`.
-- Consult `references/prose-protocol.md` before drafting `PLAN.md`.
+- Consult `references/prose-protocol.md` and
+  `references/outcome-guide.md` before drafting `PLAN.md`.
 
 ## Constraints
 
 - **Write scope**: write only `.spae/current/PLAN.md` and
-  `.spae/current/STATE.json`; forbid all other writes. Read source code
-  only for codebase fit.
+  `.spae/current/STATE.json`; forbid all other writes. Write incidental
+  run outputs—logs, reports, experiment files—to scratch: a private
+  temporary directory outside the project, removed when the run ends.
+  Scratch writes and byproducts of a command run for evidence, such as a
+  formatter's rewrites, never count as this phase's writes; never run a
+  command for its write effect outside this scope. Read source code only
+  for codebase fit.
 - **Phase boundary**: hand off work to `/inspect`; don't execute tasks.
 - **Version control and release**: never create tasks for version
   control (git staging, commits, branches, tags) or release operations
@@ -130,8 +141,8 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 
 ## Verification
 
-- `PLAN.md` holds atomic tasks in structure matching
-  `references/PLAN.md` exactly.
+- `PLAN.md` holds tasks in structure matching `references/PLAN.md`
+  exactly.
 - Every `SPEC.md` requirement maps to at least one task's `Satisfies`.
 - Every task carries an `Intent` distilled from the requirements it
   satisfies, or—for a `Satisfies: none` enabling task—its structural
@@ -146,13 +157,28 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 - Every `Satisfies` ID names a requirement the task implements and its
   own `Verification` proves.
 - Every task's `Verification` includes test execution—one smoke run for
-  an enabling tooling task—and follows
-  `references/verification-guide.md`; no step presumes human execution,
-  an attended or interactive terminal, or human presence.
+  an enabling tooling task—maps each step to the outcomes it proves, and
+  follows `references/verification-guide.md`; no step carries invocation
+  mechanics or presumes human execution, an attended or interactive
+  terminal, or human presence.
+- Every task stays self-contained and isolated per
+  `references/outcome-guide.md` **Self-contained units**: fresh agents
+  holding only its text and the repository can build, test, and verify
+  it, each in a separate run.
+- Every task stays atomic: a change one run can build, leaving the
+  system working.
+- No merge candidate remains: bordering tasks—linked by a dependency
+  edge or sharing `Scope` surface—form one unless any of these holds:
+  - Each satisfies a requirement or serves as tooling setup or a final
+    verification gate.
+  - A third task must run between them.
+  - Their merge would outgrow one run.
+- Every task line passes the `references/outcome-guide.md` substitution
+  test; `Context` holds no derivable fact beyond entry-point paths.
 - Zero tasks mandate version control or release operations.
 - `STATE.json` specifies `phase: "inspect"`, `status: "active"`,
   `cursor: {}`, and `tasks` mapping every `PLAN.md` task ID to `"todo"`.
-- No files outside **Write scope** changed.
+- This phase wrote no file outside **Write scope**.
 
 ## Result directives
 

@@ -19,7 +19,7 @@ code, and orphan files from accumulating across task cycles.
 - Forbid deleting pre-existing _untracked_ files or lines outside the
   task's declared scope.
 
-## Checklist—self-introduced artifacts
+## Self-cleanup checklist
 
 - Debug output (`console.*`, `print`, `debugger`, or similar) added to
   production code during this task.
@@ -44,6 +44,10 @@ out=$(mktemp)
 GIT_INDEX_FILE="${out}" git add -A && base_tree=$(GIT_INDEX_FILE="${out}" git write-tree) && rm -f "${out}"
 ```
 
+In an unversioned project, skip the snapshot: capture each file's
+content before this task's first edit to it, and record each file this
+task creates; audit those in place of the diff.
+
 ## Audit command
 
 Run before `PERSIST`, scoped to `$base_tree` and declared task paths:
@@ -60,7 +64,8 @@ git --no-pager diff --no-ext-diff -U0 -- <task-scoped-paths>
 ```
 
 Never run un-scoped `git status` or un-scoped `git diff` to flag orphan
-files in dirty or uncommitted repositories.
+files. Treat baseline and diff commands purely as read-only snapshot
+utilities; never stage files or alter repository commit history.
 
 ## Canonical VERIFY sub-step
 
@@ -94,4 +99,5 @@ another skill's diff (for example, `/check`):
 - No _untracked_ file created during the task invocation survives
   outside declared Scope/Files.
 - No dependency added during this task goes unused.
-- Pre-existing uncommitted files outside task scope remain unmodified.
+- Task edits leave pre-existing uncommitted files outside task scope
+  unmodified.

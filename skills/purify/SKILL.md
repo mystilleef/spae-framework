@@ -2,7 +2,8 @@
 name: purify
 description:
   "Eliminate KISS, YAGNI, Idiomatic, and Hygiene violations, including
-  test-suite bloat, while preserving intended behavior."
+  bloated, obsolete, and flaky tests, while preserving intended
+  behavior."
 user-invocable: true
 argument-hint: "[optional: file path, module, or focus area]"
 ---
@@ -15,6 +16,7 @@ argument-hint: "[optional: file path, module, or focus area]"
 - Existing implementation looks correct but heavier than necessary.
 - Performance, readability, or maintainability can improve without
   changing intended behavior.
+- Test suites carry redundant, obsolete, slow, or flaky tests.
 
 ## Goal
 
@@ -25,8 +27,9 @@ argument-hint: "[optional: file path, module, or focus area]"
 - Improve efficiency only through safe, verified changes.
 - Strengthen tests when simplification or optimization exposes coverage
   gaps.
-- Keep test suites small and fast: prune redundant tests, speed slow
-  ones, preserve protection.
+- Keep test suites small, fast, and deterministic: prune redundant and
+  obsolete tests, speed slow ones, stabilize flaky ones, preserve
+  protection.
 
 ## Input
 
@@ -39,7 +42,7 @@ Abort if no scope exists.
 
 _Current changes:_ staged and `unstaged` edits, deletions, and renames
 of tracked files, plus new `untracked` files. Requires a versioned
-project, abort if none detected.
+project.
 
 ## Testing
 
@@ -47,7 +50,8 @@ See `references/testing-guide.md` for test structure, isolation,
 mocking, assertion, and performance standards.
 
 When scope includes test files, see `references/test-pruning-guide.md`
-for the bloat smell catalog, deletion evidence, and speed fixes.
+for the test smell catalog, edit order, deletion evidence, and speed and
+stability fixes.
 
 ## Shell commands
 
@@ -56,8 +60,8 @@ redirects, and non-interactive environment directives.
 
 ## Cleanup
 
-See `references/cleanup-guide.md` for the self-introduced-artifact
-checklist and diff-only audit scope.
+See `references/cleanup-guide.md` for the Self-cleanup checklist and
+diff-only audit scope.
 
 ## Workflow
 
@@ -76,26 +80,27 @@ checklist and diff-only audit scope.
      Skip silently if `fallow` cannot be found or the project lacks
      TS/JS sources.
    - When scope includes test files, read
-     `references/test-pruning-guide.md` and detect bloat using its smell
-     catalog.
+     `references/test-pruning-guide.md` and detect test smells using its
+     catalog; failing obsolete tests count as test smells, not baseline
+     failures.
    - Record one detection line per category: `KISS`, `YAGNI`,
-     `Idiomatic`, `Hygiene`, and test-suite bloat when scope includes
-     test files. Each line names code examined (or why none applies) and
+     `Idiomatic`, `Hygiene`, and test smells when scope includes test
+     files. Each line names code examined (or why none applies) and
      violations found.
    - Once every category carries a line, exit if the survey finds none
      of: dead code, redundant abstractions, unused helpers,
      over-engineered constructs, non-idiomatic patterns, hygiene debt,
-     or test-suite bloat. Emit `Result: No Changes` via the template
-     below and halt.
+     or test smells. Emit `Result: No Changes` via the template below
+     and halt.
    - When detected waste carries high regression risk resisting safe
      verification under existing tests: record in `Findings`, omit
      edits, and emit `Result: No Changes`.
 2. **ORIENT**—State goal and scope in one sentence. Name what won't
    change: behavior, public interfaces, and feature scope. Capture
    pre-task baseline snapshot per `references/cleanup-guide.md`.
-3. **PLAN**—Read `references/testing-guide.md` and
-   `references/cleanup-guide.md`. Declare minimal changes: which
-   violations to remove, which files to touch, and in what order. Check
+3. **PLAN**—Read `references/testing-guide.md`. Declare minimal changes:
+   which violations to remove, which files to touch, and in what order;
+   test edits follow the `references/test-pruning-guide.md` order. Check
    ambiguous or risky slices before acting.
 4. **ACT**—Execute only what PLAN declared. Nothing more.
    - Remove dead code, unused branches, redundant state, obsolete
@@ -106,8 +111,7 @@ checklist and diff-only audit scope.
      behavior stay unchanged.
    - Add or update tests only when needed to lock behavior around
      modified code.
-   - Prune test bloat per `references/test-pruning-guide.md`, after
-     production edits verify green and a fresh baseline exists.
+   - Prune and stabilize tests per `references/test-pruning-guide.md`.
 5. **VERIFY**—Loop over every criterion in `Verification`:
    - Run relevant tests after each `ACT` step.
    - Audit task edits against the pre-task baseline using the
@@ -195,6 +199,8 @@ checklist and diff-only audit scope.
 - Coverage protects modified behavior or documented gaps remain.
 - Test pruning leaves coverage at the pre-pruning baseline and lowers
   test count or suite runtime.
+- Each stabilized test passes every repeated run
+  `references/test-pruning-guide.md` requires.
 - Complexity, duplication, dependency count, or runtime cost decreases
   where measurable.
 - No self-introduced cleanup violation remains per

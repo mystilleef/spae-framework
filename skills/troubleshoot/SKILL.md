@@ -42,7 +42,8 @@ argument-hint: "<symptom | path/to/diagnosis.md>"
   `AGENTS.md`, `CONTRIBUTING.md`, `README.md`.
 - Codebase sections the failure touches.
 - `references/DIAGNOSIS.md`: section template.
-- `references/prose-protocol.md`, `references/verification-guide.md`,
+- `references/prose-protocol.md`, `references/outcome-guide.md`,
+  `references/verification-guide.md`,
   `references/shell-command-guide.md`.
 
 ## Workflow
@@ -101,7 +102,11 @@ Select path by argument:
 ## Directives
 
 - Optimize for agent, token, and context efficiency.
-- Consult `references/prose-protocol.md` before drafting.
+- Consult `references/prose-protocol.md` and
+  `references/outcome-guide.md` before drafting; apply the guide's
+  substitution test to `Fix direction`, `Scope`, and `Verification`;
+  every other section records evidence or settled items—non-derivable
+  facts the guide keeps.
 - **Self-contained**: the fixing agent acts on the diagnosis with no
   memory of this run or conversation; keep it self-contained, explicit,
   and token-dense:
@@ -145,8 +150,9 @@ Select path by argument:
   - List incidental defects outside the symptom's causal chain under
     `Scope` `Exclude` with `path:line`, never as findings.
 - **Fix direction, not a diff**: per finding, name the root-cause site,
-  the change intent, the invariants it keeps, and coupling with other
-  findings; omit code patches—leave implementation to the fixer.
+  the corrected behavior there, the invariants it keeps, and coupling
+  with other findings; never the edit or a code patch—leave
+  implementation to the fixer.
 - **Rejected fixes**: log each plausible fix carrying a defect, with its
   defect—only candidates this failure invites, never boilerplate:
   - Guards, retries, or timeouts masking an upstream fault.
@@ -155,9 +161,9 @@ Select path by argument:
   - Type weakening—`as any`, non-null `!`, broadened unions.
   - Weakened, skipped, or deleted tests.
   - Build or tool configuration edits.
-- **Regression test**: under `Verification`, specify the test the fixer
-  adds—file, input, asserted behavior—failing at `Baseline` and passing
-  after the fix; follow the repository's test layout; when impractical,
+- **Regression test**: under `Verification`, specify the triggering
+  input and asserted behavior—failing at `Baseline`, passing after the
+  fix; leave test location and design to the fixer; when impractical,
   record why under `Accepted limits`.
 - **YAGNI**: discard unrequested scope, speculative refactors, and
   theoretical hardening; log each discard under `Rejected fixes` with a
@@ -215,13 +221,15 @@ Select path by argument:
 - `Reproduction` runs unattended from the repository root and yields its
   `Fails with` outcome at `Baseline`; `Not Reproduced` lists every
   condition tried.
-- Each finding cites `path:line` and symbol, mechanism, proof, severity,
-  and confidence, at its earliest causal defect; each `Suspected`
-  finding names its `Missing evidence`.
+- Each finding cites `path:line` and symbol, causal chain, proof,
+  severity, and confidence, at its earliest causal defect; each
+  `Suspected` finding names its `Missing evidence`.
 - `Status` `Result` matches the **Result** rules.
 - Every rejected hypothesis appears under `Ruled out` with its
   disproving check.
-- Every finding carries a `Fix direction` entry; no code patch or
+- Every finding carries a `Fix direction` entry; every `Fix direction`,
+  `Scope`, and `Verification` line passes the
+  `references/outcome-guide.md` substitution test; no code patch or
   implementation sequence appears.
 - `Refine`: every claim-ledger entry maps to a target section; no claim
   or rationale vanishes.

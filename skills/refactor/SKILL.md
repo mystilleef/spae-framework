@@ -36,7 +36,7 @@ Abort if no scope exists.
 
 _Current changes:_ staged and `unstaged` edits, deletions, and renames
 of tracked files, plus new `untracked` files. Requires a versioned
-project. Abort if none detected.
+project.
 
 ## Testing
 
@@ -50,8 +50,8 @@ redirects, and non-interactive environment directives.
 
 ## Cleanup
 
-See `references/cleanup-guide.md` for the self-introduced-artifact
-checklist and diff-only audit scope.
+See `references/cleanup-guide.md` for the Self-cleanup checklist and
+diff-only audit scope.
 
 ## Workflow
 

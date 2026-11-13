@@ -14,14 +14,19 @@ system boundary. Reserve end-to-end tests for critical user flows.
   standalone test files only for new modules or distinct boundaries.
 - Prefer parameterized tests for table-driven input variations on
   identical invariants; avoid copy-pasting test bodies.
-- Never commit focused (`only`) or skipped (`skip`, `xit`, `xtest`)
-  tests.
+- Never commit focused (`only`) or unconditionally skipped (`skip`,
+  `xit`, `xtest`) tests; every conditional skip guard names its missing
+  prerequisite in the skip reason.
 
 ## Isolation
 
 - Each test must pass independently of execution order.
 - Restore all mutations to global/shared state after each test.
 - Reset all shared registries and stores before each test.
+- Seed or inject every random source; never let outcomes hinge on
+  unseeded randomness.
+- Never share files, ports, or sockets across tests; give each test its
+  own temp directory and an OS-assigned port (`0`).
 
 ## CI parity
 
@@ -69,6 +74,8 @@ system boundary. Reserve end-to-end tests for critical user flows.
 ## Assertions
 
 - Assert observable behavior, not internal implementation.
+- Assert unordered collections (sets, map keys, concurrent results)
+  without depending on iteration order.
 - Eliminate redundant assertions; never duplicate existing test
   coverage.
 - Cover the happy path and every distinct failure and cancellation path.
@@ -101,8 +108,9 @@ system boundary. Reserve end-to-end tests for critical user flows.
 
 ## Verification
 
-- Run the test file and confirm it passes before declaring the task
-  done.
+- Run each new or changed test file three times, shuffling order via an
+  existing runner flag when available; every run must pass before
+  declaring the task done, without retries.
 - Run the full test suite and confirm zero new failures.
 - Verify the test runner executes the added or updated tests.
 - Scan every new or changed test file for stray console/print/debugger

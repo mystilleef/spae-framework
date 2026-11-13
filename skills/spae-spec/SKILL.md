@@ -20,8 +20,8 @@ argument-hint: "[optional-workstream-name] [optional-task]"
 ## Goal
 
 - Distill user requests, verification findings, and codebase context
-  into concise, testable requirements while preserving `SPAE` phase
-  boundaries.
+  into concise, testable requirements, correcting proven proposal
+  defects, while preserving `SPAE` phase boundaries.
 - Generate `.spae/[workstream]/SPEC.md` and advance `STATE.json` to
   `phase: plan`.
 
@@ -31,9 +31,10 @@ Resolve target `workstream` by first matching rule:
 
 - **Explicit**: workstream name argument → `.spae/[name]/`.
 - **Implicit active**: no name, no proposal → `.spae/current` target.
-- **Implicit new**: no name, proposal → `.spae/current` target when it
-  lacks `STATE.json` or reads `phase: spec`, `status: active`; otherwise
-  a new kebab-case slug unused under `.spae/`.
+- **Implicit new**: no name, proposal → the `.spae/current` target when
+  the link exists and its target lacks `STATE.json` or reads
+  `phase: spec`, `status: active`; otherwise—`.spae/current` missing
+  included—a new kebab-case slug unused under `.spae/`.
 
 Sources:
 
@@ -62,13 +63,17 @@ Select path by target state:
    - Read `AGENTS.md` at project root in full when present.
    - `Revision`: read `VERIFY.md` in full.
 3. **PLAN**—Identify codebase sections to read:
-   - `Draft`: sections the proposal touches.
+   - `Draft`: sections the proposal touches, plus direct
+     dependents—callers, importers, configs, tests, and docs—of each
+     interface or behavior it changes.
    - `Revision`: source files each `VERIFY.md` finding names.
 4. **ACT**—Draft `SPEC.md` content:
    - Read codebase sections narrowly; widen only on uncertainty.
    - `Draft`:
-     - Seed the aspect ledger from an existing `SPEC.md`, when present,
-       then sweep the proposal per `references/aspect-sweep.md`.
+     - Seed the aspect ledger from an existing `SPEC.md`, when present;
+       sweep the proposal, then audit the ledger, per
+       `references/aspect-sweep.md`; resolve each defect per **Proposal
+       fidelity**.
      - Derive goal, requirements, testing strategy, out-of-scope
        boundaries, and assumptions from the ledger.
    - `Revision`:
@@ -107,21 +112,26 @@ Select path by target state:
 - Optimize for agent, token, and context efficiency.
 - Align with existing codebase patterns; avoid speculative design.
 - Filter all requirements and incoming findings against `YAGNI`; discard
-  `unrequested` scope, speculative design, or theoretical complexity.
-  File YAGNI-discarded ledger aspects under `Out of scope` with a
-  one-line rationale, never a silent drop.
+  `unrequested` scope, speculative design, or theoretical complexity. An
+  audit-proven gap never counts as `unrequested` scope. File
+  YAGNI-discarded ledger aspects under `Out of scope` with a one-line
+  rationale, never a silent drop.
   - Filter verification breadth too: carry a proposal's verification
     request as the outcomes it protects, never its recipe, rig, or case
     matrix.
 - Write observable, testable, and implementation-neutral requirements;
-  tag each with a unique, stable `R-NNN` identifier.
+  tag each with a unique, stable `R-NNN` identifier:
+  - Carry a proposal's design claim as the contract or outcome it
+    delivers, never its mechanism—a restatement, not a correction; a
+    mechanism binds only through a settled decision or `AGENTS.md`.
 - Match level of detail to task size; avoid process bloat:
   - Require failure modes and edge cases only when the proposal
     introduces complex branching or error paths.
   - Set `Assumptions` to `None` on single-behavior specs unless explicit
     constraints exist.
-  - Never invent exclusions, assumptions, edge cases, or failure modes;
-    keep section headers intact.
+  - Never invent exclusions, assumptions, edge cases, or failure modes
+    absent evidence; an audit-proven gap supplies evidence; keep section
+    headers intact.
 - Consult `references/verification-guide.md`; decide the cheapest
   evidence proving each requirement:
   - Translate manual checks and proposal verification recipes into the
@@ -134,15 +144,19 @@ Select path by target state:
     rule.
   - Record outcomes lacking admissible, calibration-free evidence as
     `Out of scope` residual risks.
-- Consult `references/prose-protocol.md` before drafting `SPEC.md`.
+- Consult `references/prose-protocol.md` and
+  `references/outcome-guide.md` before drafting `SPEC.md`.
 - Refine and optimize `SPEC.md` for agent consumption: agents read it
   for varied purposes, with no memory of this run; keep it
   self-contained, explicit, and token-dense.
-- Run the aspect sweep on `Draft` only, per
+- Run the aspect sweep and ledger audit on `Draft` only, per
   `references/aspect-sweep.md`; `Revision` consumes `VERIFY.md` findings
   directly. Reference `PHASE_COUNT` by name only.
-- Surface aspect-sweep phases run in the result `Actions` list (for
-  example, `aspect sweep: 8/8 phases, 12/12 sections mapped`).
+- Surface aspect-sweep phases run and ledger-audit counts by defect
+  class in the result `Actions` list (for example,
+  `aspect sweep: 8/8 phases, 12/12 sections mapped`;
+  `ledger audit: 1 contradiction, 1 premise, 2 gaps`); list each
+  correction under `Findings`: claim, defect, disposition.
 
 ## Constraints
 
@@ -151,8 +165,13 @@ Select path by target state:
   contradictions count as spec defects.
 - **Write scope**: write only `.spae/current` symlink,
   `.spae/[workstream]/` directory, `SPEC.md`, and `STATE.json`; forbid
-  all other writes. Inspect source code to ground requirements and
-  confirm fit; stay read-only.
+  all other writes. Write incidental run outputs—logs, reports,
+  experiment files—to scratch: a private temporary directory outside the
+  project, removed when the run ends. Scratch writes and byproducts of a
+  command run for evidence, such as a formatter's rewrites, never count
+  as this phase's writes; never run a command for its write effect
+  outside this scope. Inspect source code only to ground requirements
+  and confirm fit.
 - **Phase boundary**: hand off work to `/plan`; don't decompose tasks.
 - **Version control and release**: never author requirements for version
   control (git staging, commits, branches, tags) or release operations
@@ -167,23 +186,48 @@ Select path by target state:
 - **Ambiguity**: resolve from codebase evidence first; fall back to a
   documented conservative assumption only when evidence proves
   insufficient; record under **Assumptions** in `SPEC.md`.
-- **Contradictions**: audit `SPEC.md` for internal conflict—mutually
-  exclusive requirements, a requirement an `Out of scope` item forbids,
-  a requirement contradicting `AGENTS.md`, `Assumptions`, or
-  `Testing strategy`, or an assumption contradicting source code.
-  Self-heal by precedence:
+- **Proposal fidelity** (`Draft`): the qualified goal—the proposal goal
+  as its settled items narrow it—binds; every other claim serves it.
+  - Settled items: decisions, rejected alternatives, accepted limits,
+    and explicit exclusions, under any heading. Each binds unless source
+    code or `AGENTS.md` falsifies its premise or proves it leaves the
+    goal unreachable.
+  - Correct a claim only on a defect the ledger audit proves; leave
+    merely suboptimal design as written; never redesign.
+  - Resolve by precedence, highest first: `AGENTS.md`, source code, the
+    qualified goal, other claims, own judgment; between peers, the claim
+    serving the qualified goal wins; otherwise apply the **Ambiguity**
+    fallback.
+  - Apply the smallest correction and cite its evidence.
+  - On a premise-void proposal—source falsifies the goal's premise, or
+    the codebase already meets the goal—specify the goal outcome against
+    source reality, file falsified claims under `Out of scope`, and lead
+    `Findings` with the void premise.
+  - Never halt on a proposal defect.
+- **Contradictions**: audit `SPEC.md` as one self-contained unit per
+  `references/outcome-guide.md`; conflicts include mutually exclusive
+  requirements, a requirement an `Out of scope` item forbids, a
+  requirement contradicting `AGENTS.md`, `Assumptions`, or
+  `Testing strategy`, an assumption contradicting source code, or
+  evidence demanded from a repository state whose runs breach
+  `Testing strategy` or `references/verification-guide.md`. Self-heal by
+  precedence:
   - `AGENTS.md` overrides requirements.
   - Requirements override `Out of scope`, except version control,
-    release, and human-presence exclusions.
+    release, human-presence, and settled-item exclusions.
   - Requirements override assumptions and testing strategy.
   - Source code overrides assumptions.
+  - `references/verification-guide.md` settles a state-bound evidence
+    conflict; record an outcome it leaves unprovable as an
+    `Out of scope` residual risk.
   - Otherwise apply the **Ambiguity** fallback; never halt on a
     contradiction.
 - **State schema**: never introduce `STATE.json` fields outside
   `references/STATE.md`.
 - **Halt conditions**: halt without writing; report `Failed` with a
   diagnostic under `Findings`:
-  - `.spae/current` missing or dangling when resolution needs it.
+  - `.spae/current` missing or dangling under **Implicit active**
+    resolution.
   - `STATE.json` holds unparseable JSON syntax.
   - Target state matches neither path.
   - `Draft` without a proposal or task.
@@ -194,6 +238,8 @@ Select path by target state:
 - Ensure `.spae/[workstream]/SPEC.md` contains distilled requirements
   and structure matching `references/SPEC.md` exactly.
 - Confirm each item carries a unique `R-NNN` identifier.
+- Confirm every requirement passes the `references/outcome-guide.md`
+  substitution test.
 - Confirm no **Contradictions** finding survives in `SPEC.md`.
 - Confirm zero requirements mandate git operations, package publishing,
   or release deployments.
@@ -204,8 +250,9 @@ Select path by target state:
   modes and edge cases only for complex proposals; allow single-target
   verification on single-behavior specs.
 - Confirm `Testing strategy` pairs each requirement with its cheapest
-  proving evidence; no rig, recipe, coordinate, calibration step,
-  inadmissible tooling, or re-proof of logic cheaper evidence covers
+  proving evidence per `references/verification-guide.md`; no rig,
+  recipe, coordinate, calibration step, inadmissible tooling, re-proof
+  of logic cheaper evidence covers, or evidence producing what it judges
   survives.
 - Confirm section depth matches task size; no invented edge case,
   failure mode, or exclusion on a single-behavior spec.
@@ -214,8 +261,12 @@ Select path by target state:
   success criterion—no orphaned aspect.
 - Confirm every proposal `section-ref` maps to a ledger signature or
   carries `no claim`, per `references/aspect-sweep.md`.
-- Confirm `Revision` runs no aspect sweep; converted `VERIFY.md` items
-  map directly to spec items.
+- Confirm every `Draft` ledger-audit defect resolves per
+  `references/aspect-sweep.md` **Ledger audit** dispositions, each
+  correction citing its evidence; no settled item yields without the
+  source or `AGENTS.md` evidence **Proposal fidelity** demands.
+- Confirm `Revision` runs no aspect sweep or ledger audit; converted
+  `VERIFY.md` items map directly to spec items.
 - Ensure `.spae/[workstream]/STATE.json` specifies `phase: "plan"`,
   `status: "active"`, `cursor: {}`, and `tasks: {}`.
 - Confirm `.spae/current` links to `.spae/[workstream]`.

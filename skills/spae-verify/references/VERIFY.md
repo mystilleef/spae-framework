@@ -5,7 +5,7 @@
 
 - **[R-NNN | none]**
   - **File**: `path:line`
-  - **Expected**: [expected result]
+  - **Expected**: [expected outcome—never the remedy]
   - **Actual**: [actual result]
   - **Evidence**: [reproducible evidence]
 

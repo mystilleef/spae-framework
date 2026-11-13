@@ -108,17 +108,22 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 - Refine and optimize `VERIFY.md` for agent consumption: agents read it
   for varied purposes, with no memory of this run; keep it
   self-contained, explicit, and token-dense; make each `Hard block`
-  actionable without repeating the investigation.
-- Consult `references/prose-protocol.md` before drafting `VERIFY.md`.
+  actionable without repeating the investigation: the unmet requirement
+  outcome with evidence; no finding prescribes a remedy.
+- Consult `references/prose-protocol.md` and
+  `references/outcome-guide.md` before drafting `VERIFY.md`.
 
 ## Constraints
 
 - **Write scope**: write only `.spae/current/VERIFY.md` and
   `.spae/current/STATE.json`; on `Pass`, delete `VERIFY.md` and the
-  `.spae/current` symlink; forbid all other writes. Byproducts of a
-  command run for evidence, such as a formatter's rewrites, never count
-  as this phase's writes; never run a command for its write effect
-  outside this scope. Read source code only for analysis.
+  `.spae/current` symlink; forbid all other writes. Write incidental run
+  outputs—logs, reports, experiment files—to scratch: a private
+  temporary directory outside the project, removed when the run ends.
+  Scratch writes and byproducts of a command run for evidence, such as a
+  formatter's rewrites, never count as this phase's writes; never run a
+  command for its write effect outside this scope. Read source code only
+  for analysis.
 - **Phase boundary**: judge the whole `workstream`; complete it or hand
   off work to `/spec`.
 - **Version control and release**: never execute git mutations (staging,
@@ -154,7 +159,8 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 - On `Revision required`, the `VERIFY.md` draft matches
   `references/VERIFY.md`: every finding headed by its `R-NNN`, else
   `none`; every `Hard block` with `File`, `Expected`, `Actual`, and
-  reproducible `Evidence`.
+  reproducible `Evidence`; every `Expected` names the unmet requirement
+  outcome; no finding prescribes a remedy.
 - No `VERIFY.md` finding requests human execution, an attended or
   interactive terminal, or human presence.
 - `STATE.json` matches the `references/STATE.md` exit snapshot for the

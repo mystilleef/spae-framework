@@ -19,7 +19,7 @@ code, and orphan files from accumulating across task cycles.
 - Forbid deleting pre-existing _untracked_ files or lines outside the
   task's declared scope.
 
-## Checklist—self-introduced artifacts
+## Self-cleanup checklist
 
 - Debug output (`console.*`, `print`, `debugger`, or similar) added to
   production code during this task.
@@ -43,6 +43,10 @@ tree without staging or workspace pollution:
 out=$(mktemp)
 GIT_INDEX_FILE="${out}" git add -A && base_tree=$(GIT_INDEX_FILE="${out}" git write-tree) && rm -f "${out}"
 ```
+
+In an unversioned project, skip the snapshot: capture each file's
+content before this task's first edit to it, and record each file this
+task creates; audit those in place of the diff.
 
 ## Audit command
 

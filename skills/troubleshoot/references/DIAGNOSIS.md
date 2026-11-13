@@ -38,7 +38,7 @@
 
 - **F1 [Title]**—`path:line` (`symbol`) · [critical | high | medium |
   low] · [Confirmed | Suspected]:
-  - **Mechanism**: [Causal chain from trigger to symptom]
+  - **Causal chain**: [Trigger to symptom, step by step]
   - **Proof**: [Check run and observed outcome]
   - **Missing evidence**: [Suspected only—confirming observation; why
     unreachable]
@@ -49,8 +49,8 @@
 
 ## Fix direction
 
-- **F1**: [Change intent at the root-cause site; invariants kept;
-  coupling with other findings]
+- **F1**: [Corrected behavior at the root-cause site—never the edit;
+  invariants kept; coupling with other findings]
 
 ## Rejected fixes
 
@@ -59,7 +59,7 @@
 
 ## Scope
 
-- **Touch**: [Files or modules the fix edits]
+- **Touch**: [Surface the fix may change—modules, behaviors, contracts]
 - **Exclude**: [Explicit boundaries; incidental defects outside the
   causal chain, with `path:line`]
 
@@ -73,8 +73,8 @@
 
 ## Verification
 
-| Outcome         | Evidence                                                      |
-| --------------- | ------------------------------------------------------------- |
-| [F/P ID or aim] | [Existing test, tool, or seam—ladder rung]                    |
-| F1 regression   | [New test: path, input, asserted behavior—fails, then passes] |
+| Outcome         | Evidence                                                           |
+| --------------- | ------------------------------------------------------------------ |
+| [F/P ID or aim] | [Existing test, tool, or seam—ladder rung]                         |
+| F1 regression   | [New test: triggering input, asserted behavior—fails, then passes] |
 ```

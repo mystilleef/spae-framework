@@ -40,7 +40,8 @@ argument-hint: "<task statement | path/to/proposal.md>"
   `AGENTS.md`, `CONTRIBUTING.md`, `README.md`.
 - Codebase sections the proposal touches.
 - `references/PROPOSAL.md`: section template.
-- `references/prose-protocol.md`, `references/verification-guide.md`.
+- `references/prose-protocol.md`, `references/outcome-guide.md`,
+  `references/verification-guide.md`.
 
 ## Workflow
 
@@ -91,7 +92,8 @@ Select path by argument:
 ## Directives
 
 - Optimize for agent, token, and context efficiency.
-- Consult `references/prose-protocol.md` before drafting.
+- Consult `references/prose-protocol.md` and
+  `references/outcome-guide.md` before drafting.
 - **Self-contained**: readers, often agents, use the proposal for varied
   purposes, with no memory of this run or conversation; keep it
   self-contained, explicit, and token-dense:
@@ -100,7 +102,9 @@ Select path by argument:
     from the repository, such as deleted experiment directories.
 - **Claims become scope**: downstream readers turn every claim into a
   requirement, test, or exclusion; write only what merits building,
-  preserving, or proving.
+  preserving, or proving. State `Design` as components, interfaces, and
+  contracts; bind an internal choice through `Decisions` with its
+  rationale, else omit it.
 - **Condense, never drop** (`Refine`): tighten wording; keep every claim
   and its rationale; move a discarded claim to `Rejected` or
   `Accepted limits` with a one-line rationale, never silently.
@@ -170,6 +174,9 @@ Select path by argument:
 - Every claim names something to build, preserve, decide, reject, or
   accept; no open question, `Unverified` item, TODO, or follow-up
   survives.
+- Every `Design` claim passes the `references/outcome-guide.md`
+  substitution test; every bound internal choice sits under `Decisions`
+  with its rationale.
 - Each `Verification` row names existing repository tooling and its
   ladder rung; no new tooling, rig, recipe, coordinate, or key sequence
   appears.

@@ -22,7 +22,8 @@
 
 ## Design
 
-- **C1 [Component]**: [Mechanism, defined terms, interfaces]
+- **C1 [Component]**: [Interfaces, contracts, defined terms—no
+  mechanism]
 
 ## Decisions
 

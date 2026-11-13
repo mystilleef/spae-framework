@@ -59,22 +59,38 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
    - Uncovered `R-NNN`: add or extend a task to implement it.
    - Missing or vague `Intent`: backfill or sharpen from `SPEC.md`; for
      an enabling task, from `Context` and the plan `## Goal`.
-   - Plan↔spec contradiction: rewrite the task to conform; `SPEC.md`
-     wins.
-   - Task conflict: reconcile against `SPEC.md`; where `SPEC.md` stays
-     silent, conform the later task to the earlier task's `Acceptance`
-     contract.
+   - Plan `## Goal` or `## Assumptions` conflicting with `SPEC.md` or
+     source code: rewrite it to conform; `SPEC.md` wins on requirements,
+     source code on facts.
+   - Task failing `references/outcome-guide.md` **Self-contained
+     units**:
+     - Conflict with `SPEC.md`, source code, another task, the plan
+       `## Goal` or `## Assumptions`, or its own lines: rewrite the task
+       to conform; `SPEC.md` wins on requirements, source code on facts;
+       where both stay silent, conform the later task to the earlier
+       task's `Acceptance` contract, and a task's own lines to its
+       `Intent`.
+     - Hidden coupling: add the missing dependency, or rebind the
+       reliance to the dependency's stated `Acceptance` contract.
+     - `Verification` step creating, regenerating, or overwriting what
+       it judges, or relying on state another run leaves behind: move
+       that production into `Scope` and `Acceptance`; verify the
+       recorded result per `references/verification-guide.md`.
    - Other `SPEC.md` tension short of a **Halt conditions** entry: favor
      its requirements; log it under `Observations`.
-   - Hidden coupling: add the missing dependency, or rebind the reliance
-     to the dependency's stated `Acceptance` contract.
    - Unjustified enabling task: state its rationale in `Context`, else
      remove it.
+   - Prescriptive line failing the `references/outcome-guide.md`
+     substitution test: restate it as the outcome or constraint it
+     protects, else remove it.
+   - Derivable `Context` fact beyond an entry-point path: trim it.
    - Disproportionate or infeasible `Verification` step—re-proving
      covered logic, needing calibration or inadmissible tooling, or
      exceeding sufficient isolation: trim it to the cheapest evidence,
      or demote it to `Risk notes`.
    - Tooling test suite: replace it with one smoke run.
+   - Invocation mechanics in a `Verification` step: reduce it to the
+     project command.
    - `Satisfies` overclaim: drop the ID; add or extend a task when
      coverage drops.
    - Granularity: split a non-atomic task; merge a merge candidate.
@@ -109,19 +125,26 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 - Refine and optimize `PLAN.md` for agent consumption: agents read it
   for varied purposes, with no memory of this run; keep rewritten tasks
   self-contained, explicit, and token-dense; write each task's `Context`
-  to supply every fact a stateless executor needs, including facts
-  surfaced only during inspection.
+  to supply every fact a fresh agent needs and can't derive, including
+  facts surfaced only during inspection.
 - Make each task's `Verification` concrete, deterministic, and
   proportional per `references/verification-guide.md`; challenge each
-  step's feasibility, isolation, and proportionality; rewrite a failing
-  step, trim an excessive one, or demote it to `Risk notes`.
-- Consult `references/prose-protocol.md` before editing `PLAN.md`.
+  step's feasibility, isolation, observation, and proportionality;
+  rewrite a failing step, trim an excessive one, or demote it to
+  `Risk notes`.
+- Consult `references/prose-protocol.md` and
+  `references/outcome-guide.md` before editing `PLAN.md`.
 
 ## Constraints
 
 - **Write scope**: write only `.spae/current/PLAN.md` and
-  `.spae/current/STATE.json`; forbid all other writes. Read source code
-  only for analysis.
+  `.spae/current/STATE.json`; forbid all other writes. Write incidental
+  run outputs—logs, reports, experiment files—to scratch: a private
+  temporary directory outside the project, removed when the run ends.
+  Scratch writes and byproducts of a command run for evidence, such as a
+  formatter's rewrites, never count as this phase's writes; never run a
+  command for its write effect outside this scope. Read source code only
+  for analysis.
 - **Phase boundary**: hand off work to `/build`; don't execute tasks.
 - **Version control and release**: never permit tasks for version
   control (git staging, commits, branches, tags) or release operations
@@ -161,38 +184,59 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
     reference—`Task graph` edges, the overview list, and `Dependencies`
     fields—resolves to a defined task.
   - Every `Dependencies` ID numerically precedes its declaring task.
-  - No hidden coupling: each task's `Scope` and `Acceptance` rely only
-    on outputs of its `Dependencies` tasks, and only through their
-    stated `Acceptance` contracts.
-  - No task's `Intent`, `Scope`, `Acceptance`, `Context`, or
-    `Verification` contradicts its `Satisfies` requirements,
-    `Out of scope`, `Assumptions`, or `Testing strategy`.
-  - No two tasks linked by a dependency edge or sharing `Scope` files or
-    symbols assert incompatible behavior, contracts, or file states.
+  - The plan `## Goal` and `## Assumptions` contradict neither `SPEC.md`
+    nor source code.
+  - Every task stays self-contained and isolated per
+    `references/outcome-guide.md` **Self-contained units**: fresh agents
+    holding only its text and the repository can build, test, and verify
+    it, each in a separate run:
+    - No hidden coupling: its `Scope` and `Acceptance` rely only on
+      outputs of its `Dependencies` tasks, and only through their stated
+      `Acceptance` contracts.
+    - No line—`Intent`, `Scope`, `Acceptance`, `Context`,
+      `Verification`—contradicts another of its lines, the plan
+      `## Goal` or `## Assumptions`, its `Satisfies` requirements, the
+      `SPEC.md` `Out of scope`, `Assumptions`, or `Testing strategy`, or
+      source code.
+    - No two bordering tasks—linked by a dependency edge or sharing
+      `Scope` surface—assert incompatible behavior, contracts, or file
+      states.
+    - Every `Verification` step observes per
+      `references/verification-guide.md`: it never creates, regenerates,
+      or overwrites what it judges.
   - Zero tasks mandate version control or release operations.
   - No task step presumes human execution, an attended or interactive
     terminal, or human presence.
 - **`Should fix`** criteria—failure adds risk or complicates execution:
   - Every `Intent` names an actionable goal.
-  - Every task stays atomic and independently verifiable; adjacent tasks
-    stay separate only with independent acceptance value or a
-    dependency-ordering reason.
+  - Every task stays atomic: a change one run can build, leaving the
+    system working.
+  - No merge candidate remains: bordering tasks form one unless any of
+    these holds:
+    - Each satisfies a requirement or serves as tooling setup or a final
+      verification gate.
+    - A third task must run between them.
+    - Their merge would outgrow one run.
   - Every `Satisfies`-bearing task's `Acceptance` names testable
     behaviors, with failure modes and edge cases when `SPEC.md`
     specifies them or task logic requires them.
   - Every task's `Verification` includes test execution commands—one
-    smoke run for an enabling tooling task.
+    smoke run for an enabling tooling task—each mapped to the outcomes
+    it proves.
   - Every `Verification` step follows
     `references/verification-guide.md`: no re-proof of covered logic,
     calibration, inadmissible tooling, or isolation beyond the
-    sufficient level.
+    sufficient level; no invocation mechanics.
+  - Every task line passes the `references/outcome-guide.md`
+    substitution test; `Context` holds no derivable fact beyond
+    entry-point paths.
   - `Task graph` edges mirror per-task `Dependencies` fields.
   - Every `Satisfies: none` task's `Context` states a credible enabling
     rationale.
 - `STATE.json` specifies `phase: "build"`, `status: "active"`,
   `cursor: {"active_task_id": "T-001"}`, and `tasks` mapping every
   `PLAN.md` task ID to `"todo"`.
-- No files outside **Write scope** changed.
+- This phase wrote no file outside **Write scope**.
 
 ## Result directives
 

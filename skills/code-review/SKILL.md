@@ -112,8 +112,9 @@ Gather intent grounding matching the resolved scope:
    threat model. Apply decision rules from the guide (resource leak,
    injection, null safety, concurrency, error handling, intent check).
    - Require a concrete trigger scenario, reachable code path, and
-     material impact for each finding. Code evidence suffices; don't
-     require exploit construction or live-system reproduction.
+     material impact for each finding; record them as its `trigger`.
+     Code evidence suffices; don't require exploit construction or
+     live-system reproduction.
    - Drop speculative or out-of-scope findings from active `findings`.
    - Route findings lacking concrete trigger scenarios or carrying
      qualifying intent evidence to `suppressed_findings`; cite the
@@ -122,8 +123,7 @@ Gather intent grounding matching the resolved scope:
    stay empty. Otherwise write `code-review-report.yaml` to the project
    root conforming to `references/report-schema.json`; omit the
    `suppressed_findings` key entirely when empty. Write once, after
-   VERIFY passes. Use `|` block scalars for multi-line `suggestion` and
-   `excerpt` fields.
+   VERIFY passes. Use `|` block scalars for multi-line values.
 6. **REPORT**—Sort findings by severity. Emit the result following the
    result directives and result template.
 
@@ -133,10 +133,10 @@ Gather intent grounding matching the resolved scope:
 - Rank findings: `Critical`, `High`, `Medium`, `Low`, `Nit`.
   - Emit `Nit` only when trivially co-located with a higher-severity
     finding.
-- Verdict: `Request Changes` (any confirmed Critical/High with a
-  concrete trigger scenario and material impact) · `Comment` (Medium/Low
-  only) · `Approve` (no findings). Derive verdict from `findings`
-  only—`suppressed_findings` never shifts it.
+- Verdict, reported in the status block and the report `verdict`:
+  `Request Changes` (any Critical or High finding) · `Comment` (Medium
+  or Low only) · `Approve` (no findings). Derive `Result` and verdict
+  from `findings` only—`suppressed_findings` never shift either.
 - Filter candidate findings against the app threat model, `KISS`, and
   `YAGNI`; reject defensive bloat, ungrounded guardrails, and
   theoretical defects outside realistic execution paths.
@@ -182,13 +182,14 @@ Gather intent grounding matching the resolved scope:
 ## Verification
 
 - Static analysis output checked when available and practical.
-- Findings map to diff or file excerpts and line references.
+- Findings map to diff or file excerpts and line references; every
+  active finding carries its trigger scenario.
 - Severity reflects user impact; assess security exploitability within
   the app threat model, without requiring exploit development.
 - Suggestions describe concrete changes.
 - Report matches workspace mandates.
-- Every `suppressed_findings` entry cites qualifying intent
-  evidence—never a general or vague rationale.
+- Every `suppressed_findings` entry cites qualifying intent evidence or
+  the missing trigger scenario—never a general or vague rationale.
 - If findings or suppressed findings exist: `code-review-report.yaml`
   written and conforms to `references/report-schema.json`.
 - Ledger dedup keys off the defect signature
@@ -236,6 +237,7 @@ Gather intent grounding matching the resolved scope:
 
 > **Code Review Status** • `[scope]`
 > **Result**: [Issues Found | No Issues | Failed]
+> **Verdict**: [Request Changes | Comment | Approve]  _(unless failed)_
 > **Impact**: [Terse impact statement]
 ```
 <!-- prettier-ignore-end -->

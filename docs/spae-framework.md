@@ -15,6 +15,9 @@ before advancing.
   for varied purposes, with no memory of the authoring run. Refine and
   optimize each artifact for agent consumption: self-contained,
   explicit, and token-dense. Human readers come second.
+- **Outcome-first artifacts**: Artifacts state _what_ to achieve and
+  _why_; consumers choose _how_. Acceptance and verification hold every
+  consumer accountable. `outcome-guide.md` defines the rule.
 - **Fault-tolerant resumption**: Agents keep no internal state. Every
   invocation begins fresh, reading only external artifacts to determine
   the execution cursor. The `STATE.json` phase advances only on phase
@@ -28,8 +31,12 @@ before advancing.
   Phases load only specific file sections required for the immediate
   task.
 - **Atomic execution**: The framework decomposes all work into
-  single-cycle, independently verifiable tasks that leave the system in
-  a working state.
+  single-cycle tasks that leave the system in a working state. Each task
+  stands alone, as each skill does: fresh, isolated agents build, test,
+  and verify it in separate runs, needing only its text and the
+  repository, and its lines stay jointly satisfiable. `/spec` audits the
+  requirement set and `/inspect` audits tasks against `outcome-guide.md`
+  **Self-contained units**.
 - **Full autonomy**: No phase, task, or verification step may require
   human execution, an attended or interactive terminal, or a human
   physically present to observe or respond. Deterministic, unattended
@@ -40,21 +47,24 @@ before advancing.
   agent produces unattended; never replicate manual human testing for
   its own sake. Settle feasibility before execution, isolate runs from
   the user's live environment, and record outcomes lacking practical
-  evidence as residual risks. `verification-guide.md` defines the
-  evidence ladder; **Verification roles** assigns each phase its part.
+  evidence as residual risks. Verification observes: `/check` and
+  `/verify` rerun planned evidence on finished work, so no step creates,
+  regenerates, or overwrites what it judges. `verification-guide.md`
+  defines the evidence ladder and these rules; **Verification roles**
+  assigns each phase its part.
 
 ## Verification roles
 
 Each phase skill states its own role; skills never carry this table.
 
-| Phase            | Role                                                                                                                                     |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `/spec`          | Decide the cheapest evidence proving each requirement; record outcomes lacking practical evidence under `Out of scope`.                  |
-| `/plan`          | Bind each step to tooling confirmed available now; schedule admitted new tooling as a task; carry residual risks to `Risk notes`.        |
-| `/inspect`       | Challenge each step's feasibility, isolation, and proportionality; rewrite failing steps or demote them to `Risk notes`.                 |
-| `/build`, `/fix` | Execute steps as planned; never discover, install, or calibrate tooling ad hoc; fail fast on an unrunnable step.                         |
-| `/check`         | Run planned steps; fail an unrunnable planned step as a plan defect; flag a task-written test breaking `verification-guide.md` as a gap. |
-| `/verify`        | Judge from automated evidence; treat residual risks as observations, never verdict inputs.                                               |
+| Phase            | Role                                                                                                                                                                                       |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/spec`          | Decide the cheapest evidence proving each requirement; record outcomes lacking practical evidence under `Out of scope`.                                                                    |
+| `/plan`          | Bind each step to tooling confirmed available now; schedule admitted new tooling as a task; carry residual risks to `Risk notes`.                                                          |
+| `/inspect`       | Challenge each step's feasibility, isolation, observation, and proportionality; rewrite failing steps or demote them to `Risk notes`.                                                      |
+| `/build`, `/fix` | Execute steps as planned; never discover, install, or calibrate tooling ad hoc; fail fast on an unrunnable step.                                                                           |
+| `/check`         | Run planned steps; halt on a step unrunnable for a cause outside the task diff; flag a step the diff leaves unrunnable, or a task-written test breaking `verification-guide.md`, as a gap. |
+| `/verify`        | Judge from automated evidence; treat residual risks as observations, never verdict inputs.                                                                                                 |
 
 ## Execution guardrails
 
@@ -78,10 +88,12 @@ framework must enforce these constraints:
   `/check`, and `/verify` may read repository code for context, but they
   may only write their designated `SPAE` artifacts. Only `/build` and
   `/fix` may edit source code, tests, configuration files, docs, or any
-  other non-`SPAE` project file. Byproducts of a command run for
-  evidence, such as a formatter's rewrites, never count as a phase's
-  writes; no phase runs a command for its write effect outside its
-  boundary.
+  other non-`SPAE` project file. Every phase writes incidental run
+  outputs to scratch: a private temporary directory outside the project,
+  removed when the run ends. Scratch writes and byproducts of a command
+  run for evidence, such as a formatter's rewrites, never count as a
+  phase's writes; no phase runs a command for its write effect outside
+  its boundary.
 - **Fail forward, not sideways**: A task or phase failure in `/build`,
   `/check`, or `/fix` halts orchestration immediately; it never reroutes
   to `/spec` or any other phase. Only `/verify`'s no-pass verdict
@@ -182,7 +194,8 @@ Contains distilled requirements and boundaries. Agents must read the
 codebase first to ensure the spec fits existing patterns.
 
 - **What**: Core goal.
-- **Requirements**: Specific, testable conditions.
+- **Requirements**: Specific, testable outcomes, contracts, constraints,
+  or sourced decisions; never unsourced mechanism.
 - **Testing strategy**: Global validation plan.
 - **Out of scope**: Explicit boundaries and residual risks.
 - **Assumptions**: Explicitly stated assumptions.
@@ -198,25 +211,31 @@ during the execution phase (`/build`, `/check`, or `/fix`).
   `none` for an enabling task.
 - **Intent**: One-line goal the task serves, so execution stays
   goal-aware.
-- **Context**: Least setup needed for execution.
-- **Scope**: Atomic changes the task makes.
-- **Acceptance**: Outcomes, not implementation steps.
-- **Verification**: Concrete commands or steps to prove success.
+- **Context**: Entry-point paths plus facts a fresh agent can't derive.
+- **Scope**: The surface the task may change—modules, behaviors,
+  contracts—plus non-obvious off-limits areas; never an edit list.
+- **Acceptance**: Observable outcomes, contracts, and preserved
+  behaviors at risk; never implementation steps.
+- **Verification**: Project commands or existing test targets, each
+  mapped to the outcomes it proves.
 
 ### 4. `VERIFY.md` (The ephemeral revision signal)
 
 Created only when `/verify` detects gaps between implementation and
-specification. Contains technical findings, bugs, and optimizations.
-`/spec` consumes this file to trigger a revision cycle. `/verify`
-deletes this file upon a successful pass.
+specification. Contains evidence-backed findings—bugs and
+optimizations—stating unmet outcomes, never remedies. `/spec` consumes
+this file to trigger a revision cycle. `/verify` deletes this file upon
+a successful pass.
 
 ### 5. `FIX.md` (The ephemeral gap signal)
 
 Created only when `/check` detects gaps between the active task's
-implementation and its `PLAN.md` entry. Contains the task `Intent`, the
-specific gaps found, and pointers to the affected files—full context to
-close them without re-reading the whole plan. `/fix` consumes this file
-to scope its edits, then deletes it upon completion.
+implementation and its `PLAN.md` entry. Contains the task `Intent`; any
+task constraints, decisions, and non-derivable facts the closures depend
+on; and each gap as the unmet outcome with evidence—never the edit
+closing it—with pointers to the affected files: full context to close
+them without re-reading the whole plan. `/fix` consumes this file to
+scope its edits, then deletes it upon completion.
 
 ## The execution loop
 
@@ -237,8 +256,8 @@ the plan concludes.
   resume an interrupted draft (`phase: spec`, `status: active`), or, on
   `status: revision_required` with `VERIFY.md` present, write a new
   `SPEC.md` from scratch using `VERIFY.md` findings and source
-  inspection; halt otherwise. Audits the draft for internal
-  contradictions and self-heals them by precedence; never halts on them.
+  inspection; halt otherwise. Audits the draft for joint satisfiability
+  and self-heals conflicts by precedence; never halts on them.
 - **Output**: Writes `SPEC.md`. Resets `STATE.json` (`phase: plan`,
   `status: active`, `cursor: {}`, `tasks: {}`). Updates `.spae/current`.
 - **Write scope**: `SPEC.md`, `STATE.json`, `.spae/current`, and the
@@ -251,8 +270,8 @@ the plan concludes.
 - **Input**: `SPEC.md`.
 - **Action**: Decomposes the specification into a Directed Acyclic Graph
   (`DAG`) of atomic tasks. Orders tasks by dependency and risk. Ensures
-  each task leaves the system in a working state. Treats repository code
-  as read-only.
+  each task stands alone and leaves the system in a working state.
+  Treats repository code as read-only.
 - **Output**: Overwrites `PLAN.md`. Initializes `tasks` to `todo`,
   resets `cursor: {}`, and updates `STATE.json` phase to `inspect`.
 - **Write scope**: `PLAN.md` and `STATE.json`.
@@ -265,9 +284,10 @@ the plan concludes.
 - **Action**: Performs gap analysis. Prioritizes concrete bugs,
   regressions, contract breaks, and verification strength. It must not
   evolve into a heavyweight governance stage. Reports findings as
-  `Must fix`, `Should fix`, or `Observations`. Rewrites tasks that
-  contradict `SPEC.md` or each other—`SPEC.md` arbitrates. Halts without
-  writing on a `SPEC.md`-internal conflict no `PLAN.md` edit can
+  `Must fix`, `Should fix`, or `Observations`. Rewrites plan lines and
+  tasks that contradict `SPEC.md`, source code, each other, or
+  themselves—`SPEC.md` arbitrates requirements, source code facts. Halts
+  without writing on a `SPEC.md`-internal conflict no `PLAN.md` edit can
   resolve. Reads source code for analysis only.
 - **Output**: Overwrites `PLAN.md` with the optimized version. When
   refinement resizes the task set, renumbers to contiguous `T-NNN` IDs,
@@ -326,8 +346,8 @@ the plan concludes.
 
 ### Step 6: `/fix` (Gap remediation)
 
-- **Input**: `STATE.json` (cursor), `FIX.md` (task, `Intent`, and gaps),
-  and source code; `FIX.md` carries all task context.
+- **Input**: `STATE.json` (cursor), `FIX.md` (task, `Intent`, `Context`,
+  and gaps), and source code; `FIX.md` carries all task context.
 - **Action**: Addresses exactly the gaps `FIX.md` lists—nothing beyond
   their scope. Holds the same source-editing authority as `/build`.
   Self-heals metadata (injects missing `version`, `workstream`,

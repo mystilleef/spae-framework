@@ -9,8 +9,9 @@
 
 ## Requirements
 
-- **R-001**: [Required behavior]
-- **R-002**: [Additional required behavior or constraint, if applicable]
+- **R-001**: [Required outcome, contract, constraint, or decision—a
+  decision cites its source]
+- **R-002**: [Additional requirement, if applicable]
 
 ## Testing strategy
 

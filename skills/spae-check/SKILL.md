@@ -52,7 +52,8 @@ Read only what the check requires:
      `Intent` to the evidence that proves it.
    - Halt on any **Halt conditions** entry.
 4. **ACT**—Gather evidence and label findings:
-   - Run every task `Verification` step and the project checks.
+   - Run every task `Verification` step and the project checks per
+     `references/verification-guide.md`.
    - Read the task diff with the scoped audit command in
      `references/cleanup-guide.md`.
    - Judge each `Acceptance` outcome and the `Intent` against step
@@ -60,11 +61,13 @@ Read only what the check requires:
    - Label each finding with exactly one tag:
      - **Gap**—blocks a clear verdict; cite reproducible evidence, never
        a hypothetical risk or stylistic preference:
-       - An unmet `Acceptance` outcome, a failing `Verification` step,
-         or behavior diverging from the `Intent`.
+       - An unmet `Acceptance` outcome, a `Verification` step that fails
+         or can't run for a cause inside the task diff—such as missing
+         isolation—or behavior diverging from the `Intent`.
        - A project-check failure the task diff causes.
        - Speculative abstraction, _unrequested_ complexity, or defensive
-         bloat the diff adds beyond the task `Scope`.
+         bloat the diff adds beyond what the task `Intent` and
+         `Acceptance` require, or edits outside its `Scope` surface.
        - A task-written test breaking
          `references/verification-guide.md`.
        - **Gap** covers only task-introduced violations within the
@@ -75,7 +78,9 @@ Read only what the check requires:
          uncommitted files outside task scope as gaps.
      - **Observation**—never a verdict input: a concern outside task
        scope, _unrequested_ edge-case coverage, a defensive-code
-       suggestion, or a theoretical risk.
+       suggestion, a theoretical risk, or an approach diverging from one
+       `Context` or `Scope` suggests yet breaking no outcome, boundary,
+       or decision.
    - On any `Gap`, draft `FIX.md` per `references/FIX.md`.
    - Apply **Directives** and **Constraints**.
 5. **VERIFY**—Loop over **Verification** criteria for the verdict and
@@ -103,16 +108,27 @@ Read only what the check requires:
 - Optimize for agent, token, and context efficiency.
 - Refine and optimize `FIX.md` for agent consumption: agents read it for
   varied purposes, with no memory of this run; keep it self-contained,
-  explicit, and token-dense; make each gap closable without `PLAN.md`.
-- Consult `references/prose-protocol.md` before drafting `FIX.md`.
+  explicit, and token-dense; make each gap closable without `PLAN.md`:
+  the unmet outcome with evidence, never the edit closing it.
+- Keep `FIX.md` self-contained and isolated per
+  `references/outcome-guide.md` **Self-contained units**: a fresh,
+  isolated agent holding only its text and the repository can close and
+  prove every gap; write `## Context` to supply every task constraint,
+  decision, and fact the agent needs and can't derive, including facts
+  surfaced only while checking.
+- Consult `references/prose-protocol.md` and
+  `references/outcome-guide.md` before drafting `FIX.md`.
 
 ## Constraints
 
 - **Write scope**: write only `.spae/current/FIX.md` and
-  `.spae/current/STATE.json`; forbid all other writes. Byproducts of a
-  command run for evidence, such as a formatter's rewrites, never count
-  as this phase's writes; never run a command for its write effect
-  outside this scope. Read source code only for analysis.
+  `.spae/current/STATE.json`; forbid all other writes. Write incidental
+  run outputs—logs, reports, experiment files—to scratch: a private
+  temporary directory outside the project, removed when the run ends.
+  Scratch writes and byproducts of a command run for evidence, such as a
+  formatter's rewrites, never count as this phase's writes; never run a
+  command for its write effect outside this scope. Read source code only
+  for analysis.
 - **Phase boundary**: judge exactly one task; hand off work to `/fix`,
   `/build`, or `/verify`.
 - **Version control and release**: never execute git mutations (staging,
@@ -133,8 +149,8 @@ Read only what the check requires:
     task absent from `PLAN.md`.
   - `tasks[active_task_id]` reads `"done"`.
   - A planned `Verification` step can't run for a cause outside the task
-    diff: missing tooling, a broken external dependency, or a need for
-    human presence.
+    diff—such as missing tooling, a broken external dependency, a step
+    producing what it judges, or a need for human presence.
 - **Scope control**: ignore pre-existing uncommitted files and
   modifications outside the active task's declared scope; they yield no
   finding.
@@ -148,7 +164,12 @@ Read only what the check requires:
 - Verdict reads clear only with zero `Gap` findings.
 - On a `Gap` verdict, the `FIX.md` draft matches `references/FIX.md`:
   `## Intent` verbatim from `PLAN.md`; every `Gap` with `File`,
-  `Expected`, `Actual`, and reproducible `Evidence`; no `Observation`.
+  `Expected`, `Actual`, and reproducible `Evidence`; every `Expected`
+  names an outcome, never an edit; no `Observation`.
+- On a `Gap` verdict, the `FIX.md` draft stays self-contained and
+  isolated per `references/outcome-guide.md` **Self-contained units**: a
+  fresh agent holding only its text and the repository can close and
+  prove every gap; `## Context` holds no derivable fact.
 - `STATE.json` matches the `references/STATE.md` exit snapshot for the
   verdict.
 - This phase wrote no file outside **Write scope**.

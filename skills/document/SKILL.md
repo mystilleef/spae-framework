@@ -37,12 +37,11 @@ Abort if no scope exists.
 
 _Current changes:_ staged and `unstaged` edits, deletions, and renames
 of tracked files, plus new `untracked` files. Requires a versioned
-project. Abort if none detected.
+project.
 
 ## Workflow
 
-1. **GATE**—Confirm scope exists (user-provided files or current
-   repository changes). Abort immediately if none.
+1. **GATE**—Resolve scope per **Input**; abort if none.
 2. **ORIENT**—State target scope and documentation goal in one sentence.
    Runtime behavior stays unchanged.
 3. **PLAN**—Declare the minimal documentation change:
