@@ -304,17 +304,21 @@ the plan concludes.
 - **Input**: `STATE.json` (cursor), `PLAN.md` (plan `Goal`, active task,
   its `Intent`), and source code.
 - **Action**: Executes exactly one atomic task. Halts on state drift at
-  entry. Writes exhaustive tests first—expected behavior, failure modes,
-  and edge cases—then writes the minimal code that satisfies them. Runs
-  project checks. Reads forward tasks to avoid foreclosing them but
+  entry. Writes the minimal code meeting each acceptance criterion and
+  proves its runtime behavior through comprehensive, robust
+  tests—expected behavior, failure modes, and edge cases—in whichever
+  order it chooses, deriving tests from the criteria, never from the
+  implementation's output. Guards each preserved behavior at risk with a
+  test passing on the pre-task and post-task state. Proves tooling,
+  configuration, and docs criteria through planned verification steps.
+  Runs project checks. Reads forward tasks to avoid foreclosing them but
   never implements beyond the active task. Drives task verification to
-  green by iterating test→implement, treating a failing check as
-  ordinary work rather than a stop signal. Fails the task only when it
-  can't pass within its scope—an infeasible acceptance criterion, a plan
-  or spec defect, or a broken external dependency—never by gaming a test
-  or editing the plan. When a task legitimately changes a contract,
-  updates the tests it invalidates to match; never weakens, skips, or
-  deletes a test to force a pass.
+  green, treating a failing check as ordinary work rather than a stop
+  signal. Fails the task only when it can't pass within its scope—an
+  infeasible acceptance criterion, a plan or spec defect, or a broken
+  external dependency—never by gaming a test or editing the plan. When a
+  task legitimately changes a contract, updates the tests it invalidates
+  to match; never weakens, skips, or deletes a test to force a pass.
 - **Output**: Mutates source code. Leaves the active task `in_progress`
   in the `tasks` registry—`/check` owns the `done` transition and cursor
   advance. Updates `STATE.json` phase to `check`. The agent never edits
@@ -352,10 +356,11 @@ the plan concludes.
   their scope. Holds the same source-editing authority as `/build`.
   Self-heals metadata (injects missing `version`, `workstream`,
   `status`) and state drift at entry (`todo` → `in_progress`); halts if
-  the active task reads `done`. Iterates test→implement until the task's
-  tests pass, treating a failing check as ordinary work rather than a
-  stop signal. Fails the task only when a gap can't close within
-  scope—an infeasible finding, a plan or spec defect, or a broken
+  the active task reads `done`. Proves each behavior gap closed with a
+  test failing on the pre-task state and passing after. Iterates until
+  the task's tests pass, treating a failing check as ordinary work
+  rather than a stop signal. Fails the task only when a gap can't close
+  within scope—an infeasible finding, a plan or spec defect, or a broken
   external dependency.
 - **Output**: Mutates source code. Updates `STATE.json` phase to
   `check`, then deletes `FIX.md`. The active task stays `in_progress`;

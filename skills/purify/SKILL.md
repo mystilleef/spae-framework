@@ -47,7 +47,9 @@ project.
 ## Testing
 
 See `references/testing-guide.md` for test structure, isolation,
-mocking, assertion, and performance standards.
+mocking, assertion, and performance standards. The project's
+`TESTING.md`, when present, extends the guide; its conventions override
+the guide on conflict.
 
 When scope includes test files, see `references/test-pruning-guide.md`
 for the test smell catalog, edit order, deletion evidence, and speed and
@@ -98,10 +100,11 @@ diff-only audit scope.
 2. **ORIENT**—State goal and scope in one sentence. Name what won't
    change: behavior, public interfaces, and feature scope. Capture
    pre-task baseline snapshot per `references/cleanup-guide.md`.
-3. **PLAN**—Read `references/testing-guide.md`. Declare minimal changes:
-   which violations to remove, which files to touch, and in what order;
-   test edits follow the `references/test-pruning-guide.md` order. Check
-   ambiguous or risky slices before acting.
+3. **PLAN**—Read `references/testing-guide.md` and, when present,
+   `TESTING.md`. Declare minimal changes: which violations to remove,
+   which files to touch, and in what order; test edits follow the
+   `references/test-pruning-guide.md` order. Check ambiguous or risky
+   slices before acting.
 4. **ACT**—Execute only what PLAN declared. Nothing more.
    - Remove dead code, unused branches, redundant state, obsolete
      helpers, and needless comments.

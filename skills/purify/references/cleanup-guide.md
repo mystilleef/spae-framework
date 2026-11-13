@@ -37,12 +37,19 @@ code, and orphan files from accumulating across task cycles.
 ## Baseline capture command
 
 Run in code-mutating skills at `ORIENT` to snapshot the pre-task working
-tree without staging or workspace pollution:
+tree—tracked and non-ignored untracked files—through a throwaway index,
+without staging or workspace pollution; record the printed tree ID as
+`base_tree`:
 
 ```sh
-out=$(mktemp)
-GIT_INDEX_FILE="${out}" git add -A && base_tree=$(GIT_INDEX_FILE="${out}" git write-tree) && rm -f "${out}"
+tmp=$(mktemp -d)
+GIT_INDEX_FILE="${tmp}/index" git add -A &&
+  GIT_INDEX_FILE="${tmp}/index" git write-tree
+rm -rf "${tmp}"
 ```
+
+Point `GIT_INDEX_FILE` at a path that doesn't exist yet; `git` rejects
+an empty file, such as `mktemp` creates, as an index.
 
 In an unversioned project, skip the snapshot: capture each file's
 content before this task's first edit to it, and record each file this
@@ -50,11 +57,22 @@ task creates; audit those in place of the diff.
 
 ## Audit command
 
-Run before `PERSIST`, scoped to `$base_tree` and declared task paths:
+Run before `PERSIST`: snapshot the post-edit working tree the same way,
+then diff `base_tree` against it, scoped to declared task paths:
 
 ```sh
-git --no-pager diff --no-ext-diff -U0 "${base_tree}" -- <task-scoped-paths>
+tmp=$(mktemp -d)
+GIT_INDEX_FILE="${tmp}/index" git add -A &&
+  post_tree=$(GIT_INDEX_FILE="${tmp}/index" git write-tree) &&
+  git --no-pager diff --no-ext-diff -U0 \
+    <base_tree> "${post_tree}" -- <task-scoped-paths>
+rm -rf "${tmp}"
 ```
+
+Comparing two snapshots lists task-created files as added and omits
+untouched pre-existing untracked files; diffing `base_tree` against the
+working tree directly omits new untracked files and reports pre-existing
+ones as deleted.
 
 When auditing without a transient baseline snapshot (for example,
 read-only check skills), scope checks strictly to declared task paths:

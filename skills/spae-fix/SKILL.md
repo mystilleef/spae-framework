@@ -16,7 +16,7 @@ user-invocable: true
 ## Goal
 
 - Close exactly the `FIX.md` `## Gaps` items for the active task with
-  minimal changes, test-first where behavior changes.
+  minimal changes, proving each behavior gap closed through a test.
 - Advance the `workstream` to `phase: check`.
 
 ## Input
@@ -34,7 +34,9 @@ Read only what the `## Gaps` items require:
 ## Testing
 
 See `references/testing-guide.md` for test structure, isolation,
-mocking, assertion, and performance standards.
+mocking, assertion, and performance standards. The project's
+`TESTING.md`, when present, extends the guide; its conventions override
+the guide on conflict.
 
 ## Cleanup
 
@@ -51,12 +53,12 @@ diff-only audit scope.
      `tasks[active_task_id]` as `"in_progress"` until `PERSIST`.
    - Halt on any **Halt conditions** entry.
 2. **ORIENT**—State goal in one sentence:
-   - `FIX.md` stays unmodified until `PERSIST` deletes it; directly
-     modify no code outside the `## Gaps` items.
+   - `FIX.md` stays unmodified until `PERSIST` deletes it; the task diff
+     stays within the `## Gaps` items.
    - Read `FIX.md` in full.
    - Capture the pre-task baseline per `references/cleanup-guide.md`.
 3. **PLAN**—Declare the remediation path:
-   - Read `references/testing-guide.md` and
+   - Read `references/testing-guide.md`, `TESTING.md` when present, and
      `references/shell-command-guide.md`.
    - Map each `## Gaps` item to its minimal edit; for a behavior gap,
      map the test surface: expected behavior, failure modes, and edge
@@ -64,11 +66,11 @@ diff-only audit scope.
    - Halt on any **Halt conditions** entry.
 4. **ACT**—Per `## Gaps` item, repeat until re-checking its `Evidence`
    shows the `Expected` result:
-   - Behavior gap—runtime behavior misses `Expected`: reproduce it with
-     a failing test, reusing an existing test that already fails on it;
-     then write the minimal code that passes it.
+   - Behavior gap—runtime behavior misses `Expected`: the minimal code
+     closing it and tests covering its test surface, including an
+     existing or new test that fails on the pre-task state.
    - Any other gap—a leftover artifact, diff bloat, a defective test, or
-     a static-check failure: make the minimal edit that closes it.
+     a static-check failure: the minimal edit closing it.
    - Apply **Directives** and **Constraints**.
 5. **VERIFY**—Loop over **Verification** criteria for the `## Gaps`
    items:
@@ -93,8 +95,8 @@ diff-only audit scope.
 
 - Optimize for agent, token, and context efficiency.
 - Align with existing codebase patterns; avoid speculative design.
-- For a behavior gap, never write production code before its test
-  exists.
+- Derive each test from its gap's `Expected` result, never from the
+  implementation's output.
 - Treat a failing test or check as ordinary fix work; drive it green.
 - When closing a gap invalidates an existing test, update that test to
   the new contract.
@@ -155,14 +157,13 @@ diff-only audit scope.
 
 - Re-checking each `## Gaps` item's `Evidence` shows its `Expected`
   result.
-- Every behavior gap carries a passing test covering expected behavior,
-  failure modes, and edge cases.
+- Every behavior gap carries passing tests covering its test surface,
+  including one that fails on the pre-task state.
 - Relevant project tests pass with no new failures.
-- Every added or updated test passes the CI parity rules in
-  `references/testing-guide.md`.
+- Every added or updated test fails when the behavior it covers breaks
+  and passes the CI parity rules in `references/testing-guide.md`.
 - No self-introduced artifact remains per `references/cleanup-guide.md`.
-- The task diff changes nothing beyond the `## Gaps` items.
-- The task diff breaks no **Integrity** rule.
+- The task diff breaks no **Scope control** or **Integrity** rule.
 - `STATE.json` specifies `phase: "check"`,
   `tasks[active_task_id]: "in_progress"`, and the entry cursor.
 - This phase wrote no file outside **Write scope**.

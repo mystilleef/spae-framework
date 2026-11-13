@@ -29,6 +29,8 @@ Use only relevant context from:
 - `.spae/current/STATE.json`; `references/STATE.md` holds field
   reference, directives, and snapshots.
 - Repository source, for codebase fit.
+- The project's `TESTING.md`, when present, for test commands and
+  prerequisites.
 
 Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 

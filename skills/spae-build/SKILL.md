@@ -15,8 +15,9 @@ user-invocable: true
 
 ## Goal
 
-- Implement exactly the active `PLAN.md` task, test-first, so it meets
-  every `Acceptance` criterion, serves its `Intent` and the plan
+- Implement exactly the active `PLAN.md` task so it meets every
+  `Acceptance` criterion, proves its runtime behavior through
+  comprehensive, robust tests, serves its `Intent` and the plan
   `## Goal`, and leaves seams for forward tasks.
 - Advance the `workstream` to `phase: check`.
 
@@ -33,7 +34,9 @@ Read only what the active task requires:
 ## Testing
 
 See `references/testing-guide.md` for test structure, isolation,
-mocking, assertion, and performance standards.
+mocking, assertion, and performance standards. The project's
+`TESTING.md`, when present, extends the guide; its conventions override
+the guide on conflict.
 
 ## Cleanup
 
@@ -48,7 +51,8 @@ diff-only audit scope.
      (`"active"`); `PERSIST` writes the healed fields.
    - Halt on any **Halt conditions** entry.
 2. **ORIENT**—State goal in one sentence:
-   - `PLAN.md` stays unmodified; forward tasks stay unbuilt.
+   - `PLAN.md` stays unmodified; forward tasks stay unbuilt; the task
+     diff stays within the task `Scope` and its tests.
    - Read the plan `## Goal` and the active task in full; read the
      `Acceptance` of its `Dependencies` tasks as the contracts it may
      rely on, and of forward tasks as seams to keep open.
@@ -57,20 +61,26 @@ diff-only audit scope.
      safely: set `STATE.json` `tasks[active_task_id]` to
      `"in_progress"`.
 3. **PLAN**—Declare the implementation path:
-   - Read `references/testing-guide.md` and
+   - Read `references/testing-guide.md`, `TESTING.md` when present, and
      `references/shell-command-guide.md`.
-   - Map the test surface per `Acceptance` criterion: expected
-     behaviors, failure modes, and edge cases.
+   - Map the test surface per behavior criterion—expected behavior,
+     failure modes, and edge cases—and the covering test per preserved
+     behavior at risk.
    - `PLAN.md` fixes outcomes, `Scope`, and `Context` decisions, never
      method; choose among valid implementations by fit to the task
      `Intent`, the plan `## Goal`, and forward seams, not local
      convenience.
    - Halt on any **Halt conditions** entry.
-4. **ACT**—Per `Acceptance` criterion, repeat `test→implement` until it
-   passes:
-   - Write a failing test: expected behavior, failure modes, and edge
-     cases.
-   - Write the minimal code that passes it.
+4. **ACT**—Per `Acceptance` criterion, repeat until it passes:
+   - Behavior criterion—runtime behavior the task adds or changes: the
+     minimal code meeting it and tests covering its test surface,
+     written in either order.
+   - Preserved behavior at risk—existing runtime behavior the task's
+     edits could break: an existing or new covering test passing on the
+     pre-task and post-task state.
+   - Any other criterion—tooling, configuration, or docs: the minimal
+     edit meeting it, proven by its planned `Verification` step, not a
+     dedicated test.
    - Apply **Directives** and **Constraints**.
 5. **VERIFY**—Loop over **Verification** criteria for the active task:
    - Audit task edits against the pre-task baseline using the
@@ -94,8 +104,9 @@ diff-only audit scope.
 
 - Optimize for agent, token, and context efficiency.
 - Align with existing codebase patterns; avoid speculative design.
-- Never write production code before its test exists; write every test
-  category the task demands—unit, integration, end-to-end.
+- Write every test category the task demands—unit, integration,
+  end-to-end—deriving each test from its `Acceptance` criterion, never
+  from the implementation's output.
 - Treat a failing test or check as ordinary build work; drive it green.
 - When the task legitimately changes a contract, update the tests it
   invalidates to the new contract.
@@ -141,8 +152,10 @@ diff-only audit scope.
     `Verification` step, a step requiring human presence, or the task as
     written contradicting the plan `## Goal`, its `Intent`, or a forward
     task—an undeniable conflict, not a subjective doubt.
-- **Scope control**: no incidental refactoring, cleanup, formatting, or
-  dependency churn outside the active task.
+- **Scope control**: keep the task diff within the task `Scope` and its
+  tests; no incidental refactoring, cleanup, formatting, or dependency
+  churn, and no speculative abstraction, _unrequested_ complexity, or
+  defensive bloat beyond what `Intent` and `Acceptance` require.
 - **Integrity**: fix issues properly and idiomatically; no hacks,
   workarounds, or shortcuts:
   - Never suppress compiler or linter diagnostics—for example,
@@ -159,14 +172,15 @@ diff-only audit scope.
 - Every `Acceptance` criterion passes.
 - Every task `Verification` step passes.
 - Relevant project tests pass with no new failures.
-- Task tests cover expected behavior, failure modes, and edge cases
-  exhaustively; no thin-coverage shortcuts.
-- Every added or updated test passes the CI parity rules in
-  `references/testing-guide.md`.
+- Every behavior criterion carries passing tests covering its test
+  surface exhaustively, and every preserved behavior at risk a test
+  passing on the pre-task and post-task state.
+- Every added or updated test fails when the behavior it covers breaks
+  and passes the CI parity rules in `references/testing-guide.md`.
 - No self-introduced artifact remains per `references/cleanup-guide.md`.
 - Implementation advances the task `Intent` and the plan `## Goal`; no
   forward-task work performed.
-- The task diff breaks no **Integrity** rule.
+- The task diff breaks no **Scope control** or **Integrity** rule.
 - `STATE.json` specifies `phase: "check"`,
   `tasks[active_task_id]: "in_progress"`, and the entry cursor.
 - This phase wrote no file outside **Write scope**.

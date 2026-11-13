@@ -34,7 +34,9 @@ project.
 ## Testing
 
 See `references/testing-guide.md` for test structure, isolation,
-mocking, assertion, and performance standards.
+mocking, assertion, and performance standards. The project's
+`TESTING.md`, when present, extends the guide; its conventions override
+the guide on conflict.
 
 ## Shell commands
 
@@ -74,8 +76,7 @@ Audit targets across four canonical categories:
    code, build, and tool configuration stay unchanged. Capture the
    pre-task baseline snapshot per `references/cleanup-guide.md`.
 3. **PLAN**—Read `references/testing-guide.md` and, when present,
-   `TESTING.md`; `TESTING.md` conventions override the guide on
-   conflict. Inspect production code, adjacent tests, and coverage
+   `TESTING.md`. Inspect production code, adjacent tests, and coverage
    commands. Catalog existing test assertions to prevent duplication.
    Record pre-existing redundant, flaky, or obsolete tests under
    `Findings` without editing them; obsolete tests reference a symbol

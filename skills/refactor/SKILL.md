@@ -41,7 +41,9 @@ project.
 ## Testing
 
 See `references/testing-guide.md` for test structure, isolation,
-mocking, assertion, and performance standards.
+mocking, assertion, and performance standards. The project's
+`TESTING.md`, when present, extends the guide; its conventions override
+the guide on conflict.
 
 ## Shell commands
 
@@ -57,7 +59,7 @@ diff-only audit scope.
 
 1. **GATE**—Precondition guard. Halt immediately on failure.
    - Abort if no scope exists.
-   - Read `references/testing-guide.md`.
+   - Read `references/testing-guide.md` and, when present, `TESTING.md`.
    - Read `references/shell-command-guide.md`.
    - Read `references/cleanup-guide.md`.
    - Read relevant production code, adjacent tests, and test commands.
