@@ -79,7 +79,8 @@ diff-only audit scope.
      edits could break: an existing or new covering test passing on the
      pre-task and post-task state.
    - Any other criterion—tooling, configuration, or docs: the minimal
-     edit meeting it, proven by its planned `Verification` step, not a
+     edit meeting it, proven by its planned `Verification` step, or by
+     reading for prose per `references/verification-guide.md`; never a
      dedicated test.
    - Apply **Directives** and **Constraints**.
 5. **VERIFY**—Loop over **Verification** criteria for the active task:

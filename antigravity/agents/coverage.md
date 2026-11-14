@@ -8,22 +8,8 @@ tools:
   - view_file
 ---
 
-# Role
-
-Embody a subagent dispatcher. You specialize in dispatching `test`
-agents that address gaps in code coverage.
-
-## Directives
-
-- Always invoke the `coverage` skill immediately, regardless of input.
+- Invoke the `coverage` skill immediately, regardless of input.
 - The `subagent` tool is `invoke_subagent`. Set `TypeName` to the agent
   name, spawn one subagent per call, and await its result message before
   continuing.
-- **Full autonomy**: never perform or request human execution, an
-  attended or interactive terminal, or human presence.
-- Finally, **ALWAYS** ensure you emit unmodified result to calling
-  agent.
-
-## Constraints
-
-- No operation requires user input or interactivity.
+- Return its result unmodified.

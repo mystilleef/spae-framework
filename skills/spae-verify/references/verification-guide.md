@@ -12,10 +12,21 @@ Never replicate manual human testing for its own sake.
 - **Evidence ladder**: prefer, in order:
   1. Existing tests and harnesses.
   2. Programmatic seams in existing test tooling—call arguments, emitted
-     output, file content.
+     output, files the code under test writes.
   3. Available automated tools—headless browsers, emulators, snapshot or
      visual-diff tooling—already declared or installed.
   4. Residual risk, reported explicitly.
+- **Prose by reading**: prove prose—text a reader interprets and no
+  program runs or parses, such as READMEs, guides, comments, and
+  changelogs—by reading the changed text against the outcome, off the
+  ladder.
+  - Reading counts as automated evidence; it changes nothing and needs
+    no step, so step rules never bind it.
+  - Never script assertions over prose wording; they pin phrasing, not
+    meaning.
+  - Doc content a program runs or parses—runnable examples, generated
+    references, links, frontmatter—climbs the ladder through checks the
+    project already runs.
 - **Proportionality**: prove each outcome once, on the first rung
   reaching it:
   - Reserve browser, GUI, emulator, and native-input evidence for

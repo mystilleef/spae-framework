@@ -69,8 +69,9 @@ diff-only audit scope.
    - Behavior gap—runtime behavior misses `Expected`: the minimal code
      closing it and tests covering its test surface, including an
      existing or new test that fails on the pre-task state.
-   - Any other gap—a leftover artifact, diff bloat, a defective test, or
-     a static-check failure: the minimal edit closing it.
+   - Any other gap—a leftover artifact, diff bloat, a defective test, a
+     static-check failure, or prose: the minimal edit closing it; prove
+     prose closed by reading per `references/verification-guide.md`.
    - Apply **Directives** and **Constraints**.
 5. **VERIFY**—Loop over **Verification** criteria for the `## Gaps`
    items:

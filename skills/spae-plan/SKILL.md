@@ -54,9 +54,9 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 4. **ACT**—Draft `PLAN.md`:
    - Read source narrowly; widen only on uncertainty.
    - Follow `references/PLAN.md`; number tasks from `T-001`.
-   - Set `Satisfies` to the `R-NNN` IDs a task implements and its own
-     `Verification` proves, and `Intent` to a one-line distillation of
-     the goal they serve.
+   - Set `Satisfies` to the `R-NNN` IDs a task implements and proves
+     through its own `Verification`—or its `Acceptance`, for prose—and
+     `Intent` to a one-line distillation of the goal they serve.
    - Enabling task—tooling setup or a final verification gate:
      `Satisfies: none`; `Intent` names its structural purpose toward the
      plan `## Goal`.
@@ -95,11 +95,13 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 - Write acceptance criteria as observable outcomes, contracts, and
   preserved behaviors at risk; name testable behaviors for a
   `Satisfies`-bearing task (include failure modes and edge cases only
-  when specified in `SPEC.md` or required by task logic); state
-  structural assurances for a `Satisfies: none` enabling task.
+  when specified in `SPEC.md` or required by task logic); for prose, per
+  `references/verification-guide.md`, name what the text must convey;
+  state structural assurances for a `Satisfies: none` enabling task.
 - Write `Verification` as project commands or existing test targets,
-  including test execution, each mapped to the outcomes it proves; keep
-  each step concrete, deterministic, and proportional per
+  including test execution—project checks alone when `Acceptance` holds
+  only prose—each mapped to the outcomes it proves; keep each step
+  concrete, deterministic, and proportional per
   `references/verification-guide.md`; never name invocation mechanics,
   test design, or review procedures:
   - Bind each step to tooling available now or installed by a dependency
@@ -154,13 +156,14 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
   `Dependencies` fields—resolves to a defined task.
 - Every `Satisfies`-bearing task's `Acceptance` names testable behaviors
   (failure modes and edge cases when `SPEC.md` specifies them or task
-  logic requires them); every enabling task's `Acceptance` states
-  structural assurances.
-- Every `Satisfies` ID names a requirement the task implements and its
-  own `Verification` proves.
+  logic requires them), and for prose, what the text must convey; every
+  enabling task's `Acceptance` states structural assurances.
+- Every `Satisfies` ID names a requirement the task implements and
+  proves through its own `Verification`—or its `Acceptance`, for prose.
 - Every task's `Verification` includes test execution—one smoke run for
-  an enabling tooling task—maps each step to the outcomes it proves, and
-  follows `references/verification-guide.md`; no step carries invocation
+  an enabling tooling task, project checks alone when `Acceptance` holds
+  only prose—maps each step to the outcomes it proves, and follows
+  `references/verification-guide.md`; no step carries invocation
   mechanics or presumes human execution, an attended or interactive
   terminal, or human presence.
 - Every task stays self-contained and isolated per

@@ -87,9 +87,10 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
      protects, else remove it.
    - Derivable `Context` fact beyond an entry-point path: trim it.
    - Disproportionate or infeasible `Verification` step—re-proving
-     covered logic, needing calibration or inadmissible tooling, or
-     exceeding sufficient isolation: trim it to the cheapest evidence,
-     or demote it to `Risk notes`.
+     covered logic, scripting assertions over prose wording, needing
+     calibration or inadmissible tooling, or exceeding sufficient
+     isolation: trim it to the cheapest evidence, or demote it to
+     `Risk notes`.
    - Tooling test suite: replace it with one smoke run.
    - Invocation mechanics in a `Verification` step: reduce it to the
      project command.
@@ -179,8 +180,9 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 - **`Must fix`** criteria—failure breaks a requirement, contract,
   safety, or verification:
   - Every `SPEC.md` requirement maps to at least one task's `Satisfies`.
-  - Every `Satisfies` ID names a requirement the task implements and its
-    own `Verification` proves.
+  - Every `Satisfies` ID names a requirement the task implements and
+    proves through its own `Verification`—or its `Acceptance`, for
+    prose.
   - Every task carries an `Intent` line.
   - Task IDs run contiguously from `T-001`; every `T-NNN`
     reference—`Task graph` edges, the overview list, and `Dependencies`
@@ -221,14 +223,16 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
     - Their merge would outgrow one run.
   - Every `Satisfies`-bearing task's `Acceptance` names testable
     behaviors, with failure modes and edge cases when `SPEC.md`
-    specifies them or task logic requires them.
+    specifies them or task logic requires them, and for prose, what the
+    text must convey.
   - Every task's `Verification` includes test execution commands—one
-    smoke run for an enabling tooling task—each mapped to the outcomes
-    it proves.
+    smoke run for an enabling tooling task, project checks alone when
+    `Acceptance` holds only prose—each mapped to the outcomes it proves.
   - Every `Verification` step follows
     `references/verification-guide.md`: no re-proof of covered logic,
-    calibration, inadmissible tooling, or isolation beyond the
-    sufficient level; no invocation mechanics.
+    scripted assertion over prose wording, calibration, inadmissible
+    tooling, or isolation beyond the sufficient level; no invocation
+    mechanics.
   - Every task line passes the `references/outcome-guide.md`
     substitution test; `Context` holds no derivable fact beyond
     entry-point paths.

@@ -172,7 +172,8 @@ Select path by argument:
 - **Size**: scale detail to failure size; write `None` under a section
   without content; keep headers intact.
 - **Proportional verification**, per `references/verification-guide.md`:
-  - Pair each outcome with the lowest evidence-ladder rung proving it.
+  - Pair each outcome with the lowest evidence-ladder rung proving it,
+    or prose with reading.
   - Require only tooling the repository already declares or installs.
   - File outcomes only a real GUI, browser, or native input can prove
     under `Accepted limits`; require such evidence only when the request
@@ -234,9 +235,9 @@ Select path by argument:
 - `Refine`: every claim-ledger entry maps to a target section; no claim
   or rationale vanishes.
 - Each `Verification` row names existing repository tooling and its
-  ladder rung; a regression test spec or its `Accepted limits` rationale
-  appears; no new tooling, rig, recipe, coordinate, or key sequence
-  appears.
+  ladder rung, or reading for prose; a regression test spec or its
+  `Accepted limits` rationale appears; no new tooling, rig, recipe,
+  coordinate, or key sequence appears.
 - GUI-, browser-, or native-input-only outcomes sit under
   `Accepted limits`, unless the request opted in.
 - Section depth matches failure size.

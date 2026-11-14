@@ -92,6 +92,7 @@ entry after every non-exit read and every spawn.
 
 ## Verification
 
+- Subagents ran one at a time, in workflow order.
 - Every spawn matched the phase-agent map row for the recorded `phase`.
 - The run ended on an exit or a **Halt conditions** entry.
 - Every tool call spawned a subagent or read `STATE.json`.

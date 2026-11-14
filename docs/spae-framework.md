@@ -310,15 +310,16 @@ the plan concludes.
   order it chooses, deriving tests from the criteria, never from the
   implementation's output. Guards each preserved behavior at risk with a
   test passing on the pre-task and post-task state. Proves tooling,
-  configuration, and docs criteria through planned verification steps.
-  Runs project checks. Reads forward tasks to avoid foreclosing them but
-  never implements beyond the active task. Drives task verification to
-  green, treating a failing check as ordinary work rather than a stop
-  signal. Fails the task only when it can't pass within its scope—an
-  infeasible acceptance criterion, a plan or spec defect, or a broken
-  external dependency—never by gaming a test or editing the plan. When a
-  task legitimately changes a contract, updates the tests it invalidates
-  to match; never weakens, skips, or deletes a test to force a pass.
+  configuration, and docs criteria through planned verification steps,
+  or by reading for prose. Runs project checks. Reads forward tasks to
+  avoid foreclosing them but never implements beyond the active task.
+  Drives task verification to green, treating a failing check as
+  ordinary work rather than a stop signal. Fails the task only when it
+  can't pass within its scope—an infeasible acceptance criterion, a plan
+  or spec defect, or a broken external dependency—never by gaming a test
+  or editing the plan. When a task legitimately changes a contract,
+  updates the tests it invalidates to match; never weakens, skips, or
+  deletes a test to force a pass.
 - **Output**: Mutates source code. Leaves the active task `in_progress`
   in the `tasks` registry—`/check` owns the `done` transition and cursor
   advance. Updates `STATE.json` phase to `check`. The agent never edits

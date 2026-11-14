@@ -120,7 +120,8 @@ Select path by argument:
 - **Size**: scale detail to task size; write `None` under a section
   without content; keep headers intact.
 - **Proportional verification**, per `references/verification-guide.md`:
-  - Pair each outcome with the lowest evidence-ladder rung proving it.
+  - Pair each outcome with the lowest evidence-ladder rung proving it,
+    or prose with reading.
   - Require only tooling the repository already declares or installs.
   - File outcomes only a real GUI, browser, or native input can prove
     under `Accepted limits`; require such evidence only when the task
@@ -178,8 +179,8 @@ Select path by argument:
   substitution test; every bound internal choice sits under `Decisions`
   with its rationale.
 - Each `Verification` row names existing repository tooling and its
-  ladder rung; no new tooling, rig, recipe, coordinate, or key sequence
-  appears.
+  ladder rung, or reading for prose; no new tooling, rig, recipe,
+  coordinate, or key sequence appears.
 - GUI-, browser-, or native-input-only outcomes sit under
   `Accepted limits`, unless the task opted in.
 - `Evidence` imposes no obligation; no delivery ordering or task

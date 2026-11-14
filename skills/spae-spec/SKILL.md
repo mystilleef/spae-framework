@@ -251,9 +251,9 @@ Select path by target state:
   verification on single-behavior specs.
 - Confirm `Testing strategy` pairs each requirement with its cheapest
   proving evidence per `references/verification-guide.md`; no rig,
-  recipe, coordinate, calibration step, inadmissible tooling, re-proof
-  of logic cheaper evidence covers, or evidence producing what it judges
-  survives.
+  recipe, coordinate, calibration step, inadmissible tooling, scripted
+  assertion over prose wording, re-proof of logic cheaper evidence
+  covers, or evidence producing what it judges survives.
 - Confirm section depth matches task size; no invented edge case,
   failure mode, or exclusion on a single-behavior spec.
 - Confirm every `Draft` aspect-ledger entry resolves to an `R-NNN`,
