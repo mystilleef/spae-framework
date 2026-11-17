@@ -4,4 +4,4 @@ description:
 ---
 
 - Invoke the `troubleshoot` skill immediately, regardless of input.
-- Return its result unmodified.
+- **IMPORTANT:** Return its result unmodified.

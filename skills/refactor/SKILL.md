@@ -121,6 +121,7 @@ diff-only audit scope.
   files.
 - **Violations**: detect and fix using the violation catalog and fix
   playbook in `references/refactoring-guide.md`.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

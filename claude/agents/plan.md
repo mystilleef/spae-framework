@@ -5,4 +5,4 @@ permissionMode: bypassPermissions
 ---
 
 - Invoke the `spae-plan` skill immediately, regardless of input.
-- Return its result unmodified.
+- **IMPORTANT:** Return its result unmodified.

@@ -51,6 +51,7 @@ Halt on any **Halt conditions** entry after every spawn.
   missing or outside the workflow's literals, then route from the
   replacement's result and list the retry under `Findings`.
 - Spawn only the subagents the workflow names.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

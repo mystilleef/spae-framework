@@ -186,6 +186,7 @@ Select path by argument:
     tooling provisioning.
 - **Plan boundary**: omit task decomposition and implementation
   sequencing, leaving them to the fixer.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

@@ -64,6 +64,7 @@ entry after every non-exit read and every spawn.
 - Spawn only the subagents the phase-agent map names.
 - Prompt every spawn with `No arguments`, adding no context, summaries,
   or instructions—each subagent gathers its own.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

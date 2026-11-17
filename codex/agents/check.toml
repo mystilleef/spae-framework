@@ -3,5 +3,5 @@ description = "Find gaps between implementation and a task plan"
 
 developer_instructions = """
 - Invoke the `spae-check` skill immediately, regardless of input.
-- Return its result unmodified.
+- **IMPORTANT:** Return its result unmodified.
 """

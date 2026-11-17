@@ -3,5 +3,5 @@ description = "Gather context to write an SPAE spec file."
 
 developer_instructions = """
 - Invoke the `spae-spec` skill immediately, regardless of input.
-- Return its result unmodified.
+- **IMPORTANT:** Return its result unmodified.
 """

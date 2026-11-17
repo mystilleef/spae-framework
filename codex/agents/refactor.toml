@@ -3,5 +3,5 @@ description = "Refactor changes to the project"
 
 developer_instructions = """
 - Invoke the `refactor` skill immediately, regardless of input.
-- Return its result unmodified.
+- **IMPORTANT:** Return its result unmodified.
 """

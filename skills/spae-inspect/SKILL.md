@@ -139,6 +139,7 @@ requirements.
   `Risk notes`.
 - Consult `references/prose-protocol.md` and
   `references/outcome-guide.md` before editing `PLAN.md`.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

@@ -75,6 +75,7 @@ project.
   documentation style.
 - **Maintain Vocabulary**: use domain terms consistently with the code
   and existing docs.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

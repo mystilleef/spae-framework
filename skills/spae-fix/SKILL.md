@@ -107,6 +107,7 @@ diff-only audit scope.
 - Re-check `Evidence` and run project checks per
   `references/verification-guide.md`—never discover, install, or
   calibrate tooling ad hoc.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

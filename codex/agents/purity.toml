@@ -5,5 +5,5 @@ developer_instructions = """
 - Invoke the `purity` skill immediately, regardless of input.
 - Use Codex subagent spawning as the `subagent` tool. Spawn the named
   agent, one per call, and wait for it to complete before continuing.
-- Return its result unmodified.
+- **IMPORTANT:** Return its result unmodified.
 """

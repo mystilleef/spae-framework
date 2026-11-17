@@ -78,6 +78,7 @@ entry after every non-exit read and every spawn.
     expand file-path arguments.
   - Add no context, summaries, or instructions—each subagent gathers its
     own.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

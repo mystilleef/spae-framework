@@ -3,5 +3,5 @@ description = "Perform a code review"
 
 developer_instructions = """
 - Invoke the `code-review` skill immediately, regardless of input.
-- Return its result unmodified.
+- **IMPORTANT:** Return its result unmodified.
 """

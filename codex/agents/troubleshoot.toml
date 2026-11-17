@@ -3,5 +3,5 @@ description = "Diagnose issues into a fix-ready report using the troubleshoot sk
 
 developer_instructions = """
 - Invoke the `troubleshoot` skill immediately, regardless of input.
-- Return its result unmodified.
+- **IMPORTANT:** Return its result unmodified.
 """

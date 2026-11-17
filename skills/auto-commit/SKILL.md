@@ -309,6 +309,7 @@ Determine input from the current repository state:
 - **Efficiency**: batch operations by file group, target only relevant
   files, parallelize independent read-only checks when useful, and
   reduce output.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

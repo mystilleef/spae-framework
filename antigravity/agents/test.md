@@ -14,4 +14,4 @@ tools:
 ---
 
 - Invoke the `test` skill immediately, regardless of input.
-- Return its result unmodified.
+- **IMPORTANT:** Return its result unmodified.

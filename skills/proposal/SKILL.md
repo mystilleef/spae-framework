@@ -138,6 +138,7 @@ Select path by argument:
     sections.
 - **Plan boundary**: omit delivery ordering, task decomposition, and
   implementation sequencing, leaving them to whoever plans the work.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

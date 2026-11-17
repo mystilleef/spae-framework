@@ -5,4 +5,4 @@ description: Diagnose issues into a fix-ready report using the troubleshoot skil
 ---
 
 - Invoke the `troubleshoot` skill immediately, regardless of input.
-- Return its result unmodified.
+- **IMPORTANT:** Return its result unmodified.

@@ -5,4 +5,4 @@ description: Orchestrate purify agents to optimize and simplify code.
 ---
 
 - Invoke the `purity` skill immediately, regardless of input.
-- Return its result unmodified.
+- **IMPORTANT:** Return its result unmodified.

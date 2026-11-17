@@ -8,4 +8,4 @@ description: Orchestrates SPAE build agents to complete tasks.
   continuing.
 - OpenCode reserves `plan` and `build`: spawn `decompose` for the `plan`
   phase and `implement` for the `build` phase.
-- Return its result unmodified.
+- **IMPORTANT:** Return its result unmodified.

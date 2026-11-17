@@ -183,6 +183,7 @@ outcome.
   example,
   `audited 6 targets across 4 categories; 4 → 3 gaps after probes; 2 rows, 1 case, 0 files`),
   keeping per-target detail out of the result.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

@@ -124,6 +124,7 @@ Read only what the check requires:
   surfaced only while checking.
 - Consult `references/prose-protocol.md` and
   `references/outcome-guide.md` before drafting `FIX.md`.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

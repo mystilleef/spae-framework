@@ -117,6 +117,7 @@ diff-only audit scope.
 - Resolve requirements the task leaves open with the assumption most
   consistent with the task `Intent` and the plan `## Goal`, then
   proceed. Never ship a locally correct, globally wrong implementation.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

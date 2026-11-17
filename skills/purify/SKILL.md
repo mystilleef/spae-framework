@@ -148,6 +148,7 @@ diff-only audit scope.
 - Surface detection as one `Actions` line (for example,
   `detection: 4/4 categories; 1 found`), keeping per-category detail out
   of the result.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

@@ -20,6 +20,10 @@ Deliver one `transformative` life perspective shift and one
    - Deliver a non-coding `transformative` life productivity tip.
 3. **REPORT**—Emit result.
 
+## Directives
+
+- **IMPORTANT:** Return the result to the caller.
+
 ## Result directives
 
 - **Minimum** words. **Maximum** signal.

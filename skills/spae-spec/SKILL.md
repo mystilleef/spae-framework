@@ -158,6 +158,7 @@ Select path by target state:
   `aspect sweep: 8/8 phases, 12/12 sections mapped` and
   `ledger audit: 1 contradiction, 1 premise, 2 gaps`). List each
   correction under `Findings`: claim, defect, disposition.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

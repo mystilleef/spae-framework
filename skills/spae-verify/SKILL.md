@@ -112,6 +112,7 @@ requirements.
   outcome with evidence. No finding prescribes a remedy.
 - Consult `references/prose-protocol.md` and
   `references/outcome-guide.md` before drafting `VERIFY.md`.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

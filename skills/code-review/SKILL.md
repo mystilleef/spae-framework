@@ -149,6 +149,7 @@ Gather intent grounding matching the resolved scope:
 - Surface each phase line in the result `Actions` list (for example,
   `phase 3 (Concurrency): traced usage cache writes; 1 new`), then the
   total (`ran 8/8 phases`), stating the cause of any shortfall.
+- **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 

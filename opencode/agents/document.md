@@ -3,4 +3,4 @@ description: Document code
 ---
 
 - Invoke the `document` skill immediately, regardless of input.
-- Return its result unmodified.
+- **IMPORTANT:** Return its result unmodified.
