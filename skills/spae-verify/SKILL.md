@@ -2,7 +2,7 @@
 name: spae-verify
 description:
   Arbiter for the `SPAE` framework. Judges the implementation against
-  `SPEC.md`; completes the `workstream` or routes it to `/spec`.
+  `SPEC.md`, then completes the `workstream` or routes it to `/spec`.
 user-invocable: true
 ---
 
@@ -15,35 +15,36 @@ user-invocable: true
 
 ## Goal
 
-- Judge the implemented `workstream` against every `SPEC.md` requirement
-  as the final arbiter; record every hard block in `VERIFY.md`.
-- On `Pass`, complete the `workstream` (`phase: done`); on
+- Judge the implemented `workstream` against every `SPEC.md` `R-NNN` as
+  the final arbiter, recording every hard block in `VERIFY.md`.
+- On `Pass`, complete the `workstream` (`phase: done`). On
   `Revision required`, route it to `phase: spec`.
 
 ## Input
 
 Read only what the verdict requires:
 
-- `.spae/current/STATE.json`; `references/STATE.md` holds field
-  reference, directives, and snapshots.
+- `.spae/current/STATE.json`, with field reference, directives, and
+  snapshots in `references/STATE.md`.
 - `.spae/current/SPEC.md`.
 - `.spae/current/PLAN.md`: task IDs and `Scope` fields.
 - Repository source, tests, docs, configuration, and logs the
   `workstream` changed, for analysis.
 
-Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
+Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all
+requirements.
 
 ## Workflow
 
 1. **GATE**—Make no writes:
-   - Parse `.spae/current/STATE.json`; self-heal missing metadata:
+   - Parse `.spae/current/STATE.json` and self-heal missing metadata:
      `version` (`"1.0"`), `workstream` (target directory name), `status`
-     (`"active"`); `PERSIST` writes the healed fields.
+     (`"active"`). `PERSIST` writes the healed fields.
    - Halt on any **Halt conditions** entry.
 2. **ORIENT**—State goal in one sentence:
-   - `SPEC.md` and `PLAN.md` stay unmodified; directly modify no source
-     or tests; write nothing before `PERSIST`.
-   - Read `SPEC.md` in full; capture every `R-NNN` into a coverage
+   - `SPEC.md` and `PLAN.md` stay unmodified, no direct edit reaches
+     source or tests, and no write precedes `PERSIST`.
+   - Read `SPEC.md` in full, capturing every `R-NNN` into a coverage
      checklist.
    - Read `PLAN.md` task `Scope` fields to bound `workstream` changes.
 3. **PLAN**—Declare the evidence map:
@@ -58,7 +59,7 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
    - Judge each `R-NNN` against command output, `workstream` changes,
      and source.
    - Label each finding with exactly one tag:
-     - **Hard block**—drives `Revision required`; cite reproducible
+     - **Hard block**—drives `Revision required`. Cite reproducible
        evidence:
        - Missing or incorrect required behavior, a contract break, or a
          regression.
@@ -73,10 +74,9 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
          `R-NNN` grounds, cited from `workstream` changes—never a
          hypothetical risk or stylistic preference.
      - **Observation**—never a verdict input: thin edge-case coverage,
-       an ambiguous requirement, a minor deviation outside `SPEC.md`
-       scope, an _unrequested_ guardrail, a theoretical risk, an
-       `Out of scope` residual risk, or a check failure the `workstream`
-       doesn't cause.
+       an ambiguous `R-NNN`, a minor deviation outside `SPEC.md` scope,
+       an _unrequested_ guardrail, a theoretical risk, an `Out of scope`
+       residual risk, or a check failure the `workstream` doesn't cause.
    - Head each finding with the `R-NNN` it concerns, else `none`.
    - On any `Hard block`, draft `VERIFY.md` per `references/VERIFY.md`.
    - Apply **Directives** and **Constraints**.
@@ -91,14 +91,14 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
      replacing any prior copy.
    - Write `STATE.json` per the `references/STATE.md` exit snapshot
      matching the verdict.
-   - Re-read `STATE.json`; on a mismatch against **Verification** state
+   - Re-read `STATE.json`. On a mismatch against **Verification** state
      criteria, rewrite and re-read before `REPORT`.
    - On a `Pass` verdict, delete `.spae/current/VERIFY.md` when present,
      then remove the `.spae/current` symlink.
 7. **REPORT**—Emit result following result directives and using result
    template:
    - `Result` by re-read `phase`: `done`→`Pass`,
-     `spec`→`Revision required`; a halt→`Failed`.
+     `spec`→`Revision required`, a halt→`Failed`.
    - List each `Hard block`, then each `Soft finding`, then each
      `Observation` under `Findings`.
 
@@ -106,36 +106,36 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 
 - Optimize for agent, token, and context efficiency.
 - Refine and optimize `VERIFY.md` for agent consumption: agents read it
-  for varied purposes, with no memory of this run; keep it
-  self-contained, explicit, and token-dense; make each `Hard block`
-  actionable without repeating the investigation: the unmet requirement
-  outcome with evidence; no finding prescribes a remedy.
+  for varied purposes, with no memory of this run. Keep it
+  self-contained, explicit, and token-dense, and make each `Hard block`
+  actionable without repeating the investigation: the unmet `R-NNN`
+  outcome with evidence. No finding prescribes a remedy.
 - Consult `references/prose-protocol.md` and
   `references/outcome-guide.md` before drafting `VERIFY.md`.
 
 ## Constraints
 
 - **Write scope**: write only `.spae/current/VERIFY.md` and
-  `.spae/current/STATE.json`; on `Pass`, delete `VERIFY.md` and the
-  `.spae/current` symlink; forbid all other writes. Write incidental run
+  `.spae/current/STATE.json`. On `Pass`, delete `VERIFY.md` and the
+  `.spae/current` symlink. Forbid all other writes. Write incidental run
   outputs—logs, reports, experiment files—to scratch: a private
   temporary directory outside the project, removed when the run ends.
-  Scratch writes and byproducts of a command run for evidence, such as a
-  formatter's rewrites, never count as this phase's writes; never run a
+  Scratch writes and byproducts of a command run for evidence, such as
+  formatter rewrites, never count as this phase's writes. Never run a
   command for its write effect outside this scope. Read source code only
   for analysis.
-- **Phase boundary**: judge the whole `workstream`; complete it or hand
-  off work to `/spec`.
+- **Phase boundary**: judge the whole `workstream`, then complete it or
+  hand off work to `/spec`.
 - **Version control and release**: never execute git mutations (staging,
   commits, branches, tags, pushes) or release operations. Never stage or
   commit `.spae/`.
 - **Autonomy**: never ask users for input or clarification
-  mid-execution; halts and failures stop autonomously. Never perform or
+  mid-execution—halts and failures stop autonomously. Never perform or
   request human execution, an attended or interactive terminal, or human
   presence.
 - **State schema**: never introduce `STATE.json` fields outside
   `references/STATE.md`.
-- **Halt conditions**: halt without writing; report `Failed` with a
+- **Halt conditions**: halt without writing and report `Failed` with a
   diagnostic under `Findings`:
   - `.spae/current` missing or dangling.
   - `STATE.json` missing or holds unparseable JSON syntax.
@@ -145,22 +145,24 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
   - Evidence can't run for a cause outside the repository: a broken
     external dependency or an environment failure.
 - **Scope control**: judge only `SPEC.md` requirements and
-  `workstream`-caused regressions; add no requirement or verdict input
-  beyond them.
+  `workstream`-caused regressions, adding no requirements or verdict
+  inputs beyond them.
 
 ## Verification
 
 - Every `R-NNN` judged against cited automated evidence.
 - Every finding matching a `Hard block` or `Soft finding`
-  item—`workstream`-added bloat included—carries that tag; every other
-  finding carries `Observation`.
-- Verdict reads `Pass` only with zero `Hard block` findings; any
+  item—`workstream`-added bloat included—carries that tag, and every
+  other finding carries `Observation`.
+- Verdict reads `Pass` only with zero `Hard block` findings—any
   `Hard block` yields `Revision required`.
 - On `Revision required`, the `VERIFY.md` draft matches
-  `references/VERIFY.md`: every finding headed by its `R-NNN`, else
-  `none`; every `Hard block` with `File`, `Expected`, `Actual`, and
-  reproducible `Evidence`; every `Expected` names the unmet requirement
-  outcome; no finding prescribes a remedy.
+  `references/VERIFY.md`:
+  - Every finding headed by its `R-NNN`, else `none`.
+  - Every `Hard block` with `File`, `Expected`, `Actual`, and
+    reproducible `Evidence`.
+  - Every `Expected` names the unmet `R-NNN` outcome.
+  - No finding prescribes a remedy.
 - No `VERIFY.md` finding requests human execution, an attended or
   interactive terminal, or human presence.
 - `STATE.json` matches the `references/STATE.md` exit snapshot for the
@@ -174,13 +176,13 @@ Never read `.spae/current/VERIFY.md`; `SPEC.md` holds every requirement.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
-- **Result contract**: orchestrating agents parse `Result`; a missing,
-  altered, or inconsistent result breaks orchestration.
-- End every run—completion, short-circuit, abort, or halt—with the
-  result template as the final message; never end on progress narration.
-- Set `Result` to exactly one template literal, verbatim; report an
-  abort or halt lacking its own literal as `Failed`, with the reason
-  under `Findings`.
+- **Result contract**: orchestrating agents parse `Result`, so a
+  missing, altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, early stop, or halt—with the
+  result template as the final message, never on progress narration.
+- Set `Result` to exactly one template literal, verbatim. Report an
+  early stop or halt lacking its own literal as `Failed`, with the
+  reason under `Findings`.
 - Emit result template as live markdown—never in a code fence.
 - Output nothing outside template.
 - Source every `SPAE Status` value from confirmed re-read, never from

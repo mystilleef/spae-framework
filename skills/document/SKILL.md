@@ -33,7 +33,7 @@ Determine scope by the first available source:
 - Files or folders provided by the user.
 - Current changes in the repository.
 
-Abort if no scope exists.
+Halt if no scope exists.
 
 _Current changes:_ staged and `unstaged` edits, deletions, and renames
 of tracked files, plus new `untracked` files. Requires a versioned
@@ -41,7 +41,7 @@ project.
 
 ## Workflow
 
-1. **GATE**—Resolve scope per **Input**; abort if none.
+1. **GATE**—Resolve scope per **Input**, halting if none exists.
 2. **ORIENT**—State target scope and documentation goal in one sentence.
    Runtime behavior stays unchanged.
 3. **PLAN**—Declare the minimal documentation change:
@@ -61,33 +61,34 @@ project.
 
 ## Directives
 
-- **Lead with Purpose**: Start each block with a one-line caller-facing
+- **Lead with Purpose**: start each block with a one-line caller-facing
   summary.
-- **Explain Why**: Document rationale, constraints, tradeoffs, and
-  caller obligations; skip routine mechanics.
-- **Describe Interfaces**: Cover parameters, return values, errors, side
+- **Explain Why**: document rationale, constraints, tradeoffs, and
+  caller obligations, skipping routine mechanics.
+- **Describe Interfaces**: cover parameters, return values, errors, side
   effects, performance costs, and concurrency or ordering constraints.
-- **Capture Safety**: Record invariants, preconditions, edge cases,
+- **Capture Safety**: record invariants, preconditions, edge cases,
   failure modes, and recovery expectations.
-- **Use Examples**: Add runnable examples when they clarify usage or
+- **Use Examples**: add runnable examples when they clarify usage or
   prevent misuse.
-- **Match Idioms**: Follow language, framework, and repository
+- **Match Idioms**: follow language, framework, and repository
   documentation style.
-- **Maintain Vocabulary**: Use domain terms consistently with the code
+- **Maintain Vocabulary**: use domain terms consistently with the code
   and existing docs.
 
 ## Constraints
 
-- **Accuracy First**: Describe observed behavior only. Never speculate.
-- **Minimal Prose**: Omit boilerplate, history, redundant type
+- **Accuracy First**: describe only observed behavior, never
+  speculation.
+- **Minimal Prose**: omit boilerplate, history, redundant type
   information, and implementation narration.
-- **Public Focus**: Document caller-facing contracts. Hide private
+- **Public Focus**: document caller-facing contracts and hide private
   implementation details unless maintainers need an invariant.
-- **One Concept per Block**: Split unrelated ideas instead of writing
+- **One Concept per Block**: split unrelated ideas instead of writing
   dense paragraphs.
-- **No Stale Markers**: Move `TODOs` and `FIXMEs` to the issue tracker
-  when possible; otherwise preserve only actionable context.
-- **No Behavioral Changes**: Don't alter runtime behavior while
+- **No Stale Markers**: move `TODOs` and `FIXMEs` to the issue tracker
+  when possible, otherwise preserving only actionable context.
+- **No Behavioral Changes**: don't alter runtime behavior while
   documenting.
 
 ## Verification
@@ -107,13 +108,13 @@ project.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
-- **Result contract**: orchestrating agents parse `Result`; a missing,
-  altered, or inconsistent result breaks orchestration.
-- End every run—completion, short-circuit, abort, or halt—with the
-  result template as the final message; never end on progress narration.
-- Set `Result` to exactly one template literal, verbatim; report an
-  abort or halt lacking its own literal as `Failed`, with the reason
-  under `Findings`.
+- **Result contract**: orchestrating agents parse `Result`, so a
+  missing, altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, early stop, or halt—with the
+  result template as the final message, never on progress narration.
+- Set `Result` to exactly one template literal, verbatim. Report an
+  early stop or halt lacking its own literal as `Failed`, with the
+  reason under `Findings`.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
 

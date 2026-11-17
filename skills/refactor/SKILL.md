@@ -11,12 +11,12 @@ argument-hint: "[optional: file path, module, or focus area]"
 
 ## When to use
 
-- **Rule of Three**: Third instance triggers extraction. Exception:
+- **Rule of Three**: third instance triggers extraction. Exception:
   security and validation logic warrants unification at 2+.
-- **Adding features**: Restructure to accommodate the change first.
-- **Fixing bugs**: Clarify structure to expose the error.
-- **Code review**: Improve unfamiliar code incrementally.
-- **Smells detected**: See violation catalog in
+- **Adding features**: restructure to accommodate the change first.
+- **Fixing bugs**: clarify structure to expose the error.
+- **Code review**: improve unfamiliar code incrementally.
+- **Smells detected**: see the violation catalog in
   `references/refactoring-guide.md`.
 
 ## Goal
@@ -32,7 +32,7 @@ Determine scope by the first available source:
 - Files or folders provided by the user.
 - Current changes in the repository.
 
-Abort if no scope exists.
+Halt if no scope exists.
 
 _Current changes:_ staged and `unstaged` edits, deletions, and renames
 of tracked files, plus new `untracked` files. Requires a versioned
@@ -42,8 +42,8 @@ project.
 
 See `references/testing-guide.md` for test structure, isolation,
 mocking, assertion, and performance standards. The project's
-`TESTING.md`, when present, extends the guide; its conventions override
-the guide on conflict.
+`TESTING.md`, when present, extends the guide and overrides it on
+conflict.
 
 ## Shell commands
 
@@ -58,7 +58,7 @@ diff-only audit scope.
 ## Workflow
 
 1. **GATE**—Precondition guard. Halt immediately on failure.
-   - Abort if no scope exists.
+   - Halt if no scope exists.
    - Read `references/testing-guide.md` and, when present, `TESTING.md`.
    - Read `references/shell-command-guide.md`.
    - Read `references/cleanup-guide.md`.
@@ -71,8 +71,8 @@ diff-only audit scope.
    - Record one detection line for each section and one for those
      remaining smells: code examined (or why none applies) and
      violations found.
-   - **Short-circuit**: once every line exists, halt and emit
-     `Result: No Changes` if none found a violation.
+   - **Short-circuit**: emit `Result: No Changes` once every line exists
+     and none found a violation.
    - When detected smells carry high regression risk resisting safe
      atomic extraction under existing tests: record in `Findings`, omit
      edits, and emit `Result: No Changes`.
@@ -88,74 +88,75 @@ diff-only audit scope.
      that responsibility.
    - Analyze package, module, or class boundaries for cyclic imports and
      unresolved downstream consumers.
-   - Select the fix from the playbook; resolve compound violations using
-     the triage rules in `references/refactoring-guide.md`.
+   - Select the fix from the playbook, resolving compound violations
+     with the triage rules in `references/refactoring-guide.md`.
 4. **ACT**—Apply one transformation at a time. Execute only what PLAN
    declared.
 5. **VERIFY**—Loop over every criterion declared in PLAN:
    - Run the full suite after each `ACT` step.
    - Audit task edits against the pre-task baseline using the
-     Self-cleanup checklist in `references/cleanup-guide.md`; remove
+     Self-cleanup checklist in `references/cleanup-guide.md`, removing
      every self-introduced artifact before proceeding.
    - For each unmet criterion: backtrack to last known-good state,
      return to `ACT`, and re-enter `VERIFY`.
    - Exit only when all criteria pass.
    - Halt only for out-of-scope blockers (failing baseline tests,
-     compilation errors, or missing runtime environments); never treat
-     complex codebase smells as blockers.
+     compilation errors, or missing runtime environments), never for
+     complex codebase smells.
 6. **REPORT**—Emit the result following the result directives and using
    the result template.
 
 ## Directives
 
-- **Cohesive Scope**: Scope each invocation to one distinct
-  responsibility boundary; batch related transformations internally
+- **Cohesive Scope**: scope each invocation to one distinct
+  responsibility boundary, batching related transformations internally
   under sequential test verification rather than micro-slicing single
   methods.
-- **Detection lines**: Surface them as one `Actions` line (for example,
-  `detection: 8/8 lines; 1 found`); keep per-section detail out of the
-  result.
-- **Two Hats**: Never add features or new tests while refactoring.
+- **Detection lines**: surface them as one `Actions` line (for example,
+  `detection: 8/8 lines; 1 found`), keeping per-section detail out of
+  the result.
+- **Two Hats**: never add features or new tests while refactoring.
   Extracting internal functions, modules, or cohesive units under
   existing test suites satisfies Two Hats without requiring new test
   files.
-- **Violations**: Detect and fix using the violation catalog and fix
+- **Violations**: detect and fix using the violation catalog and fix
   playbook in `references/refactoring-guide.md`.
 
 ## Constraints
 
-- **No Confirmation Halts**: Never halt to request user scope
-  confirmation or interactive direction; execute the smallest safe
+- **No Confirmation Halts**: never halt to request user scope
+  confirmation or interactive direction—execute the smallest safe
   transformation within detected scope or emit `Result: No Changes`.
-- **Zero Behavioral Change**: External function and observable behavior
+- **Zero Behavioral Change**: external function and observable behavior
   must remain identical.
-- **Defer if Broken**: Stabilize failing code before refactoring.
-- **Inherit Baseline**: Treat the test suite as-found at refactor start
+- **Defer if Broken**: stabilize failing code before refactoring.
+- **Inherit Baseline**: treat the test suite as-found at refactor start
   as the authoritative baseline, regardless of prior tooling in the same
   session.
-- **Track Own Edits Only**: Capture each file's content before this
+- **Track Own Edits Only**: capture each file's content before this
   run's first edit to it. Revert means rewriting captured content back,
   or deleting files this run created—never a git-level reset, stash,
   checkout, or restore, which erases uncommitted work from earlier
   phases in the same tree.
-- **Never Leave It Broken**: End every refactor with the suite green
+- **Never Leave It Broken**: end every refactor with the suite green
   again or the offending edits reverted, regardless of why VERIFY halts.
-- **Self-Inflicted Failures Stay In-Scope**: A failure this pass's own
-  edits cause never qualifies as an out-of-scope blocker; loop
-  `VERIFY`'s backtrack step instead of halting.
-- **Bug Found Mid-Refactor**: A pre-existing bug the refactor exposes
+- **Self-Inflicted Failures Stay In-Scope**: a failure this pass's own
+  edits cause never qualifies as an out-of-scope blocker—loop `VERIFY`'s
+  backtrack step instead of halting.
+- **Bug Found Mid-Refactor**: a pre-existing bug the refactor exposes
   counts as out-of-scope. Revert the edits that surfaced it, then report
   the bug as a separate finding. Never fix it in the same pass (Two
   Hats).
 - No hacks, workarounds, or shortcuts.
-- Forbid laziness; fix issues properly, correctly, and idiomatically.
-- Never edit build or tool configuration files; for example,
-  `tsconfig.json`, `.eslintrc.*`, `webpack.config.*`, `vite.config.*`,
-  `jest.config.*`, `Makefile`, `pyproject.toml`, `Cargo.toml`.
-- Never suppress or disable compiler or linter diagnostics; for example,
-  `@ts-ignore`, `eslint-disable`, `@SuppressWarnings`, `# type: ignore`.
-- Never weaken type contracts to silence errors; for example, `as any`,
-  `!` non-null assertions, or broadening union types.
+- Forbid laziness: fix issues properly, correctly, and idiomatically.
+- Never edit build or tool configuration files, such as `tsconfig.json`,
+  `.eslintrc.*`, `webpack.config.*`, `vite.config.*`, `jest.config.*`,
+  `Makefile`, `pyproject.toml`, or `Cargo.toml`.
+- Never suppress or turn off compiler or linter diagnostics, such as
+  `@ts-ignore`, `eslint-disable`, `@SuppressWarnings`, or
+  `# type: ignore`.
+- Never weaken type contracts—`as any`, `!` non-null assertions, or
+  broadened union types—to silence errors.
 
 ## Verification
 
@@ -171,7 +172,7 @@ diff-only audit scope.
 - No self-introduced cleanup violation remains per
   `references/cleanup-guide.md`.
 - `Result: Failed` only follows a working tree the agent restores to the
-  pre-refactor baseline; never a suite left red.
+  pre-refactor baseline, never a suite left red.
 
 ## Result directives
 
@@ -179,13 +180,13 @@ diff-only audit scope.
 - Keep prose terse while ensuring clarity.
 - Optimize prose for agent, token, and context efficiency.
 - Use lists and sub-lists for long sentences and dense paragraphs.
-- **Result contract**: orchestrating agents parse `Result`; a missing,
-  altered, or inconsistent result breaks orchestration.
-- End every run—completion, short-circuit, abort, or halt—with the
-  result template as the final message; never end on progress narration.
-- Set `Result` to exactly one template literal, verbatim; report an
-  abort or halt lacking its own literal as `Failed`, with the reason
-  under `Findings`.
+- **Result contract**: orchestrating agents parse `Result`, so a
+  missing, altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, early stop, or halt—with the
+  result template as the final message, never on progress narration.
+- Set `Result` to exactly one template literal, verbatim. Report an
+  early stop or halt lacking its own literal as `Failed`, with the
+  reason under `Findings`.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
 

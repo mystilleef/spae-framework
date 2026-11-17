@@ -213,7 +213,8 @@ during the execution phase (`/build`, `/check`, or `/fix`).
   goal-aware.
 - **Context**: Entry-point paths plus facts a fresh agent can't derive.
 - **Scope**: The surface the task may change—modules, behaviors,
-  contracts—plus non-obvious off-limits areas; never an edit list.
+  contracts—plus off-limits areas a fresh agent can't infer; never an
+  edit list.
 - **Acceptance**: Observable outcomes, contracts, and preserved
   behaviors at risk; never implementation steps.
 - **Verification**: Project commands or existing test targets, each

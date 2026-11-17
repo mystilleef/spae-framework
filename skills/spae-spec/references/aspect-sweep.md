@@ -38,7 +38,7 @@
   - `slug`: kebab-case, ≤6 words.
 - **Ledger**: append new candidates after each phase, pruning duplicates
   by signature.
-- **Completion**: run all `PHASE_COUNT` phases; a phase with zero new
+- **Completion**: run all `PHASE_COUNT` phases—a phase with zero new
   candidates never ends the sweep.
 
 ## Resume seeding
@@ -47,14 +47,14 @@
   `Out of scope`, `Assumptions`, `Testing strategy`) into pre-seeded
   ledger signatures before phase one.
 - Mark pre-seeded signatures as covered.
-- Still scan the full proposal each phase; pre-seeded signatures only
+- Still scan the full proposal each phase—pre-seeded signatures only
   remove duplicates.
 
 ## Ledger audit
 
 - Run once after the final sweep phase, over the completed ledger.
-- Judge claims by content, never by heading name; hand-written proposals
-  qualify.
+- Judge claims by content, never by heading name, so hand-written
+  proposals qualify.
 - Check each defect class:
   - **Contradiction**: claims demanding incompatible outcomes—a change
     against a preserved behavior, a design against a decision, an edit
@@ -68,14 +68,15 @@
   - **Regression**: a claim altering behavior outside the goal.
   - **`AGENTS.md` violation**: a claim breaking an `AGENTS.md`
     constraint.
-- Record each defect: flag the affected entry with its class; add each
-  gap as a new entry under its category with `section-ref` `audit`.
+- Record each defect: flag the affected entry with its class, and add
+  each gap as a new entry under its category with `section-ref` `audit`.
 - Dispose per `SKILL.md` **Proposal fidelity**:
-  - Contradiction: the winning claim keeps its disposition; the other
-    moves to `Out of scope` as superseded, with a one-line rationale.
-  - Premise: rewrite the disposition to source reality; `Out of scope`
-    when moot.
-  - Gap: a new `R-NNN`; `Assumptions` for a precondition.
+  - Contradiction: the winning claim keeps its disposition, and the
+    other moves to `Out of scope` as superseded, with a one-line
+    rationale.
+  - Premise: rewrite the disposition to source reality, or file it under
+    `Out of scope` when moot.
+  - Gap: a new `R-NNN`, or `Assumptions` for a precondition.
   - Regression: narrow the claim's disposition to spare the behavior.
   - `AGENTS.md` violation: conform the claim's disposition to
     `AGENTS.md`.
@@ -84,7 +85,7 @@
 
 - List every `section-ref` the proposal yields: each heading, plus each
   paragraph outside any heading.
-- Map each one to a ledger signature or mark it `no claim`; pre-seeded
+- Map each one to a ledger signature or mark it `no claim`. Pre-seeded
   signatures count.
 - Treat an unmapped `section-ref` as an unmet `VERIFY` criterion. The
   ledger alone can't reveal a claim it never recorded.
@@ -98,10 +99,11 @@
     failure.
 - Treat orphaned ledger entries as unmet `VERIFY` criteria. Forbid
   silent drops.
-- Route `Validation` entries per `verification-guide.md`: translate each
-  into the outcome it protects; cheapest admissible evidence →
-  `Testing strategy`; none → `Out of scope` residual risk. Never carry
-  recipes, rigs, coordinates, or case matrices.
+- Route `Validation` entries per `verification-guide.md`:
+  - Translate each into the outcome it protects.
+  - Cheapest evidence the ladder admits → `Testing strategy`.
+  - None → `Out of scope` residual risk.
+  - Never carry recipes, rigs, coordinates, or case matrices.
 - Route mechanism claims per `outcome-guide.md`: carry each as the
-  `R-NNN` stating its contract or outcome; a mechanism a settled
+  `R-NNN` stating its contract or outcome. A mechanism a settled
   decision or `AGENTS.md` fixes stays a constraint `R-NNN`.

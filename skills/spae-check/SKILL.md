@@ -3,7 +3,7 @@ name: spae-check
 description:
   Task Verification Gate for the `SPAE` framework. Compares the active
   `PLAN.md` task's `Intent`, `Acceptance`, and `Verification` against
-  repository evidence; routes gaps to `/fix` or advances the task.
+  repository evidence, then routes gaps to `/fix` or advances the task.
 user-invocable: true
 ---
 
@@ -17,16 +17,16 @@ user-invocable: true
 ## Goal
 
 - Judge the active task's implementation against its `Intent`,
-  `Acceptance`, and `Verification`; record every gap in `FIX.md`.
-- Advance the `workstream` to `phase: fix` on a gap; else mark the task
-  `done` and advance to `phase: build` or `phase: verify`.
+  `Acceptance`, and `Verification`, recording every gap in `FIX.md`.
+- Advance the `workstream` to `phase: fix` on a gap. Otherwise, mark the
+  task `done` and advance to `phase: build` or `phase: verify`.
 
 ## Input
 
 Read only what the check requires:
 
-- `.spae/current/STATE.json`; `references/STATE.md` holds field
-  reference, directives, and snapshots.
+- `.spae/current/STATE.json`, with field reference, directives, and
+  snapshots in `references/STATE.md`.
 - `.spae/current/PLAN.md`: the active task in full, plus task titles and
   order.
 - Repository source, tests, docs, configuration, and logs the active
@@ -35,15 +35,15 @@ Read only what the check requires:
 ## Workflow
 
 1. **GATE**—Make no writes:
-   - Parse `.spae/current/STATE.json`; self-heal missing metadata:
+   - Parse `.spae/current/STATE.json` and self-heal missing metadata:
      `version` (`"1.0"`), `workstream` (target directory name), `status`
-     (`"active"`); `PERSIST` writes the healed fields.
+     (`"active"`). `PERSIST` writes the healed fields.
    - Self-heal state drift: treat a `"todo"` or missing
      `tasks[active_task_id]` as `"in_progress"` until `PERSIST`.
    - Halt on any **Halt conditions** entry.
 2. **ORIENT**—State goal in one sentence:
-   - `PLAN.md` stays unmodified; directly modify no source or tests;
-     write nothing before `PERSIST`.
+   - `PLAN.md` stays unmodified, no direct edit reaches source or tests,
+     and no write precedes `PERSIST`.
    - Read the active task in full, plus `PLAN.md` task titles and order.
 3. **PLAN**—Declare the evidence map:
    - Read `references/verification-guide.md` and
@@ -59,7 +59,7 @@ Read only what the check requires:
    - Judge each `Acceptance` outcome and the `Intent` against step
      output, the diff, and source.
    - Label each finding with exactly one tag:
-     - **Gap**—blocks a clear verdict; cite reproducible evidence, never
+     - **Gap**—blocks a clear verdict. Cite reproducible evidence, never
        a hypothetical risk or stylistic preference:
        - An unmet `Acceptance` outcome, a `Verification` step that fails
          or can't run for a cause inside the task diff—such as missing
@@ -81,8 +81,11 @@ Read only what the check requires:
        suggestion, a theoretical risk, or an approach diverging from one
        `Context` or `Scope` suggests yet breaking no outcome, boundary,
        or decision.
+
    - On any `Gap`, draft `FIX.md` per `references/FIX.md`.
+
    - Apply **Directives** and **Constraints**.
+
 5. **VERIFY**—Loop over **Verification** criteria for the verdict and
    the `FIX.md` draft:
    - For each failure: return to `ACT`, complete the evaluation, then
@@ -90,16 +93,19 @@ Read only what the check requires:
    - Exit only when every criterion passes.
    - Halt only on a **Halt conditions** entry.
 6. **PERSIST**—Write in order:
+
    - On a `Gap` verdict, write `.spae/current/FIX.md`, replacing any
      prior copy.
+
    - Write `STATE.json` per the `references/STATE.md` exit snapshot
      matching the verdict.
-   - Re-read `STATE.json`; on a mismatch against **Verification** state
+   - Re-read `STATE.json`. On a mismatch against **Verification** state
      criteria, rewrite and re-read before `REPORT`.
+
 7. **REPORT**—Emit result following result directives and using result
    template:
    - Status block by re-read `phase`: `fix`→`Gap found`,
-     `build`→`Clear, tasks remain`, `verify`→`Clear, final task`; a
+     `build`→`Clear, tasks remain`, `verify`→`Clear, final task`, a
      halt→`Failed`.
    - List each `Gap`, then each `Observation`, under `Findings`.
 
@@ -107,13 +113,13 @@ Read only what the check requires:
 
 - Optimize for agent, token, and context efficiency.
 - Refine and optimize `FIX.md` for agent consumption: agents read it for
-  varied purposes, with no memory of this run; keep it self-contained,
-  explicit, and token-dense; make each gap closable without `PLAN.md`:
-  the unmet outcome with evidence, never the edit closing it.
+  varied purposes, with no memory of this run. Keep it self-contained,
+  explicit, and token-dense, and make each gap closable without
+  `PLAN.md`: the unmet outcome with evidence, never the edit closing it.
 - Keep `FIX.md` self-contained and isolated per
   `references/outcome-guide.md` **Self-contained units**: a fresh,
   isolated agent holding only its text and the repository can close and
-  prove every gap; write `## Context` to supply every task constraint,
+  prove every gap. Write `## Context` to supply every task constraint,
   decision, and fact the agent needs and can't derive, including facts
   surfaced only while checking.
 - Consult `references/prose-protocol.md` and
@@ -122,25 +128,25 @@ Read only what the check requires:
 ## Constraints
 
 - **Write scope**: write only `.spae/current/FIX.md` and
-  `.spae/current/STATE.json`; forbid all other writes. Write incidental
+  `.spae/current/STATE.json`. Forbid all other writes. Write incidental
   run outputs—logs, reports, experiment files—to scratch: a private
   temporary directory outside the project, removed when the run ends.
-  Scratch writes and byproducts of a command run for evidence, such as a
-  formatter's rewrites, never count as this phase's writes; never run a
+  Scratch writes and byproducts of a command run for evidence, such as
+  formatter rewrites, never count as this phase's writes. Never run a
   command for its write effect outside this scope. Read source code only
   for analysis.
-- **Phase boundary**: judge exactly one task; hand off work to `/fix`,
-  `/build`, or `/verify`.
+- **Phase boundary**: judge exactly one task, then hand off work to
+  `/fix`, `/build`, or `/verify`.
 - **Version control and release**: never execute git mutations (staging,
   commits, branches, tags, pushes) or release operations. Never stage or
   commit `.spae/`.
 - **Autonomy**: never ask users for input or clarification
-  mid-execution; halts and failures stop autonomously. Never perform or
+  mid-execution—halts and failures stop autonomously. Never perform or
   request human execution, an attended or interactive terminal, or human
   presence.
 - **State schema**: never introduce `STATE.json` fields outside
   `references/STATE.md`.
-- **Halt conditions**: halt without writing; report `Failed` with a
+- **Halt conditions**: halt without writing and report `Failed` with a
   diagnostic under `Findings`:
   - `.spae/current` missing or dangling.
   - `STATE.json` missing or holds unparseable JSON syntax.
@@ -152,7 +158,7 @@ Read only what the check requires:
     diff—such as missing tooling, a broken external dependency, a step
     producing what it judges, or a need for human presence.
 - **Scope control**: ignore pre-existing uncommitted files and
-  modifications outside the active task's declared scope; they yield no
+  modifications outside the active task's declared scope—they yield no
   finding.
 
 ## Verification
@@ -160,16 +166,20 @@ Read only what the check requires:
 - Every `Acceptance` outcome, `Verification` step, and the `Intent`
   judged against cited evidence.
 - Every defect matching a `Gap` item—diff bloat and cleanup violations
-  included—carries `Gap`; every other finding carries `Observation`.
+  included—carries `Gap`, and every other finding carries `Observation`.
 - Verdict reads clear only with zero `Gap` findings.
+
 - On a `Gap` verdict, the `FIX.md` draft matches `references/FIX.md`:
-  `## Intent` verbatim from `PLAN.md`; every `Gap` with `File`,
-  `Expected`, `Actual`, and reproducible `Evidence`; every `Expected`
-  names an outcome, never an edit; no `Observation`.
+  - `## Intent` verbatim from `PLAN.md`.
+  - Every `Gap` with `File`, `Expected`, `Actual`, and reproducible
+    `Evidence`.
+  - Every `Expected` names an outcome, never an edit.
+  - No `Observation`.
+
 - On a `Gap` verdict, the `FIX.md` draft stays self-contained and
   isolated per `references/outcome-guide.md` **Self-contained units**: a
   fresh agent holding only its text and the repository can close and
-  prove every gap; `## Context` holds no derivable fact.
+  prove every gap, and `## Context` holds no derivable fact.
 - `STATE.json` matches the `references/STATE.md` exit snapshot for the
   verdict.
 - This phase wrote no file outside **Write scope**.
@@ -181,13 +191,13 @@ Read only what the check requires:
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
-- **Result contract**: orchestrating agents parse `Result`; a missing,
-  altered, or inconsistent result breaks orchestration.
-- End every run—completion, short-circuit, abort, or halt—with the
-  result template as the final message; never end on progress narration.
-- Set `Result` to exactly one template literal, verbatim; report an
-  abort or halt lacking its own literal as `Failed`, with the reason
-  under `Findings`.
+- **Result contract**: orchestrating agents parse `Result`, so a
+  missing, altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, early stop, or halt—with the
+  result template as the final message, never on progress narration.
+- Set `Result` to exactly one template literal, verbatim. Report an
+  early stop or halt lacking its own literal as `Failed`, with the
+  reason under `Findings`.
 - Emit result template as live markdown—never in a code fence.
 - Output nothing outside template.
 - Source every `SPAE Status` value from confirmed re-read, never from

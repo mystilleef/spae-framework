@@ -2,14 +2,24 @@
 
 ## Field reference
 
-| Field                   | Type   | Valid values                                                                                       | Category           | Notes                                                                                                        |
-| ----------------------- | ------ | -------------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------ |
-| `version`               | string | `"1.0"`                                                                                            | Derivable Metadata | Fixed; default `"1.0"` when omitted                                                                          |
-| `workstream`            | string | kebab-case slug                                                                                    | Derivable Metadata | Infer from path or symlink target when omitted                                                               |
-| `phase`                 | string | `"spec"` \| `"plan"` \| `"inspect"` \| `"build"` \| `"check"` \| `"fix"` \| `"verify"` \| `"done"` | Execution State    | Phase to run next; `"done"` ends the `workstream`                                                            |
-| `status`                | string | `"active"` \| `"revision_required"` \| `"completed"`                                               | Derivable Metadata | Default `"active"`; `"revision_required"` only with `phase: "spec"`, `"completed"` only with `phase: "done"` |
-| `cursor.active_task_id` | string | `"T-NNN"`                                                                                          | Execution State    | Active task ID; `cursor: {}` while `phase` reads `"spec"`, `"plan"`, or `"inspect"`                          |
-| `tasks`                 | object | `{ "T-NNN": "todo" \| "in_progress" \| "done" }`                                                   | Execution State    | Maps every task ID to its progress; `tasks: {}` while `phase` reads `"spec"` or `"plan"`                     |
+- **`version`** (string, Derivable Metadata): `"1.0"`. Fixed, defaulting
+  to `"1.0"` when omitted.
+- **`workstream`** (string, Derivable Metadata): kebab-case slug. Infer
+  from path or symlink target when omitted.
+- **`phase`** (string, Execution State): `"spec"` | `"plan"` |
+  `"inspect"` | `"build"` | `"check"` | `"fix"` | `"verify"` | `"done"`.
+  Names the phase to run next, and `"done"` ends the `workstream`.
+- **`status`** (string, Derivable Metadata): `"active"` |
+  `"revision_required"` | `"completed"`. Defaults to `"active"`,
+  allowing `"revision_required"` only with `phase: "spec"` and
+  `"completed"` only with `phase: "done"`.
+- **`cursor.active_task_id`** (string, Execution State): `"T-NNN"`.
+  Holds the active task ID, with `cursor: {}` while `phase` reads
+  `"spec"`, `"plan"`, or `"inspect"`.
+- **`tasks`** (object, Execution State):
+  `{ "T-NNN": "todo" | "in_progress" | "done" }`. Maps every task ID to
+  its progress, with `tasks: {}` while `phase` reads `"spec"` or
+  `"plan"`.
 
 ## Directives
 
@@ -19,15 +29,15 @@
 - **`Draft` path**: target lacks `STATE.json`, or `STATE.json` reads
   `phase: "spec"`, `status: "active"`.
 - **`Revision` path**: `STATE.json` reads `status: "revision_required"`.
-- Write `STATE.json` once, at `PERSIST`, after `SPEC.md`; never mutate
-  it earlier on either path.
+- Write `STATE.json` once, at `PERSIST`, after `SPEC.md`—never mutate it
+  earlier on either path.
 - **Exit (both paths)**: write the full exit snapshot—`version`,
   `workstream`, `phase: "plan"`, `status: "active"`, `cursor: {}`, and
   `tasks: {}`.
 - Confirm every write with a fresh read before treating the write as
-  done; on a field mismatch, rewrite and re-read.
+  done. Rewrite and re-read on any field mismatch.
 - A forgotten or partial write—not a task failure—stalls orchestrator
-  dispatch and corrupts manual resumption; every write here gates
+  dispatch and corrupts manual resumption: every write here gates
   automation, not bookkeeping.
 
 ## Snapshots

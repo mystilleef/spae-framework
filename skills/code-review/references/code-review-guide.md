@@ -4,29 +4,38 @@
 
 Defensively review local repository changes for incorrect behavior, data
 loss, security vulnerabilities, or crashes. Emit no other findings. Use
-source evidence and isolated local checks; don't develop weaponized
-exploits, probe live systems, or bypass safeguards.
+source evidence and isolated local checks without developing weaponized
+exploits, probing live systems, or bypassing safeguards.
 
 ## Scope
 
-| In scope                                        | Out of scope                                           |
-| ----------------------------------------------- | ------------------------------------------------------ |
-| Lines added or modified in the diff             | Unchanged code visible in context                      |
-| New public API contracts introduced by the diff | Architecture or design concerns                        |
-| Security and correctness of new logic           | Missing tests or test coverage                         |
-|                                                 | Style, formatting, naming conventions                  |
-|                                                 | `DRY` / abstraction suggestions                        |
-|                                                 | Hypothetical callers or inputs (unless new public API) |
+**In scope**:
+
+- Lines added or modified in the diff
+- New public API contracts introduced by the diff
+- Security and correctness of new logic
+
+**Out of scope**:
+
+- Unchanged code visible in context
+- Architecture or design concerns
+- Missing tests or test coverage
+- Style, formatting, naming conventions
+- `DRY` / abstraction suggestions
+- Hypothetical callers or inputs (unless new public API)
 
 ## Severity
 
-| Level        | Criteria                                                                                         |
-| ------------ | ------------------------------------------------------------------------------------------------ |
-| **Critical** | Crash in likely path · auth bypass · data loss · secret exposed                                  |
-| **High**     | Logic error producing wrong output · resource leak · injection risk · failure silently swallowed |
-| **Medium**   | Incorrect error handling · API misuse · missing boundary validation · unsafe type coercion       |
-| **Low**      | Suboptimal but non-broken pattern · recoverable edge case unhandled                              |
-| **Nit**      | Emit only if trivially co-located with a higher-severity finding                                 |
+- **Critical**: crash in likely path · auth bypass · data loss · secret
+  exposed
+- **High**: logic error producing wrong output · resource leak ·
+  injection risk · failure silently swallowed
+- **Medium**: incorrect error handling · API misuse · missing boundary
+  validation · unsafe type coercion
+- **Low**: suboptimal but non-broken pattern · recoverable edge case
+  unhandled
+- **Nit**: emit only if trivially co-located with a higher-severity
+  finding
 
 ## Categories and checks
 
@@ -75,8 +84,8 @@ exploits, probe live systems, or bypass safeguards.
 
 - File, socket, connection, lock, or allocation acquired without
   guaranteed release → **High**
-- Resource acquired in try block but not released in finally/defer/RAII
-  destructor → **High**
+- Resource acquired in try block but not released in
+  finally/defer/scope-bound destructor → **High**
 - Unclosed stream passed out of scope without documented ownership
   transfer → **Medium**
 
@@ -121,36 +130,36 @@ Omit items out of scope, plus:
 
 ## Decision rules
 
-- **Resource leak**: Trace acquisitions (open, lock, connect, `alloc`)
+- **Resource leak**: trace acquisitions (open, lock, connect, `alloc`)
   across return/panic paths. Flag **High** if any path exits without
   release.
-- **Injection**: Trace _untrusted_ inputs (HTTP `params`/headers/body,
+- **Injection**: trace _untrusted_ inputs (HTTP `params`/headers/body,
   CLI `args`, file content). Flag **Critical** only when input reaches
   execution boundaries without _sanitization_.
-- **Null safety**: Verify guards precede _dereference_ of _nullable_
+- **Null safety**: verify guards precede _dereference_ of _nullable_
   sources (optional return, map lookup, `config`, JSON). Flag **High**
   if unguarded.
-- **Concurrency**: Trace shared mutable state across runtime execution
+- **Concurrency**: trace shared mutable state across runtime execution
   paths. Flag read-then-await-then-write patterns or lock release gaps
   only when runtime model permits concurrent execution.
-- **Error handling**: Verify catch/except blocks propagate, log, or
+- **Error handling**: verify catch/except blocks propagate, log, or
   intentionally suppress errors with documented rationale. Flag **High**
   if silently discarded.
-- **Intent check**: Search commits, PR descriptions, adjacent comments,
+- **Intent check**: search commits, PR descriptions, adjacent comments,
   or user intent for change rationales. Move findings with qualifying
   rationales to `suppressed_findings`. Route theoretical security,
   concurrency, or null safety findings lacking concrete trigger
-  scenarios to `suppressed_findings`; cite the missing scenario—never
+  scenarios to `suppressed_findings`, citing the missing scenario—never
   emit in active `findings`.
-- **Evidence threshold**: Establish a concrete trigger scenario,
-  reachable code path, and material impact. Source evidence suffices;
-  don't require exploit construction or live-system reproduction. Assess
-  exploitability only for security findings, within the app threat
-  model; judge other defects by observable failure and impact.
+- **Evidence threshold**: establish a concrete trigger scenario,
+  reachable code path, and material impact. Source evidence suffices
+  without exploit construction or live-system reproduction. Assess
+  _exploitability_ only for security findings, within the app threat
+  model, and judge other defects by observable failure and impact.
 
 ## Calibration
 
-- **Precision over recall**: One high-confidence Critical beats five
+- **Precision over recall**: one high-confidence Critical beats five
   speculative Mediums.
 - Limit evaluation to code modified in the diff.
 - Note ambiguous intent within findings rather than assuming defect.

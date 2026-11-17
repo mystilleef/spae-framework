@@ -1,8 +1,9 @@
 # Staging evidence
 
 Evidence catalogs for `SKILL.md`: coupling evidence decides which
-changes share a commit; ignore evidence decides which `untracked` paths
-join `.gitignore`. Examples illustrate each family, never limit it.
+changes share a commit, and ignore evidence decides which `untracked`
+paths join `.gitignore`. Examples illustrate each family, never limit
+it.
 
 ## 1. Coupling evidence
 
@@ -12,16 +13,16 @@ unit—`OAuth` login with its test, not login plus a user-profile change.
 
 - **Breaking:** splitting yields a commit that fails to build, resolve,
   or install, or loses file history.
-  - **Rename pair:** a deleted tracked path whose HEAD content closely
-    matches an `untracked` path; piping `git --no-pager show HEAD:<old>`
+  - **Rename pair:** a deleted tracked path whose _HEAD_ content closely
+    matches an `untracked` path. Piping `git --no-pager show HEAD:<old>`
     into `git --no-pager diff --no-index --numstat -- - <new>` measures
-    the difference; once both halves stage,
+    the difference. Once both halves stage,
     `git --no-pager diff --cached --find-renames --summary` confirms
     `rename`.
   - **Symbol rename or removal:** a change renames or removes an
-    identifier other changes reference, as in a cross-file refactor;
-    `git --no-pager grep -n -w -F <identifier>` across changed files
-    confirms.
+    identifier other changes reference, as in a cross-file refactor,
+    which `git --no-pager grep -n -w -F <identifier>` across changed
+    files confirms.
   - **Manifest and lockfile:** `package.json` with `package-lock.json`,
     `Cargo.toml` with `Cargo.lock`, `pyproject.toml` with its lockfile.
   - **Generated output and source:** a tracked generated file
@@ -49,14 +50,15 @@ unit—`OAuth` login with its test, not login plus a user-profile change.
 
 ## 2. Ignore evidence
 
-Weigh per **Ignore Verdict** in `SKILL.md`; sensitive paths follow
+Weigh per **Ignore Verdict** in `SKILL.md`. Sensitive paths follow
 **Ignore Rules** there instead.
 
 - **Decisive:**
   - **Companion:** the path equals an ignored path plus a runtime
-    suffix—lock, journal, WAL, shared-memory, PID, temp, backup;
-    `git --no-pager check-ignore -v --no-index -- <base>` confirms the
-    base. Example: `auth.json.lock` beside ignored `auth.json`.
+    suffix—lock, journal, write-ahead log, shared-memory, process ID,
+    temp, backup. `git --no-pager check-ignore -v --no-index -- <base>`
+    confirms the base. Example: `auth.json.lock` beside ignored
+    `auth.json`.
   - **Self-identification:** `CACHEDIR.TAG`, a tool-written `.gitignore`
     inside the directory, or a generated-file header.
   - **Declared output:** a tracked manifest or config names the path as
@@ -79,25 +81,25 @@ Weigh per **Ignore Verdict** in `SKILL.md`; sensitive paths follow
     entry—`auth.lock` beside ignored `auth.json`.
   - **Content:** empty or opaque.
     `git --no-pager diff --no-index --numstat -- /dev/null <path>`
-    prints `0 0` for empty and `- -` for binary; opaque text holds
-    hashes, UUIDs, PIDs, serialized state, or absolute machine paths;
-    recognized asset formats—images, fonts, documents—carry no signal.
-  - **Naming:** lock, PID, swap, temp, or backup suffixes; hash- or
-    timestamp-shaped names.
-  - **Metadata:** owner-only permissions; size far beyond repository
+    prints `0 0` for empty and `- -` for binary. Opaque text holds
+    hashes, UUIDs, PIDs, serialized state, or absolute machine paths.
+    Recognized asset formats—images, fonts, documents—carry no signal.
+  - **Naming:** lock, process ID, swap, temp, or backup suffixes, plus
+    hash- or timestamp-shaped names.
+  - **Metadata:** owner-only permissions, or size far beyond repository
     norms.
 - **Supporting, ambient:**
   - **Repository role:** existing ignore sections show a tool writing
-    state into the repository; counts only alongside a path-specific
-    signal.
+    state into the repository. This signal counts only alongside a
+    path-specific signal.
 - **Counter:**
   - **Input reference:** tracked files reference the path as an
-    input—import, include, source, config load; output declarations,
+    input—import, include, source, config load. Output declarations,
     such as a manifest `main` field pointing into `dist/`, carry no
     counter weight.
   - **Authored content:** comments, prose, hand-written code or scripts,
     such as shell scripts under `bin/`.
-  - **Versioned by convention:** lockfiles beside a tracked manifest,
-    such as `Cargo.lock` or `package-lock.json`; package markers such as
-    an empty `__init__.py`; `.gitkeep` placeholders.
+  - **Versioned by convention:** lockfiles beside a tracked manifest
+    (`Cargo.lock`, `package-lock.json`), package markers such as an
+    empty `__init__.py`, and `.gitkeep` placeholders.
   - **Guard failure:** per **Ignore Guards** in `SKILL.md`.

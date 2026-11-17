@@ -38,7 +38,7 @@ code, and orphan files from accumulating across task cycles.
 
 Run in code-mutating skills at `ORIENT` to snapshot the pre-task working
 tree—tracked and non-ignored untracked files—through a throwaway index,
-without staging or workspace pollution; record the printed tree ID as
+without staging or workspace pollution. Record the printed tree ID as
 `base_tree`:
 
 ```sh
@@ -48,12 +48,12 @@ GIT_INDEX_FILE="${tmp}/index" git add -A &&
 rm -rf "${tmp}"
 ```
 
-Point `GIT_INDEX_FILE` at a path that doesn't exist yet; `git` rejects
+Point `GIT_INDEX_FILE` at a path that doesn't exist yet: `git` rejects
 an empty file, such as `mktemp` creates, as an index.
 
-In an unversioned project, skip the snapshot: capture each file's
-content before this task's first edit to it, and record each file this
-task creates; audit those in place of the diff.
+In an unversioned project, skip the snapshot. Instead, capture each
+file's content before this task's first edit to it, record each file
+this task creates, and audit those in place of the diff.
 
 ## Audit command
 
@@ -70,9 +70,9 @@ rm -rf "${tmp}"
 ```
 
 Comparing two snapshots lists task-created files as added and omits
-untouched pre-existing untracked files; diffing `base_tree` against the
-working tree directly omits new untracked files and reports pre-existing
-ones as deleted.
+untouched pre-existing untracked files. Diffing `base_tree` against the
+working tree directly, by contrast, omits new untracked files and
+reports pre-existing ones as deleted.
 
 When auditing without a transient baseline snapshot (for example,
 read-only check skills), scope checks strictly to declared task paths:
@@ -83,7 +83,7 @@ git --no-pager diff --no-ext-diff -U0 -- <task-scoped-paths>
 
 Never run un-scoped `git status` or un-scoped `git diff` to flag orphan
 files. Treat baseline and diff commands purely as read-only snapshot
-utilities; never stage files or alter repository commit history.
+utilities—never stage files or alter repository commit history.
 
 ## Canonical VERIFY sub-step
 
@@ -92,7 +92,7 @@ authority:
 
 ```markdown
 - Audit task edits against the pre-task baseline using the Self-cleanup
-  checklist in `references/cleanup-guide.md`; remove every
+  checklist in `references/cleanup-guide.md`, removing every
   self-introduced artifact before proceeding.
 ```
 

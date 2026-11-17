@@ -2,15 +2,15 @@
 
 ## Purpose
 
-State _what_ to achieve and _why_; leave _how_ to the consumer.
+State _what_ to achieve and _why_, and leave _how_ to the consumer.
 Acceptance and verification hold every consumer accountable.
 
-## Keep: what-content
+## Keep what-content
 
 - **Outcome**: observable behavior the work produces.
 - **Contract**: behavior observable across a boundary—public API or CLI
   signatures, HTTP status and body shapes, file formats, config keys,
-  schemas, persisted data, UI output; literal values belong.
+  schemas, persisted data, UI output. Literal values belong.
 - **Constraint**: behavior to preserve, a change boundary, or an
   `AGENTS.md` rule.
 - **Decision**: a settled choice citing its source—a proposal decision,
@@ -18,7 +18,7 @@ Acceptance and verification hold every consumer accountable.
 - **Non-derivable fact**: rationale, rejected approaches, hazards found
   while authoring, cross-task contracts, external facts.
 
-## Cut: how-content
+## Cut how-content
 
 - Approach and edit lists.
 - Internal mechanism: call paths, helper names, declaration placement.
@@ -31,16 +31,16 @@ Acceptance and verification hold every consumer accountable.
 ## Rules
 
 - **Substitution test**: keep a line only when it holds under every
-  approach meeting the outcomes, or cites the decision fixing it;
-  restate any other line as the outcome or constraint it protects, else
+  approach meeting the outcomes, or cites the decision fixing it.
+  Restate any other line as the outcome or constraint it protects, else
   cut it.
 - **Derivation test**: keep a context fact only when the consumer can't
-  recover it from the repository or its own instructions; entry-point
+  recover it from the repository or its own instructions. Entry-point
   paths pass as pointers.
 - **Examples**: admit a concrete input→output example only to pin a
-  behavior prose leaves ambiguous; never a case matrix.
-- **Accountability**: state every outcome as observable and falsifiable;
-  leaner content demands sharper acceptance.
+  behavior prose leaves ambiguous—never a case matrix.
+- **Accountability**: state every outcome as observable and falsifiable,
+  since leaner content demands sharper acceptance.
 - **Self-contained units**: write each unit a consumer acts on
   independently to stand alone:
   - A fresh, isolated agent holding only the unit, the repository, and
@@ -48,7 +48,7 @@ Acceptance and verification hold every consumer accountable.
   - Its outcomes, constraints, and verification stay jointly
     satisfiable: some reachable sequence of states meets them all at
     once.
-  - Repair a failing unit before writing it; failure shapes include two
+  - Repair a failing unit before writing it. Failure shapes include two
     outcomes demanding incompatible states, an outcome requiring a state
     a constraint forbids, evidence demanded from a state its run
     constraints forbid, verification producing what it judges, and

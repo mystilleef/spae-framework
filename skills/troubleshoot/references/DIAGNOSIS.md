@@ -73,8 +73,8 @@
 
 ## Verification
 
-| Outcome         | Evidence                                                           |
-| --------------- | ------------------------------------------------------------------ |
-| [F/P ID or aim] | [Existing test, tool, or seam—ladder rung]                         |
-| F1 regression   | [New test: triggering input, asserted behavior—fails, then passes] |
+| Outcome         | Evidence                                                   |
+| --------------- | ---------------------------------------------------------- |
+| [F/P ID or aim] | [Existing test, tool, or seam—ladder rung]                 |
+| F1 regression   | [New test: triggering input, assertion—fails, then passes] |
 ```

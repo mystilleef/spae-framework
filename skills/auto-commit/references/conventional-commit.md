@@ -1,7 +1,7 @@
-# Conventional Commits 1.0.0
+# **Conventional Commits** 1.0.0
 
 Reference for the Conventional Commits 1.0.0 specification
-(conventionalcommits.org/en/v1.0.0):
+(`conventionalcommits.org/en/v1.0.0`):
 
 - §1–§5 restate the standard, which binds no tool, framework, or
   environment.
@@ -21,45 +21,45 @@ Reference for the Conventional Commits 1.0.0 specification
 
 ## 2. Rules
 
-Key words follow the specification: MUST, MAY, SHALL.
+Key words follow the specification: **MUST**, **MAY**, **SHALL**.
 
-- **Prefix:** a type—a noun such as `feat` or `fix`—then an OPTIONAL
-  scope, an OPTIONAL `!`, and a REQUIRED colon and space.
-- **`feat`:** MUST mark a commit adding a feature.
-- **`fix`:** MUST mark a commit fixing a bug.
-- **Other types:** MAY appear; see §3.
-- **Scope:** OPTIONAL; a noun naming a section of the codebase, in
-  parentheses, such as `fix(parser):`; **Commit Vocabulary** in
+- **Prefix:** a type—a noun such as `feat` or `fix`—then an **OPTIONAL**
+  scope, an **OPTIONAL** `!`, and a **REQUIRED** colon and space.
+- **`feat`:** **MUST** mark a commit adding a feature.
+- **`fix`:** **MUST** mark a commit fixing a bug.
+- **Other types:** **MAY** appear—see §3.
+- **Scope:** **OPTIONAL**—a noun naming a section of the codebase, in
+  parentheses, such as `fix(parser):`. **Commit Vocabulary** in
   `SKILL.md` picks it.
-- **Description:** MUST follow the colon and space; a short summary of
-  the code changes.
-- **Body:** OPTIONAL; begins one blank line after the description;
-  free-form, any number of newline-separated paragraphs.
-- **Footers:** OPTIONAL; begin one blank line after the body:
+- **Description:** a short summary of the code changes that **MUST**
+  follow the colon and space.
+- **Body:** **OPTIONAL** free-form text—any number of newline-separated
+  paragraphs—beginning one blank line after the description.
+- **Footers:** **OPTIONAL**, beginning one blank line after the body:
   - Each footer holds a word token, a `: ` or ` #` separator, and a
     value, after the git trailer format.
   - Tokens use `-` in place of spaces, such as `Acked-by` or
     `Reviewed-by`.
-  - A value MAY span spaces and newlines; parsing ends at the next token
-    and separator.
-- **Breaking change:** MUST appear in the prefix, a footer, or both; any
-  type MAY carry one:
+  - A value **MAY** span spaces and newlines. Parsing ends at the next
+    token and separator.
+- **Breaking change:** **MUST** appear in the prefix, a footer, or both,
+  and any type **MAY** carry one:
   - Prefix: `!` immediately before the `:`, such as `feat!:` or
-    `refactor(api)!:`; the description then SHALL describe the break,
-    and the footer turns OPTIONAL.
-  - Footer: uppercase `BREAKING CHANGE: <description>`;
-    `BREAKING-CHANGE` works as a synonym token.
+    `refactor(api)!:`. The description then **SHALL** describe the
+    break, and the footer turns **OPTIONAL**.
+  - Footer: uppercase `BREAKING CHANGE: <description>`, with
+    `BREAKING-CHANGE` as a synonym token.
 - **Case:** implementations treat every unit as case-insensitive except
-  `BREAKING CHANGE`, which MUST stay uppercase; keep casing consistent
-  within a project.
+  `BREAKING CHANGE`, which **MUST** stay uppercase. Keep casing
+  consistent within a project.
 
 ## 3. Types
 
 - **Defined:** `feat` and `fix` alone carry meaning in the
   specification.
-- **Others:** the specification mandates none; teams define types and
-  evolve them over time; **Commit Vocabulary** in `SKILL.md` picks them
-  from project evidence.
+- **Others:** the specification mandates none. Teams define types and
+  evolve them over time, and **Commit Vocabulary** in `SKILL.md` picks
+  them from project evidence.
 - **Common examples** (Angular convention, cited by the specification):
   - `build`: build system or dependencies.
   - `chore`: maintenance.
@@ -72,7 +72,7 @@ Key words follow the specification: MUST, MAY, SHALL.
 - **Revert:** the FAQ recommends a `revert` type plus a `Refs:` footer
   listing the reverted commit hashes.
 
-## 4. Semantic Versioning
+## 4. Semantic versioning
 
 - `fix` → `PATCH`.
 - `feat` → `MINOR`.
@@ -90,13 +90,13 @@ Key words follow the specification: MUST, MAY, SHALL.
 ## 6. Readability conventions
 
 These conventions originate in git practice and keep history readable
-under any version control tool; they add to the standard, never override
+under any version control tool. They add to the standard, never override
 it.
 
 - **Subject:** the first line—type, scope, and description—aims for 50
-  characters; hard limit 72.
-- **Description:** imperative mood ("add," not "added"); no trailing
-  period.
+  characters, with a hard limit of 72.
+- **Description:** imperative mood ("add," not "added"), with no
+  trailing period.
 - **Body and footers:** wrap lines at 72 characters.
 
 ## 7. Examples

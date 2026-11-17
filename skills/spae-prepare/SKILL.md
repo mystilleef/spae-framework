@@ -38,48 +38,51 @@ regardless of phase:
 
 ## Workflow
 
-After each read, check the exit first; halt on any **Halt conditions**
+After each read, check the exit first. Halt on any **Halt conditions**
 entry after every non-exit read and every spawn.
 
 1. **Resolve Workstream**:
-   - `.spae/current/STATE.json` present: proceed to step 2; list an
+   - `.spae/current/STATE.json` present: proceed to step 2, listing an
      unused proposal argument under `Findings`.
-   - Absent, proposal provided: spawn `spec` with the proposal; await
-     completion; proceed to step 2.
+   - Absent, proposal provided: spawn `spec` with the proposal, await
+     completion, then proceed to step 2.
 2. **Dispatch Loop**:
-   - Read `.spae/current/STATE.json`; record `phase`.
+   - Read `.spae/current/STATE.json` and record `phase`.
    - Exit on `phase: "build"`.
-   - Spawn the subagent the map names for `phase`, no arguments; await
-     completion.
+   - Spawn the subagent the map names for `phase`, no arguments, and
+     await completion.
    - Repeat step 2.
 3. **Report**: emit the result per **Result directives**:
-   - `Result`: `Completed` on an exit; `Halted` when a subagent reports
-     `Failed` or leaves `phase` unchanged; `Failed` on any other **Halt
-     conditions** entry.
+   - `Result`:
+     - `Completed` on an exit.
+     - `Halted` when a subagent reports `Failed` or leaves `phase`
+       unchanged.
+     - `Failed` on any other **Halt conditions** entry.
 
 ## Directives
 
 - **Spawn first**: open with the subagent tool, preceded only by the
-  `STATE.json` read; skip all preflight—context gathering, environment
-  discovery, path checks, guide or knowledge-base reads, and plan
+  `STATE.json` read. Skip all preflight—context gathering, environment
+  discovery, path checks, guide reads, knowledge-base reads, and plan
   reviews.
-- Route only from `STATE.json` `phase`; trust it over subagent output
+- Route only from `STATE.json` `phase`, trusting it over subagent output
   text.
 - Spawn only the subagents the phase-agent map names.
 - Prompt the bootstrap `spec` spawn with the proposal argument verbatim,
   and every loop spawn with `No arguments`:
   - Never reuse the proposal on later iterations, or read, list, or
     expand file-path arguments.
-  - Add no context, summaries, or instructions; each subagent gathers
-    its own.
+  - Add no context, summaries, or instructions—each subagent gathers its
+    own.
 
 ## Constraints
 
 - Limit tool calls to the subagent tool and `.spae/current/STATE.json`
-  reads; run nothing else—no other reads, file writes, listings,
-  searches, shell or git commands, skill activation, or user prompts.
+  reads. Run nothing else—no other reads, file writes, listings,
+  searches, shell commands, git commands, skill activation, or user
+  prompts.
 - Never run subagents in parallel or concurrently.
-- **Halt conditions**: halt immediately; report per **Report** with
+- **Halt conditions**: halt immediately and report per **Report** with
   `Halted at` and `Reason`:
   - `.spae/current/STATE.json` absent at start, with no proposal
     argument.
@@ -104,13 +107,13 @@ entry after every non-exit read and every spawn.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
-- **Result contract**: orchestrating agents parse `Result`; a missing,
-  altered, or inconsistent result breaks orchestration.
-- End every run—completion, short-circuit, abort, or halt—with the
-  result template as the final message; never end on progress narration.
-- Set `Result` to exactly one template literal, verbatim; report an
-  abort or halt lacking its own literal as `Failed`, with the reason
-  under `Findings`.
+- **Result contract**: orchestrating agents parse `Result`, so a
+  missing, altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, early stop, or halt—with the
+  result template as the final message, never on progress narration.
+- Set `Result` to exactly one template literal, verbatim. Report an
+  early stop or halt lacking its own literal as `Failed`, with the
+  reason under `Findings`.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
 
