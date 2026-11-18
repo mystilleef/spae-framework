@@ -256,7 +256,8 @@ Select path by target state:
   proving evidence per `references/verification-guide.md`. No rig,
   recipe, coordinate, calibration step, inadmissible tooling, scripted
   assertion over prose wording, re-proof of logic cheaper evidence
-  covers, or evidence producing what it judges survives.
+  covers, or evidence producing what it judges or relying on another
+  run's report or on state that run left outside the project survives.
 - Confirm section depth matches task size, with no invented edge case,
   failure mode, or exclusion on a single-behavior spec.
 - Confirm every `Draft` aspect-ledger entry resolves to an `R-NNN`,

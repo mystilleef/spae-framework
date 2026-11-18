@@ -76,9 +76,13 @@ requirements.
      - Hidden coupling: add the missing dependency, or rebind the
        reliance to the dependency's stated `Acceptance` contract.
      - `Verification` step creating, regenerating, or overwriting what
-       it judges, or relying on state another run leaves behind: move
-       that production into `Scope` and `Acceptance`, then verify the
-       recorded result per `references/verification-guide.md`.
+       it judges, or relying on another run's report or on state that
+       run left outside the project: rebind it per
+       `references/verification-guide.md`, first fit wins:
+       1. Evidence the step derives from the state it judges.
+       2. A recording the project keeps, produced through the task's
+          `Scope` and `Acceptance`.
+       3. Otherwise, demote its outcome to `Risk notes`.
    - Other `SPEC.md` tension short of a **Halt conditions** entry: favor
      its requirements and log it under `Observations`.
    - Unjustified enabling task: state its rationale in `Context`, else
@@ -209,7 +213,8 @@ requirements.
       states.
     - Every `Verification` step observes per
       `references/verification-guide.md`: it never creates, regenerates,
-      or overwrites what it judges.
+      or overwrites what it judges, and never relies on another run's
+      report or on state that run left outside the project.
   - Zero tasks mandate version control or release operations.
   - No task step presumes human execution, an attended or interactive
     terminal, or human presence.

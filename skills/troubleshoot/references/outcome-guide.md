@@ -52,5 +52,5 @@ Acceptance and verification hold every consumer accountable.
     outcomes demanding incompatible states, an outcome requiring a state
     a constraint forbids, evidence demanded from a state its run
     constraints forbid, verification producing what it judges, and
-    reliance on another unit's unstated content or on state another run
-    left behind.
+    reliance on another unit's unstated content, another run's report,
+    or state that run left outside the project.

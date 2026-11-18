@@ -59,20 +59,24 @@ Never replicate manual human testing for its own sake.
 - **Self-contained runs**: steps finish unaided—non-interactive, no
   watch mode, no open-ended retries or exploratory probing—and yield a
   machine-decidable result.
-  - A step needs only the project and its stated tooling, never state
-    another run left behind outside the project.
+  - A step needs only the project and its stated tooling, never another
+    run's report—a returned result, a CI log or status—or state that run
+    left outside the project.
   - Timeouts guard against hangs with generous headroom—never judge
     correctness by them.
 - **Observation**: a step observes the state it judges and changes
   nothing in the project on purpose—never creates, regenerates, or
   overwrites what it judges—so every run against unchanged state yields
   the same verdict.
+  - The judged state: the project as the step finds it.
   - Byproducts of the project's own commands, such as formatter
-    rewrites, stay incidental.
+    rewrites, stay incidental, as do outputs a step derives from the
+    judged state without the project keeping them—build outputs, scratch
+    packages and installs.
   - Prove a prior state—baselines, before-change measurements—from a
-    recording of it, or from that state reproduced in scratch under
-    isolation reached without changing the measured code. Otherwise,
-    record a residual risk.
+    recording of it the project keeps, or from that state reproduced in
+    scratch under isolation reached without changing the measured code.
+    Otherwise, record a residual risk.
 - **Honest residuals**: record outcomes lacking practical automated
   evidence as residual risks—never fake a pass or write "attempt, else
   report unverified" fallbacks.
