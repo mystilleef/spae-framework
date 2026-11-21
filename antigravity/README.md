@@ -1,14 +1,14 @@
 # State-persistent atomic execution (`SPAE`) for `Agy`
 
 Agent definitions and the `/run` skill for the
-[Antigravity CLI](https://antigravity.google/docs/cli/) (`agy`), the
-successor to the deprecated `Gemini CLI`.
+[Antigravity CLI](https://antigravity.google/docs/cli/) (`agy`), the successor
+to the deprecated `Gemini CLI`.
 
 ## Installation
 
-From the repository root, `./install.sh agy` installs the files this
-page documents (see [Installation](../README.md#installation)). On
-`Windows`, the script runs only under `WSL`.
+From the repository root, `./install.sh agy` installs the files this page
+documents (see [Installation](../README.md#installation)). On `Windows`, the
+script runs only under `WSL`.
 
 ### Manual installation
 
@@ -32,8 +32,8 @@ Copy the `/run` skill to `~/.gemini/config/skills/`:
 cp -r skills/run ~/.gemini/config/skills/
 ```
 
-To scope the install to one project, use `.agents/skills/` and
-`.agents/agents/` at the repository root instead.
+To scope the install to one project, use `.agents/skills/` and `.agents/agents/`
+at the repository root instead.
 
 ## Agents
 
@@ -49,7 +49,7 @@ To scope the install to one project, use `.agents/skills/` and
 | `test`         | Fill test coverage gaps                           |
 | `purify`       | Simplify and optimize code                        |
 | `refactor`     | Improve structure and clarity                     |
-| `review`       | Review for correctness and style                  |
+| `code-review`  | Review for correctness and style                  |
 | `document`     | Document code                                     |
 | `commit`       | Stage and commit the implementation               |
 | `work`         | Run ad-hoc tasks in an isolated session           |
@@ -58,8 +58,8 @@ To scope the install to one project, use `.agents/skills/` and
 
 ## Orchestration agents
 
-These agents drive nested subagents through the native `invoke_subagent`
-tool in `Agy`.
+These agents drive nested subagents through the native `invoke_subagent` tool in
+`Agy`.
 
 | Agent         | Purpose                                               |
 | ------------- | ----------------------------------------------------- |
@@ -70,19 +70,19 @@ tool in `Agy`.
 | `clean`       | Run `purify` then `refactor` agents sequentially      |
 | `purity`      | Spawn `purify` agents to optimize and simplify code   |
 | `structure`   | Spawn `refactor` agents to improve code structure     |
+| `review`      | Spawn `code-review` agents until no new issues        |
 
 ## Proposal skill
 
 `proposal` ships as a skill, not an agent. It optionally drafts
 `<slug>-proposal.md` for `spec`, `orchestrate`, or `prepare`. Settle
 requirements with an agent, then have it use the skill, or run
-`/proposal <requirement>`. See
-[Proposal](../README.md#proposal-optional).
+`/proposal <requirement>`. See [Proposal](../README.md#proposal-optional).
 
 ## Commands
 
-`Agy` provides no custom command files. It converts every skill into a
-slash command, so `/run` ships as a skill.
+`Agy` provides no custom command files. It converts every skill into a slash
+command, so `/run` ships as a skill.
 
 | Command                  | Purpose                   |
 | ------------------------ | ------------------------- |
@@ -90,17 +90,15 @@ slash command, so `/run` ships as a skill.
 
 ## Notes
 
-- Agents use Markdown files with `YAML` front matter. The body defines
-  the system prompt.
-- Each agent lists its `tools`. `Agy` gives agents without `tools` no
-  shell, edit, or subagent tools.
-- `Agy` rejects a `tools` entry it doesn't recognize, so use exact tool
-  names.
-- `grep_search` and `find_by_name` skip git-ignored paths such as
-  `.spae/`.
+- Agents use Markdown files with `YAML` front matter. The body defines the
+  system prompt.
+- Each agent lists its `tools`. `Agy` gives agents without `tools` no shell,
+  edit, or subagent tools.
+- `Agy` rejects a `tools` entry it doesn't recognize, so use exact tool names.
+- `grep_search` and `find_by_name` skip git-ignored paths such as `.spae/`.
 - Phase agents fall back to `view_file`, `list_dir`, and `run_command`.
 - Run any agent as the main agent with `agy --agent <name>`.
-- Orchestration relies on nested subagents. Testing covered `Agy`. `Pi`
-  remains the recommended harness.
+- Orchestration relies on nested subagents. Testing covered `Agy`. `Pi` remains
+  the recommended harness.
 
 See the [top-level README](../README.md) for the full workflow.

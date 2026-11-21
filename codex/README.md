@@ -5,9 +5,9 @@ Agent definitions and the `$run` skill for the
 
 ## Installation
 
-From the repository root, `./install.sh codex` installs the files this
-page documents (see [Installation](../README.md#installation)). On
-`Windows`, the script runs only under `WSL`.
+From the repository root, `./install.sh codex` installs the files this page
+documents (see [Installation](../README.md#installation)). On `Windows`, the
+script runs only under `WSL`.
 
 ### Manual installation
 
@@ -35,10 +35,9 @@ Requires `Codex` with subagent support.
 
 ## Usage
 
-`Codex` lacks support for custom commands. The `$run` skill replaces the
-`/run` command. Activate skills with `$`—invoke agents as
-`$run <agent> [argument]`. Only `spec` takes an argument—a description
-of the task.
+`Codex` lacks support for custom commands. The `$run` skill replaces the `/run`
+command. Activate skills with `$`—invoke agents as `$run <agent> [argument]`.
+Only `spec` takes an argument—a description of the task.
 
 | Agent     | Invocation                |
 | --------- | ------------------------- |
@@ -64,7 +63,7 @@ of the task.
 | `test`         | Fill test coverage gaps                           |
 | `purify`       | Simplify and optimize code                        |
 | `refactor`     | Improve structure and clarity                     |
-| `review`       | Review for correctness and style                  |
+| `code-review`  | Review for correctness and style                  |
 | `document`     | Document code                                     |
 | `commit`       | Stage and commit the implementation               |
 | `work`         | Run ad-hoc tasks in an isolated session           |
@@ -73,8 +72,8 @@ of the task.
 
 ## Orchestration agents
 
-These agents require nested subagent support. Orchestration on `Codex`
-remains untested.
+These agents require nested subagent support. Orchestration on `Codex` remains
+untested.
 
 | Agent         | Purpose                                               |
 | ------------- | ----------------------------------------------------- |
@@ -85,13 +84,13 @@ remains untested.
 | `clean`       | Run `purify` then `refactor` agents sequentially      |
 | `purity`      | Spawn `purify` agents to optimize and simplify code   |
 | `structure`   | Spawn `refactor` agents to improve code structure     |
+| `review`      | Spawn `code-review` agents until no new issues        |
 
 ## Proposal skill
 
 `proposal` ships as a skill, not an agent. It optionally drafts
 `<slug>-proposal.md` for `spec`, `orchestrate`, or `prepare`. Settle
 requirements with an agent, then have it use the skill, or run
-`$proposal <requirement>`. See
-[Proposal](../README.md#proposal-optional).
+`$proposal <requirement>`. See [Proposal](../README.md#proposal-optional).
 
 See the [top-level README](../README.md) for the full workflow.

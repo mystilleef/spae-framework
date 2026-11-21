@@ -1,14 +1,14 @@
 # State-persistent atomic execution (`SPAE`) for `Pi`
 
-Agent definitions for the [`Pi`](https://github.com/mystilleef/pi)
-harness, the official and recommended harness for `SPAE`. `Pi` supports
-the orchestration agents below.
+Agent definitions for the [`Pi`](https://github.com/mystilleef/pi) harness, the
+official and recommended harness for `SPAE`. `Pi` supports the orchestration
+agents below.
 
 ## Installation
 
 From the repository root, `./install.sh pi` installs the files this page
-documents (see [Installation](../README.md#installation)). On `Windows`,
-the script runs only under `WSL`.
+documents (see [Installation](../README.md#installation)). On `Windows`, the
+script runs only under `WSL`.
 
 ### Manual installation
 
@@ -26,8 +26,7 @@ Copy agents to `~/.pi/agent/agents/`:
 cp -r agents/* ~/.pi/agent/agents/
 ```
 
-Install
-[`mystilleef/pi-subagent`](https://github.com/mystilleef/pi-subagent)
+Install [`mystilleef/pi-subagent`](https://github.com/mystilleef/pi-subagent)
 for the built-in `/run` command.
 
 ## Agents
@@ -44,7 +43,7 @@ for the built-in `/run` command.
 | `test`         | Fill test coverage gaps                           |
 | `purify`       | Simplify and optimize code                        |
 | `refactor`     | Improve structure and clarity                     |
-| `review`       | Review for correctness and style                  |
+| `code-review`  | Review for correctness and style                  |
 | `document`     | Document code                                     |
 | `commit`       | Stage and commit the implementation               |
 | `work`         | Run ad-hoc tasks in an isolated session           |
@@ -65,13 +64,13 @@ These agents require nested subagent support via
 | `clean`       | Run `purify` then `refactor` agents sequentially      |
 | `purity`      | Spawn `purify` agents to optimize and simplify code   |
 | `structure`   | Spawn `refactor` agents to improve code structure     |
+| `review`      | Spawn `code-review` agents until no new issues        |
 
 ## Proposal skill
 
 `proposal` ships as a skill, not an agent. It optionally drafts
 `<slug>-proposal.md` for `spec`, `orchestrate`, or `prepare`. Settle
 requirements with an agent, then have it use the skill, or run
-`/skill:proposal <requirement>`. See
-[Proposal](../README.md#proposal-optional).
+`/skill:proposal <requirement>`. See [Proposal](../README.md#proposal-optional).
 
 See the [top-level README](../README.md) for the full workflow.

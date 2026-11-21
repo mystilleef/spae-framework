@@ -5,9 +5,9 @@ Agent definitions and the `/run` command for the
 
 ## Installation
 
-From the repository root, `./install.sh claude` installs the files this
-page documents (see [Installation](../README.md#installation)). On
-`Windows`, the script runs only under `WSL`.
+From the repository root, `./install.sh claude` installs the files this page
+documents (see [Installation](../README.md#installation)). On `Windows`, the
+script runs only under `WSL`.
 
 ### Manual installation
 
@@ -47,7 +47,7 @@ Requires `Claude Code` with subagent support.
 | `test`         | Fill test coverage gaps                           |
 | `purify`       | Simplify and optimize code                        |
 | `refactor`     | Improve structure and clarity                     |
-| `review`       | Review for correctness and style                  |
+| `code-review`  | Review for correctness and style                  |
 | `document`     | Document code                                     |
 | `commit`       | Stage and commit the implementation               |
 | `work`         | Run ad-hoc tasks in an isolated session           |
@@ -56,8 +56,8 @@ Requires `Claude Code` with subagent support.
 
 ## Orchestration agents
 
-These agents require nested subagent support. Orchestration on
-`Claude Code` remains untested.
+These agents require nested subagent support. Orchestration on `Claude Code`
+remains untested.
 
 | Agent         | Purpose                                               |
 | ------------- | ----------------------------------------------------- |
@@ -68,13 +68,13 @@ These agents require nested subagent support. Orchestration on
 | `clean`       | Run `purify` then `refactor` agents sequentially      |
 | `purity`      | Spawn `purify` agents to optimize and simplify code   |
 | `structure`   | Spawn `refactor` agents to improve code structure     |
+| `review`      | Spawn `code-review` agents until no new issues        |
 
 ## Proposal skill
 
 `proposal` ships as a skill, not an agent. It optionally drafts
 `<slug>-proposal.md` for `spec`, `orchestrate`, or `prepare`. Settle
 requirements with an agent, then have it use the skill, or run
-`/proposal <requirement>`. See
-[Proposal](../README.md#proposal-optional).
+`/proposal <requirement>`. See [Proposal](../README.md#proposal-optional).
 
 See the [top-level README](../README.md) for the full workflow.

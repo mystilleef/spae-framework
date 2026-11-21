@@ -1,21 +1,19 @@
 # State-persistent atomic execution framework
 
-The `SPAE` framework provides a cross-platform, agent-first, structured
-workflow loop for AI agent harnesses.
+The `SPAE` framework provides a cross-platform, agent-first, structured workflow
+loop for AI agent harnesses.
 
-It runs a seven-step loop that produces consistent, high-quality,
-predictable `LLM` outputs, even when using lower-tier agents. Gaps found
-at the end feed back to the start. The loop exits only when `verify`
-passes.
+It runs a seven-step loop that produces consistent, high-quality, predictable
+`LLM` outputs, even when using lower-tier agents. Gaps found at the end feed
+back to the start. The loop exits only when `verify` passes.
 
 **spec → plan → inspect → build → check → fix → verify**
 
 ![State-Persistent Atomic Execution (SPAE) framework execution lifecycle](assets/spae-workflow.svg)
 
-> **Official harness**: `Pi` serves as the official and recommended
-> harness for `SPAE`. Orchestration testing covered `Pi` and `Agy`.
-> Other harnesses run each phase by hand, with orchestration untested.
-> See [Installation](#installation).
+> **Official harness**: `Pi` serves as the official and recommended harness for
+> `SPAE`. Orchestration testing covered `Pi` and `Agy`. Other harnesses run each
+> phase by hand, with orchestration untested. See [Installation](#installation).
 
 ## What `SPAE` does
 
@@ -24,8 +22,8 @@ passes.
 - Decomposing requests into atomic, independently verifiable tasks
 - Persisting state in external artifacts (not conversational memory)
 - Enforcing phase boundaries so each agent reads only what it needs
-- Allowing any harness (`Pi`, `Claude`, `Agy`, `Gemini`, `OpenCode`,
-  `Codex`, etc.) to resume work at any point
+- Allowing any harness (`Pi`, `Claude`, `Agy`, `Gemini`, `OpenCode`, `Codex`,
+  etc.) to resume work at any point
 
 ## Contents
 
@@ -45,38 +43,35 @@ passes.
 
 ## Framework design
 
-- **Harness agnostic**—use any combination of `Pi`, `Claude`, `Agy`,
-  `Gemini`, `OpenCode`, `Codex`, etc., at each phase, though `Pi`
-  remains recommended
+- **Harness agnostic**—use any combination of `Pi`, `Claude`, `Agy`, `Gemini`,
+  `OpenCode`, `Codex`, etc., at each phase, though `Pi` remains recommended
 - **Fresh agent per phase**—each phase starts a new agent with no shared
-  conversation. Mix providers and models per phase, for example a
-  stronger model for `inspect`, `check`, and `verify` (see
-  [Agents](#agents))
-- **Human oversight**—run each phase by hand, or automate with
-  orchestration agents (`Pi`, `Agy`)
-- **Fault-tolerant resumption**—`SPAE` saves progress after every phase,
-  so a dropped connection, agent error, or halted orchestration loses no
-  finished work. Resume from any harness:
+  conversation. Mix providers and models per phase, for example a stronger model
+  for `inspect`, `check`, and `verify` (see [Agents](#agents))
+- **Human oversight**—run each phase by hand, or automate with orchestration
+  agents (`Pi`, `Agy`)
+- **Fault-tolerant resumption**—`SPAE` saves progress after every phase, so a
+  dropped connection, agent error, or halted orchestration loses no finished
+  work. Resume from any harness:
   - Rerun the interrupted phase, or
   - Run `/run orchestrate` to continue autonomously
-- **Atomic execution**—every task stays small enough to verify in a
-  single cycle
-- **Independent verification**—the agent that writes code never approves
-  it. Separate agents check each task against the plan and the finished
-  work against the spec
-- **Closed loop**—`verify` feeds gaps back to `spec`, and the workflow
-  ends only when `verify` passes
+- **Atomic execution**—every task stays small enough to verify in a single cycle
+- **Independent verification**—the agent that writes code never approves it.
+  Separate agents check each task against the plan and the finished work against
+  the spec
+- **Closed loop**—`verify` feeds gaps back to `spec`, and the workflow ends only
+  when `verify` passes
 
-See [`docs/spae-framework.md`](docs/spae-framework.md) for the complete
-protocol specification, execution guardrails, and lifecycle details.
+See [`docs/spae-framework.md`](docs/spae-framework.md) for the complete protocol
+specification, execution guardrails, and lifecycle details.
 
 ---
 
 ## Usage
 
-Invoke any agent with `/run <agent> [argument]` (or `$run` in `Codex`).
-Agents encapsulate skills and carry out each phase. See each agent's
-invocation for its arguments.
+Invoke any agent with `/run <agent> [argument]` (or `$run` in `Codex`). Agents
+encapsulate skills and carry out each phase. See each agent's invocation for its
+arguments.
 
 | Agent     | Invocation             |
 | --------- | ---------------------- |
@@ -88,22 +83,22 @@ invocation for its arguments.
 | `fix`     | `/run fix`             |
 | `verify`  | `/run verify`          |
 
-`OpenCode` reserves `plan` and `build`, so its agents use `decompose`
-and `implement` instead. See [`opencode/README.md`](opencode/README.md).
+`OpenCode` reserves `plan` and `build`, so its agents use `decompose` and
+`implement` instead. See [`opencode/README.md`](opencode/README.md).
 
 ---
 
 ## Proposal (optional)
 
 `proposal` ships as a skill, not an agent. It drafts a reviewable
-`./<slug>-proposal.md`—design, decisions, rejected alternatives,
-accepted limits, and verification—for any agent taking a `<proposal>`:
-`spec`, `orchestrate`, or `prepare`.
+`./<slug>-proposal.md`—design, decisions, rejected alternatives, accepted
+limits, and verification—for any agent taking a `<proposal>`: `spec`,
+`orchestrate`, or `prepare`.
 
 Draft one either way:
 
-- **Discuss first**: settle requirements with an agent, then have it
-  draft the proposal with the `proposal` skill.
+- **Discuss first**: settle requirements with an agent, then have it draft the
+  proposal with the `proposal` skill.
 - **Direct**: pass the requirement as the skill's argument.
 
 | Harness    | Direct invocation               |
@@ -121,16 +116,16 @@ Then seed the workflow, for example `/run spec <slug>-proposal.md` or
 
 ## Workflow
 
-Run phases in order, looping until `/run verify` passes. Each agent
-reads only its designated inputs and writes only its designated outputs.
-Each `/run` call spawns a fresh agent, so `build`, `check`, and `fix` on
-one task each run in separate agents. Invoking skills directly in one
-session forfeits this isolation.
+Run phases in order, looping until `/run verify` passes. Each agent reads only
+its designated inputs and writes only its designated outputs. Each `/run` call
+spawns a fresh agent, so `build`, `check`, and `fix` on one task each run in
+separate agents. Invoking skills directly in one session forfeits this
+isolation.
 
 The workflow nests two loops:
 
-- **Task loop**—`build → check ⇄ fix` repeats per task until `check`
-  marks it `done`
+- **Task loop**—`build → check ⇄ fix` repeats per task until `check` marks it
+  `done`
 - **Workstream loop**—`verify → spec` repeats until `verify` passes
 
 ```mermaid
@@ -167,19 +162,16 @@ flowchart TD
 | 6     | `/run fix`             | Close gaps found by `/run check`       |
 | 7     | `/run verify`          | Verify code against `SPEC.md`          |
 
-The task loop alternates between build, check, and Remediation Fix (FIX)
-cycles:
+The task loop alternates between build, check, and Remediation Fix (FIX) cycles:
 
 - `/run build`—executes the active atomic task and sets phase to `check`
-- `/run check`—verifies active task implementation against `PLAN.md`.
-  Marks task `done` if clean, or writes `FIX.md` and routes to
-  `/run fix` if gaps exist
-- `/run fix`—closes gaps listed in `FIX.md`, deletes `FIX.md`, and
-  returns phase to `check`
+- `/run check`—verifies active task implementation against `PLAN.md`. Marks task
+  `done` if clean, or writes `FIX.md` and routes to `/run fix` if gaps exist
+- `/run fix`—closes gaps listed in `FIX.md`, deletes `FIX.md`, and returns phase
+  to `check`
 
 If `/run verify` finds gaps, it creates `VERIFY.md` and resets state to
-`/run spec`, restarting the workstream loop. Repeat until `/run verify`
-passes.
+`/run spec`, restarting the workstream loop. Repeat until `/run verify` passes.
 
 ---
 
@@ -187,12 +179,11 @@ passes.
 
 > **Testing covered `Pi` and `Agy` only.** Orchestration requires nested
 > subagent support. `Pi` users must install
-> [`mystilleef/pi-subagent`](https://github.com/mystilleef/pi-subagent).
-> `Agy` ships native nested subagents.
+> [`mystilleef/pi-subagent`](https://github.com/mystilleef/pi-subagent). `Agy`
+> ships native nested subagents.
 
-Orchestration agents spawn and drive nested `subagents` autonomously,
-completing multi-agent workflows without human intervention at each
-step.
+Orchestration agents spawn and drive nested `subagents` autonomously, completing
+multi-agent workflows without human intervention at each step.
 
 ---
 
@@ -204,36 +195,36 @@ step.
 | `prepare`     | `/run prepare [<proposal>]`     | Run prep phases (1-3)     |
 | `spawn`       | `/run spawn`                    | Cycle all remaining tasks |
 
-**`orchestrate`** reads `STATE.json`, determines the current phase, and
-spawns the appropriate `SPAE` agent sequentially until the workflow
-completes or the agent surfaces a blocker. Pass a proposal on first run
-to seed the `spec` phase.
+**`orchestrate`** reads `STATE.json`, determines the current phase, and spawns
+the appropriate `SPAE` agent sequentially until the workflow completes or the
+agent surfaces a blocker. Pass a proposal on first run to seed the `spec` phase.
 
 **Resume**—after any agent halts the workflow, for any reason, run
-`/run orchestrate` without a proposal. `orchestrate` reads `STATE.json`
-and picks up where the last agent left off.
+`/run orchestrate` without a proposal. `orchestrate` reads `STATE.json` and
+picks up where the last agent left off.
 
-**`prepare`** runs the preparatory phases—spec, plan, and
-inspect—autonomously until the workflow reaches the `build` phase. Pass
-a proposal on first run to seed the `spec` phase.
+**`prepare`** runs the preparatory phases—spec, plan, and inspect—autonomously
+until the workflow reaches the `build` phase. Pass a proposal on first run to
+seed the `spec` phase.
 
-**`spawn`** targets the build phase exclusively—iterates all remaining
-tasks, cycling `build`, `check`, and `fix` per task until the phase
-advances to `verify`.
+**`spawn`** targets the build phase exclusively—iterates all remaining tasks,
+cycling `build`, `check`, and `fix` per task until the phase advances to
+`verify`.
 
 ---
 
 ### Non-**`SPAE`** orchestrators
 
-| Agent       | Invocation       | Purpose                              |
-| ----------- | ---------------- | ------------------------------------ |
-| `coverage`  | `/run coverage`  | Spawn test agents for gaps           |
-| `clean`     | `/run clean`     | Run purify and refactor sequentially |
-| `purity`    | `/run purity`    | Spawn purify agents to optimize code |
-| `structure` | `/run structure` | Spawn refactor agents for structure  |
+| Agent       | Invocation       | Purpose                                      |
+| ----------- | ---------------- | -------------------------------------------- |
+| `coverage`  | `/run coverage`  | Spawn test agents for gaps                   |
+| `clean`     | `/run clean`     | Run purify and refactor sequentially         |
+| `purity`    | `/run purity`    | Spawn purify agents to optimize code         |
+| `structure` | `/run structure` | Spawn refactor agents for structure          |
+| `review`    | `/run review`    | Spawn code-review agents until no new issues |
 
-The `coverage`, `clean`, `purity`, and `structure` agents execute phases
-of their subagents repeatedly until they achieve the desired outcome.
+The `coverage`, `clean`, `purity`, `structure`, and `review` agents execute
+phases of their subagents repeatedly until they achieve the desired outcome.
 
 ---
 
@@ -242,25 +233,25 @@ of their subagents repeatedly until they achieve the desired outcome.
 After `/run verify` passes, run these agents to refine and ship the
 implementation. Follow the order below.
 
-| Order | Agent           | Purpose                          |
-| ----- | --------------- | -------------------------------- |
-| 1     | `/run test`     | Fill test coverage gaps          |
-| 2     | `/run purify`   | Simplify and optimize code       |
-| 3     | `/run refactor` | Improve structure and clarity    |
-| 4     | `/run review`   | Review for correctness and style |
-| 5     | `/run commit`   | Stage and commit implementation  |
+| Order | Agent              | Purpose                          |
+| ----- | ------------------ | -------------------------------- |
+| 1     | `/run test`        | Fill test coverage gaps          |
+| 2     | `/run purify`      | Simplify and optimize code       |
+| 3     | `/run refactor`    | Improve structure and clarity    |
+| 4     | `/run code-review` | Review for correctness and style |
+| 5     | `/run commit`      | Stage and commit implementation  |
 
-**Tested on `Pi` and `Agy` only.** `/run coverage`, `/run clean`,
-`/run purity`, and `/run structure` operate as orchestration agents.
+**Tested on `Pi` and `Agy` only.** `/run coverage`, `/run clean`, `/run purity`,
+`/run structure`, and `/run review` operate as orchestration agents.
 `/run clean` replaces steps 2–3 by running `purify` then `refactor`
-automatically.
+automatically, and `/run review` runs `code-review` passes until no new issues.
 
 ---
 
 ## Utility agents
 
-These agents run independently of the `SPAE` workflow. Use them at any
-point to avoid polluting the main conversation context.
+These agents run independently of the `SPAE` workflow. Use them at any point to
+avoid polluting the main conversation context.
 
 | Agent               | Purpose                                           |
 | ------------------- | ------------------------------------------------- |
@@ -272,8 +263,8 @@ point to avoid polluting the main conversation context.
 
 ## Artifacts
 
-All artifacts live in `.spae/<workstream>/`. Never commit this
-directory—add `.spae/` to `.gitignore`.
+All artifacts live in `.spae/<workstream>/`. Never commit this directory—add
+`.spae/` to `.gitignore`.
 
 | File         | Purpose                                            |
 | ------------ | -------------------------------------------------- |
@@ -299,9 +290,9 @@ directory—add `.spae/` to `.gitignore`.
 
 ## Installation
 
-You can use the installation script _(recommended)_ to install the
-`SPAE` agents, skills, and commands for each, or all, harnesses. Or
-install them manually.
+You can use the installation script _(recommended)_ to install the `SPAE`
+agents, skills, and commands for each, or all, harnesses. Or install them
+manually.
 
 ### Using the installation script
 
@@ -314,12 +305,12 @@ From a local clone:
 
 - Destinations match the manual tables below.
 - `antigravity` aliases `agy`.
-- `all` installs every harness found in `PATH` except deprecated
-  `gemini`. Uninstall `all` covers all six harnesses.
+- `all` installs every harness found in `PATH` except deprecated `gemini`.
+  Uninstall `all` covers all six harnesses.
 - On `Windows`, the script runs only under `WSL`.
 - Pre-flight validates the whole selection before any write.
-- Edited, linked, and foreign files survive. `--force` backs up edited
-  files first.
+- Edited, linked, and foreign files survive. `--force` backs up edited files
+  first.
 
 | Option              | Effect                                       |
 | ------------------- | -------------------------------------------- |
@@ -357,24 +348,21 @@ Each file gets one status line:
 | `CODEX_HOME`          | `~/.codex`                 |
 | `XDG_STATE_HOME`      | `~/.local/state` (backups) |
 
-- Empty values fall back to defaults. Relative values cause pre-flight
-  errors.
+- Empty values fall back to defaults. Relative values cause pre-flight errors.
 - Backups land in `<state>/spae/backups/<UTC stamp>/<absolute path>`.
 
 #### Notes
 
-- `~/.agents/skills/` serves `pi`, `opencode`, `codex`, and `gemini`.
-  Uninstall operations keep it until the selection covers all four
-  harnesses.
-- `Pi` requires [pi-subagent](https://github.com/mystilleef/pi-subagent)
-  for `/run`, though the installer only prints a reminder.
+- `~/.agents/skills/` serves `pi`, `opencode`, `codex`, and `gemini`. Uninstall
+  operations keep it until the selection covers all four harnesses.
+- `Pi` requires [pi-subagent](https://github.com/mystilleef/pi-subagent) for
+  `/run`, though the installer only prints a reminder.
 - Restart running harness sessions after install or uninstall.
-- `OpenCode` reads both `~/.claude/skills/` and `~/.agents/skills/`.
-  Installing `claude` and `opencode` together places each skill in both.
-  Delete one copy if `OpenCode` lists duplicates.
-- Renamed or deleted upstream skills, agents, and commands leave old
-  copies behind. The installer never reports or removes them, so delete
-  them manually.
+- `OpenCode` reads both `~/.claude/skills/` and `~/.agents/skills/`. Installing
+  `claude` and `opencode` together places each skill in both. Delete one copy if
+  `OpenCode` lists duplicates.
+- Renamed or deleted upstream skills, agents, and commands leave old copies
+  behind. The installer never reports or removes them, so delete them manually.
 
 ### Manual installation
 
@@ -386,8 +374,8 @@ orchestration. Its agents and install steps live in
 
 #### Skills
 
-Copy the contents of `skills/` to each harness's skills directory.
-Skills carry out each phase and work with any compliant harness.
+Copy the contents of `skills/` to each harness's skills directory. Skills carry
+out each phase and work with any compliant harness.
 
 | Harness    | Destination                |
 | ---------- | -------------------------- |
@@ -400,12 +388,12 @@ Skills carry out each phase and work with any compliant harness.
 
 #### Agents
 
-Agents wrap skills in isolated sessions. Each harness requires its own
-agent files. Every harness ships the same agents.
+Agents wrap skills in isolated sessions. Each harness requires its own agent
+files. Every harness ships the same agents.
 
-Shipped agent files inherit model and provider from the parent agent,
-keeping front matter minimal. To mix models, add `model` or `provider`
-fields to your copies on harnesses that support them.
+Shipped agent files inherit model and provider from the parent agent, keeping
+front matter minimal. To mix models, add `model` or `provider` fields to your
+copies on harnesses that support them.
 
 | Harness    | Source                | Destination                  |
 | ---------- | --------------------- | ---------------------------- |
@@ -416,9 +404,9 @@ fields to your copies on harnesses that support them.
 | `OpenCode` | `opencode/agents/`    | `~/.config/opencode/agents/` |
 | `Codex`    | `codex/agents/`       | `~/.codex/agents/`           |
 
-> `Google` deprecated `Gemini CLI` in favor of `Agy`, the Antigravity
-> CLI. Use the `antigravity/` files for new installs. The `gemini/`
-> files receive no further updates.
+> `Google` deprecated `Gemini CLI` in favor of `Agy`, the Antigravity CLI. Use
+> the `antigravity/` files for new installs. The `gemini/` files receive no
+> further updates.
 
 #### Run command
 
@@ -438,18 +426,16 @@ The `/run` command orchestrates subagent invocation. Invoke agents as
 
 ## Smoke test
 
-Verify harness setup with
-[`examples/proposal.md`](examples/proposal.md), a tiny `slug` `CLI`
-project.
+Verify harness setup with [`examples/proposal.md`](examples/proposal.md), a tiny
+`slug` `CLI` project.
 
-1. Copy `examples/proposal.md` to an empty directory outside this
-   repository.
+1. Copy `examples/proposal.md` to an empty directory outside this repository.
 2. Start the harness there.
 3. Seed the workflow:
    - Manual: `/run spec proposal.md`, then each phase in order
    - **`Pi`** and `Agy`: `/run orchestrate proposal.md` runs every phase
-4. Confirm `.spae/current/STATE.json` after each phase. Orchestration
-   ends at `done`:
+4. Confirm `.spae/current/STATE.json` after each phase. Orchestration ends at
+   `done`:
 
 | After     | `phase`   | Also confirm                               |
 | --------- | --------- | ------------------------------------------ |
@@ -458,5 +444,5 @@ project.
 | `inspect` | `build`   | Cursor `active_task_id` reads `T-001`      |
 | `verify`  | `done`    | `status` reads `completed`, and tests pass |
 
-Failure at any phase marks a setup gap: agent files, skills, or `/run`
-wiring. See [Installation](#installation).
+Failure at any phase marks a setup gap: agent files, skills, or `/run` wiring.
+See [Installation](#installation).
