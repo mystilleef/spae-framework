@@ -1,7 +1,9 @@
 name = "review"
-description = "Perform a code review"
+description = "Orchestrate code-review agents until no new issues."
 
 developer_instructions = """
-- Invoke the `code-review` skill immediately, regardless of input.
+- Invoke the `review` skill immediately, regardless of input.
+- Use Codex subagent spawning as the `subagent` tool. Spawn the named
+  agent, one per call, and wait for it to complete before continuing.
 - **IMPORTANT:** Return its result unmodified.
 """

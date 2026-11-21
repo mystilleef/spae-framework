@@ -1,6 +1,8 @@
 ---
 name: code-review
-description: Find bugs and potential issues in code changes.
+description: >-
+  Find bugs and potential issues in code changes. Use before merge, or rerun on
+  an identical scope to surface missed findings.
 user-invocable: false
 argument-hint: "[optional: diff, commit, PR, file, or focus area]"
 ---
@@ -11,143 +13,142 @@ argument-hint: "[optional: diff, commit, PR, file, or focus area]"
 
 - Reviewing diffs, commits, PRs, or changed files before merge.
 - Auditing generated code or refactors for regressions.
+- Rerunning on an identical scope to surface findings an earlier run missed.
 
 ## Goal
 
-Conduct a defensive, evidence-based review of local repository changes.
-Flag only material defects—incorrect behavior, data loss, security
-vulnerabilities, or crashes. Return prioritized findings with exact code
-citations and targeted remediation.
-
-## Scope
-
-**In scope**:
-
-- Lines added or modified in the diff
-- New public API contracts introduced by the diff
-- Security and correctness of new logic
-
-**Out of scope**:
-
-- Unchanged code visible in context
-- Architecture or design concerns
-- Missing tests or test coverage
-- Style, formatting, naming conventions
-- `DRY` / abstraction suggestions
-- Hypothetical callers or inputs (unless new public API)
+Conduct a defensive, evidence-based review of local repository changes. Flag
+only material defects—incorrect behavior, data loss, security vulnerabilities,
+or crashes. Return prioritized findings with exact code citations and advisory
+fix guidance. Repeat runs over an identical scope extend the prior report and
+count only additions as new.
 
 ## Input
 
 Determine scope from the first available source:
 
-- Files or folders provided by the user.
-- Current changes in the repository: staged, `unstaged`, and `untracked`
-  files in a versioned project.
-
-Halt if no scope detected.
+- The diff, commit, `PR`, files, or folders the invocation argument names.
+- Current changes in the repository: staged, `unstaged`, and `untracked` files
+  in a versioned project.
 
 Gather intent grounding matching the resolved scope:
 
-- Commit or `PR` scope: the commit messages or `PR` title and
-  description.
-- Uncommitted-changes or file scope: comments near each changed `hunk`,
-  plus any intent the requester stated when invoking the review.
+- Commit or `PR` scope: the commit messages or `PR` title and description.
+- Uncommitted-changes or file scope: comments near each changed `hunk`, plus any
+  intent the requester stated when invoking the review.
 
 ## Workflow
 
-1. **GATE**—Identify changed files and diff boundaries, halting if no
-   scope exists. Delete `code-review-report.yaml` from the project root
-   if present.
-2. **ORIENT**—Read `references/code-review-guide.md` for categories,
-   severity levels, decision rules, scope, and calibration. Read
-   `references/report-schema.json` as the output contract. Anchor to
-   review goal and name what the review won't change.
+1. **GATE**—Identify changed files and diff boundaries, halting if no scope
+   exists. Then resolve the ledger seed:
+   - Run `scripts/fingerprint.sh` from the project root with the invocation
+     argument verbatim—or `No arguments` without one—as its sole argument, and
+     record the printed `fingerprint`.
+   - When `code-review-report.yaml` in the project root carries a matching
+     `fingerprint`, seed the ledger with its `findings` and
+     `suppressed_findings` entries—the inherited entries. Otherwise delete the
+     report if present.
+2. **ORIENT**—Read `references/code-review-guide.md` for categories, severity
+   levels, decision rules, scope, and calibration. Read
+   `references/report-schema.json` as the output contract, and
+   `references/outcome-guide.md` `## Guidance` for each finding's `guidance`.
+   Anchor to review goal and name what the review won't change.
    - Ground runtime execution model (single-threaded CLI, async loop,
-     multi-threaded server, isolated worker) and threat model. Limit
-     validation to source inspection and isolated local checks,
-     excluding live-system probing and exploit development.
-   - Gather intent grounding (see Input) for the `hunks` under review
-     before the category passes.
+     multi-threaded server, isolated worker) and threat model. Limit validation
+     to source inspection and isolated local checks, excluding live-system
+     probing and exploit development.
+   - Gather intent grounding (see Input) for the `hunks` under review before the
+     phase sweep.
 3. **ACT**—Execute:
    - Read relevant project documentation (`AGENTS.md`, `ORIENT.md`,
      `DESIGN.md`), nearby code, and tests for grounding.
-   - Detect and run configured linters, type checkers, and static
-     analysis, treating tool errors as confirmed findings.
-   - Sweep all `PHASE_COUNT` (8) phases against a running ledger—a phase
-     with zero new candidates never ends the sweep:
-     - Each phase scans every category below in full before consulting
-       the ledger—produce the complete candidate list first, then
-       dedupe. Skipping already-covered ground before scanning defeats
-       the sweep.
+   - Detect and run configured linters, type checkers, and static analysis,
+     treating tool errors as confirmed findings.
+   - Sweep all `PHASE_COUNT` (8) phases against a running ledger, seeded per
+     GATE—a phase with zero new candidates never ends the sweep:
+     - Each phase scans every category below in full before consulting the
+       ledger—produce the complete candidate list first, then dedupe. Skipping
+       already-covered ground before scanning defeats the sweep.
      - Phase `N` carries heightened focus on category `N` in the order
-       below—focus adds attention without narrowing scope, and every
-       phase still scans all 8.
+       below—focus adds attention without narrowing scope, and every phase still
+       scans all 8.
      - Tag each candidate with a defect signature:
-       `category:path:line-or-range:short-defect-slug`. Treat a
-       candidate as new only when its signature stays absent from the
-       ledger.
-     - Append new candidates to the ledger after each phase, then record
-       one phase line: focus category, code traced for it (or why none
-       applies), and new-candidate count.
+       `category:path:line-or-range:short-defect-slug`. Treat a candidate as new
+       only when no ledger entry describes the same defect at the same
+       code—signatures key the match, and a reworded slug or shifted range never
+       makes a known defect new.
+     - Append new candidates to the ledger after each phase, then record one
+       phase line: focus category, code traced for it (or why none applies), and
+       new-candidate count.
    - Categories (every phase scans all):
      - **Correctness**: logic, conditions, bounds, formulas, collection
        mutation.
-     - **Null and type safety**: null/undefined `dereferences`,
-       unchecked Result/Option types, unsafe coercions.
+     - **Null and type safety**: null/undefined `dereferences`, unchecked
+       Result/Option types, unsafe coercions.
      - **Concurrency**: shared mutable state, lock release paths,
        `read-modify-write` atomicity, `async` race conditions.
-     - **Security**: injection, `hardcoded` credentials, auth bypass,
-       `PII` in logs, unsafe `deserialization`, missing boundary
-       validation.
-     - **Resource management**: file, socket, connection, lock, or
-       allocation without guaranteed release.
-     - **Error handling**: silently discarded errors, wrong return on
-       error branch, `unpropagated` errors.
-     - **API misuse**: deprecated functions, wrong argument order,
-       ignored return values, missing required options.
+     - **Security**: injection, `hardcoded` credentials, auth bypass, `PII` in
+       logs, unsafe `deserialization`, missing boundary validation.
+     - **Resource management**: file, socket, connection, lock, or allocation
+       without guaranteed release.
+     - **Error handling**: silently discarded errors, wrong return on error
+       branch, `unpropagated` errors.
+     - **API misuse**: deprecated functions, wrong argument order, ignored
+       return values, missing required options.
      - **Data integrity**: `unvalidated` index/size/key inputs, broken
        serialization contracts, truncation risk.
-4. **VERIFY**—Run once, after the phase sweep completes—never per phase.
-   Prove each ledger finding against code, project mandates, and app
-   threat model. Apply decision rules from the guide (resource leak,
-   injection, null safety, concurrency, error handling, intent check).
-   - Require a concrete trigger scenario, reachable code path, and
-     material impact for each finding, recorded as its `trigger`. Code
-     evidence suffices without exploit construction or live-system
-     reproduction.
-   - Drop speculative or out-of-scope findings from active `findings`.
-   - Route findings lacking concrete trigger scenarios or carrying
-     qualifying intent evidence to `suppressed_findings`, citing the
-     missing scenario or intent evidence—never emit them in `findings`.
-5. **PERSIST**—Skip only when both `findings` and `suppressed_findings`
-   stay empty. Otherwise write `code-review-report.yaml` to the project
-   root conforming to `references/report-schema.json`, omitting the
-   `suppressed_findings` key entirely when empty. Write once, after
-   VERIFY passes. Use `|` block scalars for multi-line values.
-6. **REPORT**—Sort findings by severity. Emit the result following the
-   result directives and result template.
+4. **VERIFY**—Run once, after the phase sweep completes—never per phase. Prove
+   each ledger finding, inherited entries included, against code, project
+   mandates, and app threat model. Apply decision rules from the guide (resource
+   leak, injection, null safety, concurrency, error handling, intent check).
+   - Require a concrete trigger scenario, reachable code path, and material
+     impact for each finding, recorded as its `trigger`. Code evidence suffices
+     without exploit construction or live-system reproduction.
+   - Drop speculative or out-of-scope new candidates. Never drop an inherited
+     entry, so later runs keep its signature.
+   - Route findings lacking concrete trigger scenarios or carrying qualifying
+     intent evidence to `suppressed_findings`, citing the missing scenario or
+     intent evidence—never emit them in `findings`. Inherited entries failing
+     proof route there too.
+5. **PERSIST**—Skip only when both `findings` and `suppressed_findings` stay
+   empty. Otherwise:
+   - Re-run `scripts/fingerprint.sh` as in GATE. On output differing from the
+     GATE `fingerprint`—reviewed content changed mid-run—halt as `Failed`,
+     naming the changed paths under `Findings`.
+   - Write `code-review-report.yaml` to the project root per
+     `references/report-schema.json`: record the `fingerprint` and each entry's
+     `signature`, use `|` block scalars for multi-line values, and omit the
+     `suppressed_findings` key when empty.
+6. **REPORT**—Sort findings by severity. Emit the result following the result
+   directives and result template.
 
 ## Directives
 
 - Cite each finding with a quoted excerpt and `path:line`.
 - Rank findings: `Critical`, `High`, `Medium`, `Low`, `Nit`.
-  - Emit `Nit` only when trivially co-located with a higher-severity
-    finding.
+  - Emit `Nit` only when trivially co-located with a higher-severity finding.
+- `Result`, reported in the status block and the report `result`: `Issues Found`
+  (any non-inherited `findings` entry) · `No New Issues` (inherited `findings`
+  entries only) · `No Issues` (no findings).
 - Verdict, reported in the status block and the report `verdict`:
-  `Request Changes` (any Critical or High finding) · `Comment` (Medium
-  or Low only) · `Approve` (no findings). Derive `Result` and verdict
-  from `findings` only—`suppressed_findings` never shift either.
-- Filter candidate findings against the app threat model, `KISS`, and
-  `YAGNI`, rejecting defensive bloat, ungrounded guardrails, and
-  theoretical defects outside realistic execution paths.
+  `Request Changes` (any Critical or High finding) · `Comment` (Medium or Low
+  only) · `Approve` (no findings). Derive `Result` and verdict from `findings`
+  only—`suppressed_findings` never shift either.
+- Filter candidate findings against the app threat model, `KISS`, and `YAGNI`,
+  rejecting defensive bloat, ungrounded guardrails, and theoretical defects
+  outside realistic execution paths.
 - Mark uncertainty explicitly: _"Context may change this finding, but…"_
-- Suggest targeted, scope-appropriate fixes without rewriting the patch.
+- Give every `findings` and `suppressed_findings` entry advisory `guidance` per
+  `references/outcome-guide.md` `## Guidance`: a targeted, scope-appropriate
+  `solution`, plus `pattern`, `avoid`, and `tests` when they help—never a
+  rewrite of the patch.
 - Omit empty categories and "none found" sections.
 - Verify findings against `AGENTS.md` before reporting.
 - Keep `PHASE_COUNT` (8) equal to the category count as a single named
   constant—never scatter phase-count literals across the workflow.
-- Surface each phase line in the result `Actions` list (for example,
-  `phase 3 (Concurrency): traced usage cache writes; 1 new`), then the
+- Open the result `Actions` list with the seed line (for example,
+  `seeded 4 inherited entries` or `no seed`), then surface each phase line (for
+  example, `phase 3 (Concurrency): traced usage cache writes; 1 new`), then the
   total (`ran 8/8 phases`), stating the cause of any shortfall.
 - **IMPORTANT:** Return the result to the caller.
 
@@ -155,51 +156,41 @@ Gather intent grounding matching the resolved scope:
 
 - No finding without direct code evidence.
 - Preserve security coverage: trace trust boundaries, assess impact, and
-  recommend fixes. Don't develop weaponized exploits, access live
-  systems, or bypass safeguards to verify findings.
+  recommend fixes. Don't develop weaponized exploits, access live systems, or
+  bypass safeguards to verify findings.
 - No praise, broad commentary, or unrelated cleanup requests.
 - No large raw tool output—summarize diagnostics.
 - Don't change project source files during review.
-- Don't flag: missing comments/docs, performance micro-optimizations
-  without evidence the path runs hot, hypothetical inputs (unless the
-  diff introduces a new public-facing API), or theoretical
-  vulnerabilities outside the app threat model.
-- Run `VERIFY`, `PERSIST`, and `REPORT` once, after the phase
-  sweep—never per phase.
-
-## Calibration
-
-- Precision over recall—one high-confidence Critical beats five
-  speculative Mediums.
-- Don't speculate about code outside the diff.
-- Note ambiguous intent in the finding rather than assuming defect.
-- Flag the defect without editorializing about the author or decision.
-- Language-specific idioms inform findings—don't flag idiomatic use as
-  incorrect.
-- When a stack context block arrives (for example,
-  `Stack: Python 3.12, asyncio`), apply its language-specific severity
-  adjustments—it takes precedence.
+- Run `VERIFY`, `PERSIST`, and `REPORT` once, after the phase sweep—never per
+  phase.
 
 ## Verification
 
 - Static analysis output checked when available and practical.
-- Findings map to diff or file excerpts and line references, and every
-  active finding carries its trigger scenario.
-- Severity reflects user impact, with security _exploitability_ assessed
-  within the app threat model, without requiring exploit development.
-- Suggestions describe concrete changes.
+- Findings map to diff or file excerpts and line references, and every active
+  finding carries its trigger scenario.
+- Severity reflects user impact, with security _exploitability_ assessed within
+  the app threat model, without requiring exploit development.
+- Every `guidance.solution` describes a concrete change, and every `guidance`
+  follows the `references/outcome-guide.md` `## Guidance` rules.
 - Report matches workspace mandates.
-- Every `suppressed_findings` entry cites qualifying intent evidence or
-  the missing trigger scenario—never a general or vague rationale.
-- If findings or suppressed findings exist: `code-review-report.yaml`
-  written and conforms to `references/report-schema.json`.
+- Every `suppressed_findings` entry cites qualifying intent evidence or the
+  missing trigger scenario—never a general or vague rationale.
+- If findings or suppressed findings exist: `code-review-report.yaml` written,
+  conforming to `references/report-schema.json`, with a `fingerprint` matching
+  the PERSIST re-run of `scripts/fingerprint.sh`.
+- Ledger seeded only from a report whose `fingerprint` matches the GATE run of
+  `scripts/fingerprint.sh`—any other report deleted.
+- Every inherited entry re-proven and persisted in `findings` or
+  `suppressed_findings`—none dropped.
+- `Result` counts only non-inherited `findings` entries as new.
 - Ledger deduplication keys off the defect signature
-  (`category:path:line-or-range:slug`)—no phase counts a finding new
-  without a fresh signature.
-- Phase sweep ran all `PHASE_COUNT` (8) phases, and no
-  zero-new-candidate phase ended it.
-- Every phase line names concrete code traced for its focus category or
-  why none applies—restating the category never counts.
+  (`category:path:line-or-range:slug`)—no phase counts a known defect new under
+  a reworded slug or shifted range.
+- Phase sweep ran all `PHASE_COUNT` (8) phases, and no zero-new-candidate phase
+  ended it.
+- Every phase line names concrete code traced for its focus category or why none
+  applies—restating the category never counts.
 
 ## Result directives
 
@@ -209,13 +200,12 @@ Gather intent grounding matching the resolved scope:
 - Split actions and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
 - Omit inapplicable fields.
-- **Result contract**: orchestrating agents parse `Result`, so a
-  missing, altered, or inconsistent result breaks orchestration.
-- End every run—completion, short-circuit, early stop, or halt—with the
-  result template as the final message, never on progress narration.
-- Set `Result` to exactly one template literal, verbatim. Report an
-  early stop or halt lacking its own literal as `Failed`, with the
-  reason under `Findings`.
+- **Result contract**: orchestrating agents parse `Result`, so a missing,
+  altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, early stop, or halt—with the result
+  template as the final message, never on progress narration.
+- Set `Result` to exactly one template literal, verbatim. Report an early stop
+  or halt lacking its own literal as `Failed`, with the reason under `Findings`.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
 
@@ -237,7 +227,7 @@ Gather intent grounding matching the resolved scope:
   - [Terse list summarizing outcome]
 
 > **Code Review Status** • `[scope]`
-> **Result**: [Issues Found | No Issues | Failed]
+> **Result**: [Issues Found | No New Issues | No Issues | Failed]
 > **Verdict**: [Request Changes | Comment | Approve]  _(unless failed)_
 > **Impact**: [Terse impact statement]
 ```

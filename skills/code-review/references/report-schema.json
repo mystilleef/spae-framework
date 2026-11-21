@@ -3,17 +3,22 @@
   "title": "CodeReviewReport",
   "description": "Output contract for the code-review skill. Emitted as YAML. Use | block scalars for multi-line values.",
   "type": "object",
-  "required": ["scope", "result", "findings"],
+  "required": ["scope", "fingerprint", "result", "findings"],
   "additionalProperties": false,
   "properties": {
     "scope": {
       "type": "string",
       "description": "What was reviewed — file path, PR, commit, or diff description."
     },
+    "fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 digest printed by scripts/fingerprint.sh; a repeat run seeds its ledger from this report only on a match."
+    },
     "result": {
       "type": "string",
-      "enum": ["Issues Found", "No Issues", "Failed"],
-      "description": "Overall review outcome."
+      "enum": ["Issues Found", "No New Issues", "No Issues", "Failed"],
+      "description": "Overall review outcome: Issues Found (any non-inherited finding), No New Issues (inherited findings only), No Issues (no findings), or Failed."
     },
     "verdict": {
       "type": "string",
@@ -39,9 +44,20 @@
       "description": "Defects found, sorted by severity: Critical → High → Medium → Low → Nit.",
       "items": {
         "type": "object",
-        "required": ["severity", "path", "finding", "trigger", "suggestion"],
+        "required": [
+          "signature",
+          "severity",
+          "path",
+          "finding",
+          "trigger",
+          "guidance"
+        ],
         "additionalProperties": false,
         "properties": {
+          "signature": {
+            "type": "string",
+            "description": "Defect signature category:path:line-or-range:short-defect-slug; keys ledger deduplication across runs."
+          },
           "severity": {
             "type": "string",
             "enum": ["Critical", "High", "Medium", "Low", "Nit"],
@@ -67,9 +83,29 @@
             "type": "string",
             "description": "Concrete trigger scenario: input or state, reachable code path, and material impact."
           },
-          "suggestion": {
-            "type": "string",
-            "description": "Concrete fix — not vague advice."
+          "guidance": {
+            "type": "object",
+            "description": "Advisory fix hints per references/outcome-guide.md ## Guidance; consumers weigh them on their merits, then accept, partially accept, or ignore them.",
+            "required": ["solution"],
+            "additionalProperties": false,
+            "properties": {
+              "pattern": {
+                "type": "string",
+                "description": "Existing exemplar to mirror—path:line and symbol."
+              },
+              "solution": {
+                "type": "string",
+                "description": "Concrete, targeted fix sketch naming key sites and steps—never vague advice, a diff, or a full patch."
+              },
+              "avoid": {
+                "type": "string",
+                "description": "Tempting wrong fix the finding invites—such as a suppression, a masking guard, or a weakened type—with why it fails."
+              },
+              "tests": {
+                "type": "string",
+                "description": "Regression test hint: test file to extend, fixtures to reuse, triggering case."
+              }
+            }
           }
         }
       }
@@ -80,14 +116,19 @@
       "items": {
         "type": "object",
         "required": [
+          "signature",
           "severity",
           "path",
           "finding",
-          "suggestion",
+          "guidance",
           "suppressionRationale"
         ],
         "additionalProperties": false,
         "properties": {
+          "signature": {
+            "type": "string",
+            "description": "Defect signature category:path:line-or-range:short-defect-slug; keys ledger deduplication across runs."
+          },
           "severity": {
             "type": "string",
             "enum": ["Critical", "High", "Medium", "Low", "Nit"],
@@ -113,9 +154,29 @@
             "type": "string",
             "description": "Concrete trigger scenario, when one exists; omit for a finding suppressed for lacking one."
           },
-          "suggestion": {
-            "type": "string",
-            "description": "Concrete fix — not vague advice."
+          "guidance": {
+            "type": "object",
+            "description": "Advisory fix hints per references/outcome-guide.md ## Guidance; consumers weigh them on their merits, then accept, partially accept, or ignore them.",
+            "required": ["solution"],
+            "additionalProperties": false,
+            "properties": {
+              "pattern": {
+                "type": "string",
+                "description": "Existing exemplar to mirror—path:line and symbol."
+              },
+              "solution": {
+                "type": "string",
+                "description": "Concrete, targeted fix sketch naming key sites and steps—never vague advice, a diff, or a full patch."
+              },
+              "avoid": {
+                "type": "string",
+                "description": "Tempting wrong fix the finding invites—such as a suppression, a masking guard, or a weakened type—with why it fails."
+              },
+              "tests": {
+                "type": "string",
+                "description": "Regression test hint: test file to extend, fixtures to reuse, triggering case."
+              }
+            }
           },
           "suppressionRationale": {
             "type": "string",
