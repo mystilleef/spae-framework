@@ -1,9 +1,8 @@
 ---
 name: spae-spawn
 description: >-
-  Execution Orchestrator for the `SPAE` framework. Spawns the `build`,
-  `check`, and `fix` subagents per task until the `workstream` reaches
-  `phase: verify`.
+  Execution Orchestrator for the `SPAE` framework. Spawns the `build`, `check`,
+  and `fix` subagents per task until the `workstream` reaches `phase: verify`.
 user-invocable: false
 ---
 
@@ -11,13 +10,13 @@ user-invocable: false
 
 ## When to use
 
-- The user wants to perform the build phase of the `SPAE` structured
-  workflow autonomously.
+- The user wants to perform the build phase of the `SPAE` structured workflow
+  autonomously.
 
 ## Goal
 
-- Spawn the subagent matching the current `STATE.json` phase, looped
-  until the `workstream` reaches `phase: verify`.
+- Spawn the subagent matching the current `STATE.json` phase, looped until the
+  `workstream` reaches `phase: verify`.
 
 ## Input
 
@@ -26,8 +25,8 @@ Read `.spae/current/STATE.json` for `phase`, `workstream`, `cursor`, and
 
 ## Phase-agent map
 
-Every phase maps to exactly one subagent, spawned the same way
-regardless of phase:
+Every phase maps to exactly one subagent, spawned the same way regardless of
+phase:
 
 | `phase` | Subagent |
 | ------- | -------- |
@@ -37,46 +36,41 @@ regardless of phase:
 
 ## Workflow
 
-After each read, check the exit first. Halt on any **Halt conditions**
-entry after every non-exit read and every spawn.
+After each read, check the exit first. Halt on any **Halt conditions** entry
+after every non-exit read and every spawn.
 
 1. **Dispatch Loop**:
    - Read `.spae/current/STATE.json` and record `phase`.
    - Exit on `phase: "verify"`.
-   - Spawn the subagent the map names for `phase`, no arguments, and
-     await completion.
+   - Spawn the subagent the map names for `phase`, no arguments, and await
+     completion.
    - Repeat step 1.
 2. **Report**: emit the result per **Result directives**:
    - `Result`:
      - `Completed` on an exit.
-     - `Halted` when a subagent reports `Failed` or leaves `phase`
-       unchanged.
+     - `Halted` when a subagent reports `Failed` or leaves `phase` unchanged.
      - `Failed` on any other **Halt conditions** entry.
 
 ## Directives
 
 - **Spawn first**: open with the subagent tool, preceded only by the
   `STATE.json` read. Skip all preflight—context gathering, environment
-  discovery, path checks, guide reads, knowledge-base reads, and plan
-  reviews.
-- Route only from `STATE.json` `phase`, trusting it over subagent output
-  text.
+  discovery, path checks, guide reads, knowledge-base reads, and plan reviews.
+- Route only from `STATE.json` `phase`, trusting it over subagent output text.
 - Spawn only the subagents the phase-agent map names.
-- Prompt every spawn with `No arguments`, adding no context, summaries,
-  or instructions—each subagent gathers its own.
+- Prompt every spawn with `No arguments`, adding no context, summaries, or
+  instructions—each subagent gathers its own.
 - **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 
-- Limit tool calls to the subagent tool and `.spae/current/STATE.json`
-  reads. Run nothing else—no other reads, file writes, listings,
-  searches, shell commands, git commands, skill activation, or user
-  prompts.
+- Limit tool calls to the subagent tool and `.spae/current/STATE.json` reads.
+  Run nothing else—no other reads, file writes, listings, searches, shell
+  commands, git commands, skill activation, or user prompts.
 - Never run subagents in parallel or concurrently.
 - **Halt conditions**: halt immediately and report per **Report** with
   `Halted at` and `Reason`:
-  - `STATE.json` missing at a loop read, or holding unparseable JSON
-    syntax.
+  - `STATE.json` missing at a loop read, or holding unparseable JSON syntax.
   - `phase` matching no phase-agent map row.
   - `cursor.active_task_id` missing.
   - `phase` unchanged since the previous spawn.
@@ -97,13 +91,12 @@ entry after every non-exit read and every spawn.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
-- **Result contract**: orchestrating agents parse `Result`, so a
-  missing, altered, or inconsistent result breaks orchestration.
-- End every run—completion, short-circuit, early stop, or halt—with the
-  result template as the final message, never on progress narration.
-- Set `Result` to exactly one template literal, verbatim. Report an
-  early stop or halt lacking its own literal as `Failed`, with the
-  reason under `Findings`.
+- **Result contract**: orchestrating agents parse `Result`, so a missing,
+  altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, early stop, or halt—with the result
+  template as the final message, never on progress narration.
+- Set `Result` to exactly one template literal, verbatim. Report an early stop
+  or halt lacking its own literal as `Failed`, with the reason under `Findings`.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
 

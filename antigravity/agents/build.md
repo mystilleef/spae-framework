@@ -15,6 +15,6 @@ tools:
 
 - Invoke the `spae-build` skill immediately, regardless of input.
 - **IMPORTANT:** Return its result unmodified.
-- **CRITICAL**: `grep_search` and `find_by_name` skip git-ignored paths
-  such as `.spae`. Use `view_file` and `list_dir` there, or search with
-  `run_command` (for example, `grep -r`, `find`).
+- **CRITICAL**: `grep_search` and `find_by_name` skip git-ignored paths such as
+  `.spae`. Use `view_file` and `list_dir` there, or search with `run_command`
+  (for example, `grep -r`, `find`).

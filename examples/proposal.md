@@ -1,12 +1,12 @@
 # Proposal: `slug` CLI
 
-Tiny command-line tool converting text to URL slugs. Smoke-test project
-for the `SPAE` workflow; keep scope minimal.
+Tiny command-line tool converting text to URL slugs. Smoke-test project for the
+`SPAE` workflow; keep scope minimal.
 
 ## Goal
 
-- Provide one command, `python3 slug.py`, printing a URL-safe slug for
-  input text.
+- Provide one command, `python3 slug.py`, printing a URL-safe slug for input
+  text.
 
 ## Requirements
 
@@ -18,12 +18,12 @@ for the `SPAE` workflow; keep scope minimal.
 - **Transform**:
   - Lowercase the text.
   - Keep ASCII letters `a-z` and digits `0-9`.
-  - Collapse every run of other characters (spaces, punctuation,
-    non-ASCII) into one hyphen.
+  - Collapse every run of other characters (spaces, punctuation, non-ASCII) into
+    one hyphen.
   - Strip leading and trailing hyphens.
 - **Success**: print the slug and a newline to stdout; exit `0`.
-- **Failure**: when the slug comes out empty, print `error: empty slug`
-  to stderr, print nothing to stdout, and exit `1`.
+- **Failure**: when the slug comes out empty, print `error: empty slug` to
+  stderr, print nothing to stdout, and exit `1`.
 
 | Input                | Stdout           | Exit |
 | -------------------- | ---------------- | ---- |
@@ -41,8 +41,7 @@ for the `SPAE` workflow; keep scope minimal.
 
 - Framework: `unittest`; run with `python3 -m unittest`.
 - Invoke the CLI as a subprocess; assert stdout, stderr, and exit code.
-- Cover each table row, the stdin path, and argument precedence over
-  stdin.
+- Cover each table row, the stdin path, and argument precedence over stdin.
 - Run unattended; no network, no interactive input.
 
 ## Out of scope

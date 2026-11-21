@@ -3,10 +3,9 @@
 Reference for the Conventional Commits 1.0.0 specification
 (`conventionalcommits.org/en/v1.0.0`):
 
-- §1–§5 restate the standard, which binds no tool, framework, or
-  environment.
-- §6 adds readability conventions from git practice that serve any
-  version control tool.
+- §1–§5 restate the standard, which binds no tool, framework, or environment.
+- §6 adds readability conventions from git practice that serve any version
+  control tool.
 - §7 gives examples.
 
 ## 1. Structure
@@ -23,43 +22,41 @@ Reference for the Conventional Commits 1.0.0 specification
 
 Key words follow the specification: **MUST**, **MAY**, **SHALL**.
 
-- **Prefix:** a type—a noun such as `feat` or `fix`—then an **OPTIONAL**
-  scope, an **OPTIONAL** `!`, and a **REQUIRED** colon and space.
+- **Prefix:** a type—a noun such as `feat` or `fix`—then an **OPTIONAL** scope,
+  an **OPTIONAL** `!`, and a **REQUIRED** colon and space.
 - **`feat`:** **MUST** mark a commit adding a feature.
 - **`fix`:** **MUST** mark a commit fixing a bug.
 - **Other types:** **MAY** appear—see §3.
 - **Scope:** **OPTIONAL**—a noun naming a section of the codebase, in
-  parentheses, such as `fix(parser):`. **Commit Vocabulary** in
-  `SKILL.md` picks it.
-- **Description:** a short summary of the code changes that **MUST**
-  follow the colon and space.
+  parentheses, such as `fix(parser):`. **Commit Vocabulary** in `SKILL.md` picks
+  it.
+- **Description:** a short summary of the code changes that **MUST** follow the
+  colon and space.
 - **Body:** **OPTIONAL** free-form text—any number of newline-separated
   paragraphs—beginning one blank line after the description.
 - **Footers:** **OPTIONAL**, beginning one blank line after the body:
-  - Each footer holds a word token, a `: ` or ` #` separator, and a
-    value, after the git trailer format.
-  - Tokens use `-` in place of spaces, such as `Acked-by` or
-    `Reviewed-by`.
-  - A value **MAY** span spaces and newlines. Parsing ends at the next
-    token and separator.
-- **Breaking change:** **MUST** appear in the prefix, a footer, or both,
-  and any type **MAY** carry one:
+  - Each footer holds a word token, a `: ` or ` #` separator, and a value, after
+    the git trailer format.
+  - Tokens use `-` in place of spaces, such as `Acked-by` or `Reviewed-by`.
+  - A value **MAY** span spaces and newlines. Parsing ends at the next token and
+    separator.
+- **Breaking change:** **MUST** appear in the prefix, a footer, or both, and any
+  type **MAY** carry one:
   - Prefix: `!` immediately before the `:`, such as `feat!:` or
-    `refactor(api)!:`. The description then **SHALL** describe the
-    break, and the footer turns **OPTIONAL**.
-  - Footer: uppercase `BREAKING CHANGE: <description>`, with
-    `BREAKING-CHANGE` as a synonym token.
+    `refactor(api)!:`. The description then **SHALL** describe the break, and
+    the footer turns **OPTIONAL**.
+  - Footer: uppercase `BREAKING CHANGE: <description>`, with `BREAKING-CHANGE`
+    as a synonym token.
 - **Case:** implementations treat every unit as case-insensitive except
-  `BREAKING CHANGE`, which **MUST** stay uppercase. Keep casing
-  consistent within a project.
+  `BREAKING CHANGE`, which **MUST** stay uppercase. Keep casing consistent
+  within a project.
 
 ## 3. Types
 
-- **Defined:** `feat` and `fix` alone carry meaning in the
-  specification.
-- **Others:** the specification mandates none. Teams define types and
-  evolve them over time, and **Commit Vocabulary** in `SKILL.md` picks
-  them from project evidence.
+- **Defined:** `feat` and `fix` alone carry meaning in the specification.
+- **Others:** the specification mandates none. Teams define types and evolve
+  them over time, and **Commit Vocabulary** in `SKILL.md` picks them from
+  project evidence.
 - **Common examples** (Angular convention, cited by the specification):
   - `build`: build system or dependencies.
   - `chore`: maintenance.
@@ -69,34 +66,32 @@ Key words follow the specification: **MUST**, **MAY**, **SHALL**.
   - `refactor`: restructuring without behavior change.
   - `style`: formatting without logic change.
   - `test`: tests.
-- **Revert:** the FAQ recommends a `revert` type plus a `Refs:` footer
-  listing the reverted commit hashes.
+- **Revert:** the FAQ recommends a `revert` type plus a `Refs:` footer listing
+  the reverted commit hashes.
 
 ## 4. Semantic versioning
 
 - `fix` → `PATCH`.
 - `feat` → `MINOR`.
 - A breaking change, regardless of type → `MAJOR`.
-- Other types carry no implicit version effect unless they include a
-  breaking change.
+- Other types carry no implicit version effect unless they include a breaking
+  change.
 
 ## 5. Practices from the FAQ
 
-- **Mixed types:** a change fitting more than one type splits into
-  separate commits whenever possible.
-- **Early development:** write messages as if the product already
-  shipped.
+- **Mixed types:** a change fitting more than one type splits into separate
+  commits whenever possible.
+- **Early development:** write messages as if the product already shipped.
 
 ## 6. Readability conventions
 
-These conventions originate in git practice and keep history readable
-under any version control tool. They add to the standard, never override
-it.
+These conventions originate in git practice and keep history readable under any
+version control tool. They add to the standard, never override it.
 
 - **Subject:** the first line—type, scope, and description—aims for 50
   characters, with a hard limit of 72.
-- **Description:** imperative mood ("add," not "added"), with no
-  trailing period.
+- **Description:** imperative mood ("add," not "added"), with no trailing
+  period.
 - **Body and footers:** wrap lines at 72 characters.
 
 ## 7. Examples

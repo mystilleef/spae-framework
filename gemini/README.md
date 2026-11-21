@@ -3,16 +3,15 @@
 Agent definitions and commands for the
 [`Gemini CLI`](https://github.com/google-gemini/gemini-cli) harness.
 
-> **Deprecated.** `Google` replaced `Gemini CLI` with the
-> `Antigravity CLI` (`agy`). Use
-> [`antigravity/`](../antigravity/README.md) for new installs. These
-> files receive no further updates.
+> **Deprecated.** `Google` replaced `Gemini CLI` with the `Antigravity CLI`
+> (`agy`). Use [`antigravity/`](../antigravity/README.md) for new installs.
+> These files receive no further updates.
 
 ## Installation
 
-From the repository root, `./install.sh gemini` installs the files this
-page documents (see [Installation](../README.md#installation)). On
-`Windows`, the script runs only under `WSL`.
+From the repository root, `./install.sh gemini` installs the files this page
+documents (see [Installation](../README.md#installation)). On `Windows`, the
+script runs only under `WSL`.
 
 ### Manual installation
 
@@ -61,8 +60,8 @@ Requires `Gemini CLI` with agent and custom command support.
 
 ## Orchestration agents
 
-These agents require nested subagent support. Orchestration on
-`Gemini CLI` remains untested.
+These agents require nested subagent support. Orchestration on `Gemini CLI`
+remains untested.
 
 | Agent         | Purpose                                               |
 | ------------- | ----------------------------------------------------- |

@@ -1,16 +1,16 @@
 ---
 name: tip
 description: >
-  Deliver a transformative life perspective shift and a productivity
-  tip. Use when the user invokes /tip or wants non-technical inspiration
-  or a fresh mental model.
+  Deliver a transformative life perspective shift and a productivity tip. Use
+  when the user invokes /tip or wants non-technical inspiration or a fresh
+  mental model.
 user-invocable: true
 ---
 
 # Tip
 
-Deliver one `transformative` life perspective shift and one
-`transformative` life productivity tip to inspire the reader.
+Deliver one `transformative` life perspective shift and one `transformative`
+life productivity tip to inspire the reader.
 
 ## Workflow
 

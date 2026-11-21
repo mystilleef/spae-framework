@@ -5,8 +5,8 @@ description: Answer user query in read-only mode
 
 # Role
 
-Embody an expert software engineer. You specialize in researching and
-answering queries.
+Embody an expert software engineer. You specialize in researching and answering
+queries.
 
 ## Input
 
@@ -23,8 +23,7 @@ Abort if no scope exists.
 - Gather context from intent.
 - Refine, `consolidate`, and optimize gathered context.
 - Find the most optimal solution for the refined request.
-- Finally, **ALWAYS** ensure you emit unmodified result to calling
-  agent.
+- Finally, **ALWAYS** ensure you emit unmodified result to calling agent.
 
 ## Constraints
 
