@@ -1,23 +1,24 @@
 ---
 name: spae-inspect
 description:
-  Optimization & Verification for the `SPAE` framework. Performs gap
-  analysis on `PLAN.md`.
+  Optimization & Verification for the `SPAE` framework. Performs gap analysis on
+  `PLAN.md`.
 user-invocable: true
+argument-hint: ""
 ---
 
 # Inspect (`SPAE`)
 
 ## When to use
 
-- `STATE.json` reads `phase: inspect`: audit `PLAN.md` against `SPEC.md`
-  and codebase constraints before execution.
+- `STATE.json` reads `phase: inspect`: audit `PLAN.md` against `SPEC.md` and
+  codebase constraints before execution.
 
 ## Goal
 
-- Find gaps and contradictions between `SPEC.md`, `PLAN.md`, and
-  relevant codebase context, and fix each fully, matching correction
-  depth to finding severity, not diff size.
+- Find gaps and contradictions between `SPEC.md`, `PLAN.md`, and relevant
+  codebase context, and fix each fully, matching correction depth to finding
+  severity, not diff size.
 - Advance the `workstream` to `phase: build`.
 
 ## Input
@@ -26,91 +27,90 @@ Read only what the inspection requires:
 
 - `.spae/current/SPEC.md`.
 - `.spae/current/PLAN.md`.
-- `.spae/current/STATE.json`, with field reference, directives, and
-  snapshots in `references/STATE.md`.
+- `.spae/current/STATE.json`, with field reference, directives, and snapshots in
+  `references/STATE.md`.
 - Repository source, for analysis.
-- The project's `TESTING.md`, when present, for test commands and
-  prerequisites.
+- Project-root testing guides (`TESTING*.md`) covering the files under test,
+  when present, for test commands and prerequisites: `TESTING.md` covers the
+  main language, `TESTING-<LANG>.md` the named one (`TESTING-LUA.md` for
+  `*.lua`).
 
-Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all
-requirements.
+Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
 
 ## Workflow
 
 1. **GATE**—Make no writes:
-   - Parse `.spae/current/STATE.json` and self-heal missing metadata:
-     `version` (`"1.0"`), `workstream` (target directory name), `status`
-     (`"active"`). `PERSIST` writes the healed fields.
+   - Parse `.spae/current/STATE.json` and self-heal missing metadata: `version`
+     (`"1.0"`), `workstream` (target directory name), `status` (`"active"`).
+     `PERSIST` writes the healed fields.
    - Halt on any **Halt conditions** entry.
 2. **ORIENT**—State goal in one sentence:
-   - Source code and `SPEC.md` stay unmodified, with no write before
-     `PERSIST`.
-   - Read `SPEC.md` and `PLAN.md` in full, capturing every `R-NNN` into
-     a coverage checklist.
+   - Source code and `SPEC.md` stay unmodified, with no write before `PERSIST`.
+   - Read `SPEC.md` and `PLAN.md` in full, capturing every `R-NNN` into a
+     coverage checklist.
 3. **PLAN**—Run gap analysis:
-   - Judge `PLAN.md` against every **Verification** `Must fix` and
-     `Should fix` criterion, recording each failure as a finding of that
-     class.
-   - Record any other gap against `SPEC.md` or the codebase—concrete
-     bug, regression, contract break—under the class its impact matches.
-   - Log notes that shouldn't expand scope as `Observations`, which
-     change nothing.
-   - Declare each finding's repair, halting on any **Halt conditions**
-     entry.
-4. **ACT**—Apply each finding's repair to a working draft of `PLAN.md`,
-   changing nothing absent a `Must fix` or `Should fix` finding:
+   - Judge `PLAN.md` against every **Verification** `Must fix` and `Should fix`
+     criterion, recording each failure as a finding of that class.
+   - Record any other gap against `SPEC.md` or the codebase—concrete bug,
+     regression, contract break—under the class its impact matches.
+   - Log notes that shouldn't expand scope as `Observations`, which change
+     nothing.
+   - Declare each finding's repair, halting on any **Halt conditions** entry.
+4. **ACT**—Apply each finding's repair to a working draft of `PLAN.md`, changing
+   nothing absent a `Must fix` or `Should fix` finding:
    - Uncovered `R-NNN`: add or extend a task covering it.
-   - Missing or vague `Intent`: backfill or sharpen from `SPEC.md`, or
-     for an enabling task, from `Context` and the plan `## Goal`.
-   - Plan `## Goal` or `## Assumptions` conflicting with `SPEC.md` or
-     source code: rewrite it to conform—`SPEC.md` wins on requirements,
-     source code on facts.
-   - Task failing `references/outcome-guide.md` **Self-contained
-     units**:
-     - Conflict with `SPEC.md`, source code, another task, the plan
-       `## Goal` or `## Assumptions`, or its own lines: rewrite the task
-       to conform—`SPEC.md` wins on requirements, source code on facts.
-       Where both stay silent, conform the later task to the earlier
-       task's `Acceptance` contract, and a task's own lines to its
-       `Intent`.
-     - Hidden coupling: add the missing dependency, or rebind the
-       reliance to the dependency's stated `Acceptance` contract.
-     - `Verification` step creating, regenerating, or overwriting what
-       it judges, or relying on another run's report or on state that
-       run left outside the project: rebind it per
-       `references/verification-guide.md`, first fit wins:
+   - Missing or vague `Intent`: backfill or sharpen from `SPEC.md`, or for an
+     enabling task, from `Context` and the plan `## Goal`.
+   - Plan `## Goal` or `## Assumptions` conflicting with `SPEC.md` or source
+     code: rewrite it to conform—`SPEC.md` wins on requirements, source code on
+     facts.
+   - Task failing `references/outcome-guide.md` **Self-contained units**:
+     - Conflict with `SPEC.md`, source code, another task, the plan `## Goal` or
+       `## Assumptions`, or its own lines: rewrite the task to conform—`SPEC.md`
+       wins on requirements, source code on facts. Where both stay silent,
+       conform the later task to the earlier task's `Acceptance` contract, and a
+       task's own lines to its `Intent`.
+     - Hidden coupling: add the missing dependency, or rebind the reliance to
+       the dependency's stated `Acceptance` contract.
+     - `Verification` step creating, regenerating, or overwriting what it
+       judges, or relying on another run's report or on state that run left
+       outside the project: rebind it per `references/verification-guide.md`,
+       first fit wins:
        1. Evidence the step derives from the state it judges.
-       2. A recording the project keeps, produced through the task's
-          `Scope` and `Acceptance`.
+       2. A recording the project keeps, produced through the task's `Scope` and
+          `Acceptance`.
        3. Otherwise, demote its outcome to `Risk notes`.
-   - Other `SPEC.md` tension short of a **Halt conditions** entry: favor
-     its requirements and log it under `Observations`.
-   - Unjustified enabling task: state its rationale in `Context`, else
-     remove it.
-   - Prescriptive line failing the `references/outcome-guide.md`
-     substitution test: restate it as the outcome or constraint it
-     protects, else remove it.
+   - Other `SPEC.md` tension short of a **Halt conditions** entry: favor its
+     requirements and log it under `Observations`.
+   - Unjustified enabling task: state its rationale in `Context`, else remove
+     it.
+   - Prescriptive line failing the `references/outcome-guide.md` substitution
+     test: restate it as the outcome or constraint it protects and move its
+     method to the task `Guidance`, else remove it.
+   - `Guidance` line breaking a `references/outcome-guide.md` `## Guidance`
+     rule—contradicting the task's binding lines, `SPEC.md`, or source code,
+     ungrounded, stating a binding claim, or relying on another task's
+     `Guidance`: correct it to conform, else remove it.
+   - Ungrounded `Acceptance` line or clause, an unspecified failure mode or edge
+     case included: narrow it to its grounded part, else remove it.
    - Derivable `Context` fact beyond an entry-point path: trim it.
-   - Disproportionate or infeasible `Verification` step—re-proving
-     covered logic, scripting assertions over prose wording, needing
-     calibration or inadmissible tooling, or isolating beyond what
-     suffices: trim it to the cheapest evidence, or demote it to
-     `Risk notes`.
+   - Disproportionate or infeasible `Verification` step—re-proving covered
+     logic, scripting assertions over prose wording, needing calibration or
+     inadmissible tooling, or isolating beyond what suffices: trim it to the
+     cheapest evidence, or demote it to `Risk notes`.
    - Tooling test suite: replace it with one smoke run.
-   - Invocation mechanics in a `Verification` step: reduce it to the
-     project command.
-   - Overstated `Satisfies` ID: drop it, then add or extend a task when
-     coverage drops.
+   - Invocation mechanics in a `Verification` step: reduce it to the project
+     command.
+   - Overstated `Satisfies` ID: drop it, then add or extend a task when coverage
+     drops.
    - Granularity: split a non-atomic task, and merge a merge candidate.
-   - Version control or release step: strip it, removing any task left
-     empty.
-   - Ordering: reorder so every dependency precedes its dependent, and
-     break a cycle by dropping an ungrounded edge, else merging its
-     tasks.
-   - Renumber after any add, remove, or reorder, or on non-contiguous
-     IDs: assign contiguous IDs from `T-001` and update every `T-NNN`
-     reference in lockstep—task headers, `Task graph` edges, the
-     overview list, and `Dependencies` fields.
+   - Version control or release step: strip it, removing any task left empty.
+   - Ordering: reorder so every dependency precedes its dependent, and break a
+     cycle by dropping an ungrounded edge, else merging its tasks.
+   - Renumber after any add, remove, or reorder, or on non-contiguous IDs:
+     assign contiguous IDs from `T-001` and update every `T-NNN` reference in
+     lockstep—task headers, `Task graph` edges, the overview list, and
+     `Dependencies` fields.
    - Apply **Directives** and **Constraints**.
 5. **VERIFY**—Loop over **Verification** criteria for `PLAN.md`:
    - For each failure: return to `ACT`, fix, then re-enter `VERIFY`.
@@ -121,8 +121,7 @@ requirements.
    - Write `STATE.json` per `references/STATE.md` exit snapshot.
    - Re-read `STATE.json`. On a mismatch against **Verification** state
      criteria, rewrite and re-read before `REPORT`.
-7. **REPORT**—Emit result following result directives and using result
-   template:
+7. **REPORT**—Emit result following result directives and using result template:
    - `Result`: `Revised` when `PERSIST` wrote `PLAN.md`, else `Ready`.
    - List findings under `Findings` by class: `Must fix`, `Should fix`,
      `Observations`.
@@ -131,40 +130,38 @@ requirements.
 
 - Optimize for agent, token, and context efficiency.
 - Align with existing codebase patterns and avoid speculative design.
-- Refine and optimize `PLAN.md` for agent consumption: agents read it
-  for varied purposes, with no memory of this run. Keep rewritten tasks
-  self-contained, explicit, and token-dense, and write each task's
-  `Context` to supply every fact a fresh agent needs and can't derive,
-  including facts surfaced only during inspection.
-- Make each task's `Verification` concrete, deterministic, and
-  proportional per `references/verification-guide.md`. Challenge each
-  step's feasibility, isolation, observation, and proportionality, then
-  rewrite a failing step, trim an excessive one, or demote it to
-  `Risk notes`.
-- Consult `references/prose-protocol.md` and
-  `references/outcome-guide.md` before editing `PLAN.md`.
+- Refine and optimize `PLAN.md` for agent consumption: agents read it for varied
+  purposes, with no memory of this run. Keep rewritten tasks self-contained,
+  explicit, and token-dense, and write each task's `Context` to supply every
+  fact a fresh agent needs and can't derive, including facts surfaced only
+  during inspection. Record hints surfaced during inspection in the `Guidance`
+  of each task a repair rewrites.
+- Make each task's `Verification` concrete, deterministic, and proportional per
+  `references/verification-guide.md`. Challenge each step's feasibility,
+  isolation, observation, and proportionality, then rewrite a failing step, trim
+  an excessive one, or demote it to `Risk notes`.
+- Consult `references/prose-protocol.md` and `references/outcome-guide.md`
+  before editing `PLAN.md`.
 - **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 
 - **Write scope**: write only `.spae/current/PLAN.md` and
-  `.spae/current/STATE.json`. Forbid all other writes. Write incidental
-  run outputs—logs, reports, experiment files—to scratch: a private
-  temporary directory outside the project, removed when the run ends.
-  Scratch writes and byproducts of a command run for evidence, such as
-  formatter rewrites, never count as this phase's writes. Never run a
-  command for its write effect outside this scope. Read source code only
-  for analysis.
+  `.spae/current/STATE.json`. Forbid all other writes. Write incidental run
+  outputs—logs, reports, experiment files—to scratch: a private temporary
+  directory outside the project, removed when the run ends. Scratch writes and
+  byproducts of a command run for evidence, such as formatter rewrites, never
+  count as this phase's writes. Never run a command for its write effect outside
+  this scope. Read source code only for analysis.
 - **Phase boundary**: hand off work to `/build` without executing tasks.
-- **Version control and release**: never permit tasks for version
-  control (git staging, commits, branches, tags) or release operations
-  (package publishing, deployments). Never stage or commit `.spae/` or
-  execute git mutations.
-- **Autonomy**: never ask users for input or clarification
-  mid-execution—halts and failures stop autonomously. Never leave a task
-  step presuming human execution, an attended or interactive terminal,
-  or human presence. Translate such a need into automated evidence, else
-  record it in `Risk notes` as a residual risk.
+- **Version control and release**: never permit tasks for version control (git
+  staging, commits, branches, tags) or release operations (package publishing,
+  deployments). Never stage or commit `.spae/` or execute git mutations.
+- **Autonomy**: never ask users for input or clarification mid-execution—halts
+  and failures stop autonomously. Never leave a task step presuming human
+  execution, an attended or interactive terminal, or human presence. Translate
+  such a need into automated evidence, else record it in `Risk notes` as a
+  residual risk.
 - **State schema**: never introduce `STATE.json` fields outside
   `references/STATE.md`.
 - **Halt conditions**: halt without writing and report `Failed` with a
@@ -173,81 +170,81 @@ requirements.
   - `STATE.json` missing or holds unparseable JSON syntax.
   - `STATE.json` `phase` other than `inspect`.
   - `SPEC.md` or `PLAN.md` missing.
-  - A `SPEC.md`-internal conflict no `PLAN.md` edit can resolve:
-    mutually exclusive requirements, or requirements an `Out of scope`
-    item forbids.
-- **Scope control**: keep `/inspect` lightweight, adding no
-  requirements, features, tasks, or approval gates absent grounding in
-  `SPEC.md` or a concrete codebase constraint.
+  - A `SPEC.md`-internal conflict no `PLAN.md` edit can resolve: mutually
+    exclusive requirements, or requirements an `Out of scope` item forbids.
+- **Scope control**: keep `/inspect` lightweight, adding no requirements,
+  features, tasks, or approval gates absent grounding in `SPEC.md` or a concrete
+  codebase constraint.
 
 ## Verification
 
-- Every recorded `Must fix` and `Should fix` finding resolved in
-  `PLAN.md`.
-- **`Must fix`** criteria—failure breaks requirements, contracts,
-  safety, or verification:
+- Every recorded `Must fix` and `Should fix` finding resolved in `PLAN.md`.
+- **`Must fix`** criteria—failure breaks requirements, contracts, safety, or
+  verification:
   - Every `SPEC.md` `R-NNN` maps to at least one task's `Satisfies`.
-  - Every `Satisfies` ID names an `R-NNN` the task implements and proves
-    through its own `Verification`—or its `Acceptance`, for prose.
+  - Every `Satisfies` ID names an `R-NNN` the task implements and proves through
+    its own `Verification`—or its `Acceptance`, for prose.
   - Every task carries an `Intent` line.
   - Task IDs run contiguously from `T-001`, and every `T-NNN`
     reference—`Task graph` edges, the overview list, and `Dependencies`
     fields—resolves to a defined task.
   - Every `Dependencies` ID numerically precedes its declaring task.
-  - The plan `## Goal` and `## Assumptions` contradict neither `SPEC.md`
-    nor source code.
+  - The plan `## Goal` and `## Assumptions` contradict neither `SPEC.md` nor
+    source code.
   - Every task stays self-contained and isolated per
-    `references/outcome-guide.md` **Self-contained units**: fresh agents
-    holding only its text and the repository can build, test, and verify
-    it, each in a separate run:
-    - No hidden coupling: its `Scope` and `Acceptance` rely only on
-      outputs of its `Dependencies` tasks, and only through their stated
-      `Acceptance` contracts.
+    `references/outcome-guide.md` **Self-contained units**: fresh agents holding
+    only its text and the repository can build, test, and verify it, each in a
+    separate run:
+    - No hidden coupling: its `Scope` and `Acceptance` rely only on outputs of
+      its `Dependencies` tasks, and only through their stated `Acceptance`
+      contracts.
     - No line—`Intent`, `Scope`, `Acceptance`, `Context`,
-      `Verification`—contradicts another of its lines, the plan
-      `## Goal` or `## Assumptions`, its `Satisfies` requirements, the
-      `SPEC.md` `Out of scope`, `Assumptions`, or `Testing strategy`, or
-      source code.
-    - No two bordering tasks—linked by a dependency edge or sharing
-      `Scope` surface—assert incompatible behavior, contracts, or file
-      states.
-    - Every `Verification` step observes per
-      `references/verification-guide.md`: it never creates, regenerates,
-      or overwrites what it judges, and never relies on another run's
-      report or on state that run left outside the project.
+      `Verification`—contradicts another of its lines, the plan `## Goal` or
+      `## Assumptions`, its `Satisfies` requirements, the `SPEC.md`
+      `Out of scope`, `Assumptions`, or `Testing strategy`, or source code.
+    - No two bordering tasks—linked by a dependency edge or sharing `Scope`
+      surface—assert incompatible behavior, contracts, or file states.
+    - Every `Verification` step observes per `references/verification-guide.md`:
+      it never creates, regenerates, or overwrites what it judges, and never
+      relies on another run's report or on state that run left outside the
+      project.
   - Zero tasks mandate version control or release operations.
-  - No task step presumes human execution, an attended or interactive
-    terminal, or human presence.
+  - No task step presumes human execution, an attended or interactive terminal,
+    or human presence.
 - **`Should fix`** criteria—failure adds risk or complicates execution:
   - Every `Intent` names an actionable goal.
-  - Every task stays atomic: a change one run can build, leaving the
-    system working.
-  - No merge candidate remains: bordering tasks form one unless any of
-    these holds:
+  - Every task stays atomic: a change one run can build, leaving the system
+    working.
+  - No merge candidate remains: bordering tasks form one unless any of these
+    holds:
     - Each satisfies an `R-NNN` or serves as tooling setup or a final
       verification gate.
     - A third task must run between them.
     - Their merge would outgrow one run.
-  - Every `Satisfies`-bearing task's `Acceptance` names testable
-    behaviors, with failure modes and edge cases when `SPEC.md`
-    specifies them or task logic requires them, and for prose, what the
-    text must convey.
-  - Every task's `Verification` includes test execution commands—one
-    smoke run for an enabling tooling task, project checks alone when
-    `Acceptance` holds only prose—each mapped to the outcomes it proves.
-  - Every `Verification` step follows
-    `references/verification-guide.md`: no re-proof of covered logic,
-    scripted assertion over prose wording, calibration, inadmissible
-    tooling, isolation beyond what suffices, or invocation mechanics.
-  - Every task line passes the `references/outcome-guide.md`
-    substitution test, and `Context` holds no derivable fact beyond
-    entry-point paths.
+  - Every `Satisfies`-bearing task's `Acceptance` names testable behaviors,
+    including failure modes and edge cases only when `SPEC.md` specifies them or
+    task logic requires them, and for prose, what the text must convey.
+  - Every `Acceptance` line stays grounded: a `SPEC.md` constraint, a preserved
+    behavior at risk, task logic, or its task's `Satisfies` requirements or
+    enabling rationale demands it.
+  - Every task's `Verification` includes test execution commands—one smoke run
+    for an enabling tooling task, project checks alone when `Acceptance` holds
+    only prose—each mapped to the outcomes it proves.
+  - Every `Verification` step follows `references/verification-guide.md`: no
+    re-proof of covered logic, scripted assertion over prose wording,
+    calibration, inadmissible tooling, isolation beyond what suffices, or
+    invocation mechanics.
+  - Every binding task line passes the `references/outcome-guide.md`
+    substitution test, and `Context` holds no derivable fact beyond entry-point
+    paths.
+  - Every `Guidance` line follows the `references/outcome-guide.md`
+    `## Guidance` rules.
   - `Task graph` edges mirror per-task `Dependencies` fields.
   - Every `Satisfies: none` task's `Context` states a credible enabling
     rationale.
 - `STATE.json` specifies `phase: "build"`, `status: "active"`,
-  `cursor: {"active_task_id": "T-001"}`, and `tasks` mapping every
-  `PLAN.md` task ID to `"todo"`.
+  `cursor: {"active_task_id": "T-001"}`, and `tasks` mapping every `PLAN.md`
+  task ID to `"todo"`.
 - This phase wrote no file outside **Write scope**.
 
 ## Result directives
@@ -257,17 +254,16 @@ requirements.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
-- **Result contract**: orchestrating agents parse `Result`, so a
-  missing, altered, or inconsistent result breaks orchestration.
-- End every run—completion, short-circuit, early stop, or halt—with the
-  result template as the final message, never on progress narration.
-- Set `Result` to exactly one template literal, verbatim. Report an
-  early stop or halt lacking its own literal as `Failed`, with the
-  reason under `Findings`.
+- **Result contract**: orchestrating agents parse `Result`, so a missing,
+  altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, early stop, or halt—with the result
+  template as the final message, never on progress narration.
+- Set `Result` to exactly one template literal, verbatim. Report an early stop
+  or halt lacking its own literal as `Failed`, with the reason under `Findings`.
 - Emit result template as live markdown—never in a code fence.
 - Output nothing outside template.
-- Source every `SPAE Status` value from confirmed re-read, never from
-  working memory of intent.
+- Source every `SPAE Status` value from confirmed re-read, never from working
+  memory of intent.
 
 ### Result template
 

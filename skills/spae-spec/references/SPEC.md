@@ -9,28 +9,37 @@
 
 ## Requirements
 
-- **R-001**: [Required outcome, contract, constraint, or decision—a
-  decision cites its source]
+- **R-001**: [Required outcome, contract, constraint, or decision—a decision
+  cites its source]
 - **R-002**: [Additional requirement, if applicable]
 
 ## Testing strategy
 
-- **Approach**: [unit | integration | e2e | automated inspection—the
-  cheapest proving the requirements; follow `verification-guide.md`]
+- **Approach**: [unit | integration | e2e | automated inspection—the cheapest
+  proving the requirements; follow `verification-guide.md`]
 - **Expected behavior**: [What succeeds under valid inputs]
 - **Failure modes**: [What fails, errors, or rejects—if applicable]
-- **Edge cases**: [Boundary, empty, nil, or zero-value conditions—if
-  applicable]
+- **Edge cases**: [Boundary, empty, nil, or zero-value conditions—if applicable]
 - **Exclusions**: [What to skip—if applicable]
 
 ## Out of scope
 
 - [Excluded item—reason]
 - [Outcome lacking practical automated evidence—residual risk]
-- Git repository management and release deployments—SPAE governs
-  verified local source and test modifications only
+- Git repository management and release deployments—SPAE governs verified local
+  source and test modifications only
 
 ## Assumptions
 
 - [Constraining assumption]
+
+## Guidance
+
+[Advisory—binds nothing; `None` when absent; omit any absent kind]
+
+- **R-001**:
+  - **Pattern**: [`path:line` (`symbol`)—existing exemplar to mirror]
+  - **Solution**: [Recommended solution sketch naming key sites and steps]
+  - **Avoid**: [Tempting wrong approach—its defect]
+  - **Tests**: [Test file to extend, fixtures to reuse, notable cases]
 ```

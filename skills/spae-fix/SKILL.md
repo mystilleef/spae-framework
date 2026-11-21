@@ -1,84 +1,84 @@
 ---
 name: spae-fix
 description:
-  Gap Remediation for the `SPAE` framework. Closes the gaps `FIX.md`
-  lists for the active task, then routes it to `/check`.
+  Gap Remediation for the `SPAE` framework. Closes the gaps `FIX.md` lists for
+  the active task, then routes it to `/check`.
 user-invocable: true
+argument-hint: ""
 ---
 
 # Fix (`SPAE`)
 
 ## When to use
 
-- `STATE.json` reads `phase: fix`: close the gaps `FIX.md` lists for the
-  active task.
+- `STATE.json` reads `phase: fix`: close the gaps `FIX.md` lists for the active
+  task.
 
 ## Goal
 
-- Close exactly the `FIX.md` `## Gaps` items for the active task with
-  minimal changes, proving each behavior gap closed through a test.
+- Close exactly the `FIX.md` `## Gaps` items for the active task with minimal
+  changes, proving each behavior gap closed through a test.
 - Advance the `workstream` to `phase: check`.
 
 ## Input
 
 Read only what the `## Gaps` items require:
 
-- `.spae/current/STATE.json`, with field reference, directives, and
-  snapshots in `references/STATE.md`.
-- `.spae/current/FIX.md`, carrying all task context: the task ID and
-  title in its heading, `## Intent`, an optional `## Context`, and
-  `## Gaps` items with `File`, `Expected`, `Actual`, and `Evidence`.
-- Repository source, tests, docs, and configuration the `## Gaps` items
-  affect.
+- `.spae/current/STATE.json`, with field reference, directives, and snapshots in
+  `references/STATE.md`.
+- `.spae/current/FIX.md`, carrying all task context: the task ID and title in
+  its heading, `## Intent`, an optional `## Context`, `## Gaps` items with
+  `File`, `Expected`, `Actual`, `Evidence`, and optional `Guidance`, plus an
+  optional `## Guidance`—both advisory.
+- Repository source, tests, docs, and configuration the `## Gaps` items affect.
 
 ## Testing
 
-See `references/testing-guide.md` for test structure, isolation,
-mocking, assertion, and performance standards. The project's
-`TESTING.md`, when present, extends the guide. Its conventions override
-the guide on conflict.
+See `references/testing-guide.md` for test structure, isolation, mocking,
+assertion, and performance standards, and for selecting project testing guides
+(`TESTING*.md` at the project root). Project guides override it on conflict.
 
 ## Cleanup
 
-See `references/cleanup-guide.md` for the Self-cleanup checklist and
-diff-only audit scope.
+See `references/cleanup-guide.md` for the Self-cleanup checklist and diff-only
+audit scope.
 
 ## Workflow
 
 1. **GATE**—Make no writes:
-   - Parse `.spae/current/STATE.json` and self-heal missing metadata:
-     `version` (`"1.0"`), `workstream` (target directory name), `status`
-     (`"active"`). `PERSIST` writes the healed fields.
-   - Self-heal state drift: treat a `"todo"` or missing
-     `tasks[active_task_id]` as `"in_progress"` until `PERSIST`.
+   - Parse `.spae/current/STATE.json` and self-heal missing metadata: `version`
+     (`"1.0"`), `workstream` (target directory name), `status` (`"active"`).
+     `PERSIST` writes the healed fields.
+   - Self-heal state drift: treat a `"todo"` or missing `tasks[active_task_id]`
+     as `"in_progress"` until `PERSIST`.
    - Halt on any **Halt conditions** entry.
 2. **ORIENT**—State goal in one sentence:
-   - `FIX.md` stays unmodified until `PERSIST` deletes it, and the task
-     diff stays within the `## Gaps` items.
+   - `FIX.md` stays unmodified until `PERSIST` deletes it, and the task diff
+     stays within the `## Gaps` items.
    - Read `FIX.md` in full.
    - Capture the pre-task baseline per `references/cleanup-guide.md`.
 3. **PLAN**—Declare the remediation path:
-   - Read `references/testing-guide.md`, `TESTING.md` when present, and
-     `references/shell-command-guide.md`.
-   - Map each `## Gaps` item to its minimal edit. For a behavior gap,
-     map the test surface: expected behavior, failure modes, and edge
-     cases.
+   - Read `references/testing-guide.md`, each project testing guide covering the
+     files under test, and `references/shell-command-guide.md`.
+   - Map each `## Gaps` item to its minimal edit. For a behavior gap, map the
+     test surface: expected behavior, failure modes, and edge cases.
+   - Weigh the advisory `Guidance`—per gap and in `## Guidance`—by fit to each
+     gap's `Expected`, never following it blindly: accept, partially accept, or
+     ignore it. Gap lines and the repository win on conflict.
    - Halt on any **Halt conditions** entry.
-4. **ACT**—Per `## Gaps` item, repeat until re-checking its `Evidence`
-   shows the `Expected` result:
-   - Behavior gap—runtime behavior misses `Expected`: the minimal code
-     closing it and tests covering its test surface, including an
-     existing or new test that fails on the pre-task state.
+4. **ACT**—Per `## Gaps` item, repeat until re-checking its `Evidence` shows the
+   `Expected` result:
+   - Behavior gap—runtime behavior misses `Expected`: the minimal code closing
+     it and tests covering its test surface, including an existing or new test
+     that fails on the pre-task state.
    - Any other gap—a leftover artifact, diff bloat, a defective test, a
-     static-check failure, or prose: the minimal edit closing it, with
-     prose proven closed by reading per
-     `references/verification-guide.md`.
+     static-check failure, or prose: the minimal edit closing it, with prose
+     proven closed by reading per `references/verification-guide.md`.
    - Apply **Directives** and **Constraints**.
-5. **VERIFY**—Loop over **Verification** criteria for the `## Gaps`
-   items:
-   - Audit task edits against the pre-task baseline using the
-     Self-cleanup checklist in `references/cleanup-guide.md`, removing
-     every self-introduced artifact before proceeding.
+5. **VERIFY**—Loop over **Verification** criteria for the `## Gaps` items:
+   - Audit task edits against the pre-task baseline using the Self-cleanup
+     checklist in `references/cleanup-guide.md`, removing every self-introduced
+     artifact before proceeding.
    - For each failure: return to `ACT`, fix, then re-enter `VERIFY`.
    - Exit only when every criterion passes.
    - Halt only on a **Halt conditions** entry.
@@ -89,11 +89,10 @@ diff-only audit scope.
 
    - Delete `.spae/current/FIX.md`.
 
-7. **REPORT**—Emit result following result directives and using result
-   template:
-   - `Result`: `Gaps addressed, FIX.md removed` after `PERSIST`, else
-     `Failed`.
-   - List each closed gap under `Findings`.
+7. **REPORT**—Emit result following result directives and using result template:
+   - `Result`: `Gaps addressed, FIX.md removed` after `PERSIST`, else `Failed`.
+   - List under `Findings`: each closed gap, and one line per divergence from
+     `Guidance`: `diverged from Guidance: <why>`.
 
 ## Directives
 
@@ -102,71 +101,67 @@ diff-only audit scope.
 - Derive each test from its gap's `Expected` result, never from the
   implementation's output.
 - Treat a failing test or check as ordinary fix work and drive it green.
-- When closing a gap invalidates an existing test, update that test to
-  the new contract.
+- When closing a gap invalidates an existing test, update that test to the new
+  contract.
 - Re-check `Evidence` and run project checks per
-  `references/verification-guide.md`—never discover, install, or
-  calibrate tooling ad hoc.
+  `references/verification-guide.md`—never discover, install, or calibrate
+  tooling ad hoc.
 - **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 
-- **Write scope**: edit only the source, tests, docs, and configuration
-  the `## Gaps` items require, plus `.spae/current/STATE.json` and the
-  `.spae/current/FIX.md` deletion, both at `PERSIST`. Forbid all other
-  writes. Write incidental run outputs—logs, reports, experiment
-  files—to scratch: a private temporary directory outside the project,
-  removed when the run ends. Scratch writes and byproducts of a command
-  run for evidence, such as formatter rewrites, never count as this
-  phase's writes. Never run a command for its write effect outside this
-  scope. Never delete pre-existing uncommitted files.
-- **Phase boundary**: remediate exactly one task and hand off work to
-  `/check`, never marking a task `"done"` or moving the cursor.
+- **Write scope**: edit only the source, tests, docs, and configuration the
+  `## Gaps` items require, plus `.spae/current/STATE.json` and the
+  `.spae/current/FIX.md` deletion, both at `PERSIST`. Forbid all other writes.
+  Write incidental run outputs—logs, reports, experiment files—to scratch: a
+  private temporary directory outside the project, removed when the run ends.
+  Scratch writes and byproducts of a command run for evidence, such as formatter
+  rewrites, never count as this phase's writes. Never run a command for its
+  write effect outside this scope. Never delete pre-existing uncommitted files.
+- **Phase boundary**: remediate exactly one task and hand off work to `/check`,
+  never marking a task `"done"` or moving the cursor.
 - **Version control and release**: never execute git mutations (staging,
-  commits, branches, tags, pushes) or release operations. Never stage or
-  commit `.spae/`.
-- **Autonomy**: never ask users for input or clarification
-  mid-execution—halts and failures stop autonomously. Never perform or
-  request human execution, an attended or interactive terminal, or human
-  presence.
+  commits, branches, tags, pushes) or release operations. Never stage or commit
+  `.spae/`.
+- **Autonomy**: never ask users for input or clarification mid-execution—halts
+  and failures stop autonomously. Never perform or request human execution, an
+  attended or interactive terminal, or human presence.
 - **State schema**: never introduce `STATE.json` fields outside
   `references/STATE.md`.
-- **Halt conditions**: halt with no further `STATE.json` write and
-  report `Failed` with a diagnostic under `Findings`:
+- **Halt conditions**: halt with no further `STATE.json` write and report
+  `Failed` with a diagnostic under `Findings`:
   - `.spae/current` missing or dangling.
   - `STATE.json` missing or holds unparseable JSON syntax.
   - `STATE.json` `phase` other than `fix`.
   - `cursor.active_task_id` missing.
   - `tasks[active_task_id]` reads `"done"`.
-  - `FIX.md` missing, naming a task other than `cursor.active_task_id`,
-    or listing no `## Gaps` item.
-  - A gap can't close within its scope: an `Expected` result infeasible
-    or contradicting the `## Intent`, `## Context`, or another gap, a
-    broken external dependency, an `Evidence` command or project check
-    that can't run, or a need for human presence.
-- **Scope control**: close each `## Gaps` item as written and change
-  nothing else. `## Intent` and `## Context` shape design, never scope.
-  No incidental refactoring, cleanup, formatting, or dependency churn.
+  - `FIX.md` missing, naming a task other than `cursor.active_task_id`, or
+    listing no `## Gaps` item.
+  - A gap can't close within its scope: an `Expected` result infeasible or
+    contradicting the `## Intent`, `## Context`, or another gap, a broken
+    external dependency, an `Evidence` command or project check that can't run,
+    or a need for human presence.
+- **Scope control**: close each `## Gaps` item as written and change nothing
+  else. `## Intent`, `## Context`, and `Guidance` shape design, never scope. No
+  incidental refactoring, cleanup, formatting, or dependency churn.
 - **Integrity**: fix issues properly and idiomatically, with no hacks,
   workarounds, or shortcuts:
-  - Never suppress compiler or linter diagnostics—for example,
-    `@ts-ignore`, `eslint-disable`, `@SuppressWarnings`,
-    `# type: ignore`.
-  - Never weaken type contracts to silence errors—for example, `as any`,
-    `!` non-null assertions, or broadened union types.
-  - Never edit build or tool configuration as a workaround—change it
-    only when a `## Gaps` item requires it.
+  - Never suppress compiler or linter diagnostics—for example, `@ts-ignore`,
+    `eslint-disable`, `@SuppressWarnings`, `# type: ignore`.
+  - Never weaken type contracts to silence errors—for example, `as any`, `!`
+    non-null assertions, or broadened union types.
+  - Never edit build or tool configuration as a workaround—change it only when a
+    `## Gaps` item requires it.
   - Never weaken, skip, delete, or game a test to force a pass.
 
 ## Verification
 
-- Re-checking each `## Gaps` item's `Evidence` shows its `Expected`
-  result.
-- Every behavior gap carries passing tests covering its test surface,
-  including one that fails on the pre-task state.
+- Re-checking each `## Gaps` item's `Evidence` shows its `Expected` result.
+- Every behavior gap carries passing tests covering its test surface, including
+  one that fails on the pre-task state.
 - Relevant project tests pass with no new failures.
-- Every added or updated test fails when the behavior it covers breaks
-  and passes the CI parity rules in `references/testing-guide.md`.
+- Every added or updated test fails when the behavior it covers breaks and
+  passes the CI parity rules in `references/testing-guide.md`.
 - No self-introduced artifact remains per `references/cleanup-guide.md`.
 - The task diff breaks no **Scope control** or **Integrity** rule.
 - `STATE.json` specifies `phase: "check"`,
@@ -180,17 +175,16 @@ diff-only audit scope.
 - Optimize prose for agent, token, and context efficiency.
 - Split actions, findings, and summaries into terse bullet points.
 - Use lists and sub-lists for long sentences and dense paragraphs.
-- **Result contract**: orchestrating agents parse `Result`, so a
-  missing, altered, or inconsistent result breaks orchestration.
-- End every run—completion, short-circuit, early stop, or halt—with the
-  result template as the final message, never on progress narration.
-- Set `Result` to exactly one template literal, verbatim. Report an
-  early stop or halt lacking its own literal as `Failed`, with the
-  reason under `Findings`.
+- **Result contract**: orchestrating agents parse `Result`, so a missing,
+  altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, early stop, or halt—with the result
+  template as the final message, never on progress narration.
+- Set `Result` to exactly one template literal, verbatim. Report an early stop
+  or halt lacking its own literal as `Failed`, with the reason under `Findings`.
 - Emit result template as live markdown—never in a code fence.
 - Output nothing outside template.
-- Source every `SPAE Status` value from confirmed re-read, never from
-  working memory of intent.
+- Source every `SPAE Status` value from confirmed re-read, never from working
+  memory of intent.
 
 ### Result template
 

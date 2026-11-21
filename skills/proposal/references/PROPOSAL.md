@@ -22,12 +22,20 @@
 
 ## Design
 
-- **C1 [Component]**: [Interfaces, contracts, defined terms—no
-  mechanism]
+- **C1 [Component]**: [Interfaces, contracts, defined terms—no mechanism]
 
 ## Decisions
 
 - **D1 [Choice]**: [Rationale]
+
+## Guidance
+
+[Advisory—binds nothing; `None` when absent; omit any absent kind]
+
+- **[B/C ID]**:
+  - **Pattern**: [`path:line` (`symbol`)—existing exemplar to mirror]
+  - **Solution**: [Recommended solution sketch naming key sites and steps]
+  - **Tests**: [Test file to extend, fixtures to reuse, notable cases]
 
 ## Rejected
 
