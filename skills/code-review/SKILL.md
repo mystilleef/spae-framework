@@ -18,10 +18,10 @@ argument-hint: "[optional: diff, commit, PR, file, or focus area]"
 ## Goal
 
 Conduct a defensive, evidence-based review of local repository changes. Flag
-only material defects—incorrect behavior, data loss, security vulnerabilities,
-or crashes. Return prioritized findings with exact code citations and advisory
-fix guidance. Repeat runs over an identical scope extend the prior report and
-count only additions as new.
+only plausible, material defects—incorrect behavior, data loss, security
+vulnerabilities, or crashes. Return prioritized findings with exact code
+citations and advisory fix guidance. Repeat runs over an identical scope extend
+the prior report and count only additions as new.
 
 ## Input
 
@@ -46,17 +46,21 @@ Gather intent grounding matching the resolved scope:
      record the printed `fingerprint`.
    - When `code-review-report.yaml` in the project root carries a matching
      `fingerprint`, seed the ledger with its `findings` and
-     `suppressed_findings` entries—the inherited entries. Otherwise delete the
-     report if present.
+     `suppressed_findings` entries—the inherited entries—and inherit its
+     `model`. Otherwise delete the report if present.
 2. **ORIENT**—Read `references/code-review-guide.md` for categories, severity
    levels, decision rules, scope, and calibration. Read
    `references/report-schema.json` as the output contract, and
    `references/outcome-guide.md` `## Guidance` for each finding's `guidance`.
    Anchor to review goal and name what the review won't change.
-   - Ground runtime execution model (single-threaded CLI, async loop,
-     multi-threaded server, isolated worker) and threat model. Limit validation
-     to source inspection and isolated local checks, excluding live-system
-     probing and exploit development.
+   - Ground the review `model`, refining any inherited one:
+     - Runtime execution model (single-threaded CLI, async loop, multi-threaded
+       server, isolated worker) and threat model.
+     - Trusted inputs—sources the user, project, or plugin controls, such as its
+       source tree, install paths, and configuration—carry realistic values,
+       never adversarial or contrived ones, in every category.
+   - Limit validation to source inspection and isolated local checks, excluding
+     live-system probing and exploit development.
    - Gather intent grounding (see Input) for the `hunks` under review before the
      phase sweep.
 3. **ACT**—Execute:
@@ -65,7 +69,7 @@ Gather intent grounding matching the resolved scope:
    - Detect and run configured linters, type checkers, and static analysis,
      treating tool errors as confirmed findings.
    - Sweep all `PHASE_COUNT` (8) phases against a running ledger, seeded per
-     GATE—a phase with zero new candidates never ends the sweep:
+     _GATE_—a phase with zero new candidates never ends the sweep:
      - Each phase scans every category below in full before consulting the
        ledger—produce the complete candidate list first, then dedupe. Skipping
        already-covered ground before scanning defeats the sweep.
@@ -73,10 +77,12 @@ Gather intent grounding matching the resolved scope:
        below—focus adds attention without narrowing scope, and every phase still
        scans all 8.
      - Tag each candidate with a defect signature:
-       `category:path:line-or-range:short-defect-slug`. Treat a candidate as new
-       only when no ledger entry describes the same defect at the same
-       code—signatures key the match, and a reworded slug or shifted range never
-       makes a known defect new.
+       `category:path:line-or-range:short-defect-slug`. Collapse instances
+       sharing one root cause across call sites into one candidate, anchored at
+       its primary site and naming the sibling sites. Treat a candidate as new
+       only when no ledger entry describes the same defect or root
+       cause—signatures key the match, and a reworded slug, shifted range, or
+       sibling site never makes a known defect new.
      - Append new candidates to the ledger after each phase, then record one
        phase line: focus category, code traced for it (or why none applies), and
        new-candidate count.
@@ -99,26 +105,27 @@ Gather intent grounding matching the resolved scope:
        serialization contracts, truncation risk.
 4. **VERIFY**—Run once, after the phase sweep completes—never per phase. Prove
    each ledger finding, inherited entries included, against code, project
-   mandates, and app threat model. Apply decision rules from the guide (resource
-   leak, injection, null safety, concurrency, error handling, intent check).
-   - Require a concrete trigger scenario, reachable code path, and material
-     impact for each finding, recorded as its `trigger`. Code evidence suffices
-     without exploit construction or live-system reproduction.
-   - Drop speculative or out-of-scope new candidates. Never drop an inherited
-     entry, so later runs keep its signature.
-   - Route findings lacking concrete trigger scenarios or carrying qualifying
-     intent evidence to `suppressed_findings`, citing the missing scenario or
-     intent evidence—never emit them in `findings`. Inherited entries failing
-     proof route there too.
+   mandates, and the `model`, applying the guide's severity rules and decision
+   rules:
+   - Pass each finding through the evidence threshold—concrete, reachable,
+     plausible trigger plus material impact—recorded as its `trigger`.
+   - Rate severity by likelihood × impact, and weigh each `guidance.solution`
+     for fix proportionality.
+   - Drop out-of-scope new candidates. Never drop an inherited entry, so later
+     runs keep its signature.
+   - Route findings failing the evidence threshold or fix proportionality, or
+     carrying qualifying intent evidence, to `suppressed_findings`, citing the
+     failed test, the fix disproportion, or the intent evidence—never emit them
+     in `findings`.
 5. **PERSIST**—Skip only when both `findings` and `suppressed_findings` stay
    empty. Otherwise:
-   - Re-run `scripts/fingerprint.sh` as in GATE. On output differing from the
-     GATE `fingerprint`—reviewed content changed mid-run—halt as `Failed`,
+   - Re-run `scripts/fingerprint.sh` as in _GATE_. On output differing from the
+     _GATE_ `fingerprint`—reviewed content changed mid-run—halt as `Failed`,
      naming the changed paths under `Findings`.
    - Write `code-review-report.yaml` to the project root per
-     `references/report-schema.json`: record the `fingerprint` and each entry's
-     `signature`, use `|` block scalars for multi-line values, and omit the
-     `suppressed_findings` key when empty.
+     `references/report-schema.json`: record the `fingerprint`, the `model`, and
+     each entry's `signature`, use `|` block scalars for multi-line values, and
+     omit the `suppressed_findings` key when empty.
 6. **REPORT**—Sort findings by severity. Emit the result following the result
    directives and result template.
 
@@ -134,14 +141,14 @@ Gather intent grounding matching the resolved scope:
   `Request Changes` (any Critical or High finding) · `Comment` (Medium or Low
   only) · `Approve` (no findings). Derive `Result` and verdict from `findings`
   only—`suppressed_findings` never shift either.
-- Filter candidate findings against the app threat model, `KISS`, and `YAGNI`,
-  rejecting defensive bloat, ungrounded guardrails, and theoretical defects
-  outside realistic execution paths.
+- Hold candidate findings and every `guidance.solution` to the `model`, `KISS`,
+  and `YAGNI`: never demand defensive bloat or ungrounded guardrails, and keep
+  theoretical defects outside realistic execution paths out of `findings`.
 - Mark uncertainty explicitly: _"Context may change this finding, but…"_
 - Give every `findings` and `suppressed_findings` entry advisory `guidance` per
-  `references/outcome-guide.md` `## Guidance`: a targeted, scope-appropriate
-  `solution`, plus `pattern`, `avoid`, and `tests` when they help—never a
-  rewrite of the patch.
+  `references/outcome-guide.md` `## Guidance`: the minimal, targeted `solution`,
+  plus `pattern`, `avoid`, and `tests` when they help—never a rewrite of the
+  patch.
 - Omit empty categories and "none found" sections.
 - Verify findings against `AGENTS.md` before reporting.
 - Keep `PHASE_COUNT` (8) equal to the category count as a single named
@@ -168,25 +175,28 @@ Gather intent grounding matching the resolved scope:
 
 - Static analysis output checked when available and practical.
 - Findings map to diff or file excerpts and line references, and every active
-  finding carries its trigger scenario.
-- Severity reflects user impact, with security _exploitability_ assessed within
-  the app threat model, without requiring exploit development.
+  finding carries a trigger passing the evidence threshold.
+- Severity reflects likelihood × user impact, with security _exploitability_
+  assessed within the `model`, without requiring exploit development.
+- No self-recovering, fallback-only, or rerun-cleared finding outranks `Low`.
 - Every `guidance.solution` describes a concrete change, and every `guidance`
   follows the `references/outcome-guide.md` `## Guidance` rules.
 - Report matches workspace mandates.
-- Every `suppressed_findings` entry cites qualifying intent evidence or the
-  missing trigger scenario—never a general or vague rationale.
+- Every `suppressed_findings` entry cites qualifying intent evidence, the failed
+  evidence-threshold test, or the fix disproportion—never a general or vague
+  rationale.
 - If findings or suppressed findings exist: `code-review-report.yaml` written,
-  conforming to `references/report-schema.json`, with a `fingerprint` matching
-  the PERSIST re-run of `scripts/fingerprint.sh`.
-- Ledger seeded only from a report whose `fingerprint` matches the GATE run of
+  conforming to `references/report-schema.json`, with the grounded `model` and a
+  `fingerprint` matching the PERSIST re-run of `scripts/fingerprint.sh`.
+- Ledger seeded only from a report whose `fingerprint` matches the _GATE_ run of
   `scripts/fingerprint.sh`—any other report deleted.
-- Every inherited entry re-proven and persisted in `findings` or
+- Every inherited entry re-proven under the same evidence, severity, and
+  proportionality tests, then persisted in `findings` or
   `suppressed_findings`—none dropped.
 - `Result` counts only non-inherited `findings` entries as new.
 - Ledger deduplication keys off the defect signature
-  (`category:path:line-or-range:slug`)—no phase counts a known defect new under
-  a reworded slug or shifted range.
+  (`category:path:line-or-range:slug`), one entry per root cause—no phase counts
+  a known defect new under a reworded slug, shifted range, or sibling site.
 - Phase sweep ran all `PHASE_COUNT` (8) phases, and no zero-new-candidate phase
   ended it.
 - Every phase line names concrete code traced for its focus category or why none

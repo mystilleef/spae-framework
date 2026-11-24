@@ -56,16 +56,16 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
 4. **ACT**—Draft `PLAN.md`:
    - Read source narrowly, widening only on uncertainty.
    - Follow `references/PLAN.md`, numbering tasks from `T-001`.
-   - Set `Satisfies` to the `R-NNN` IDs a task implements and proves through its
-     own `Verification`—or its `Acceptance`, for prose—and `Intent` to a
-     one-line distillation of the goal they serve.
+   - Set `Satisfies` to every `R-NNN` ID a task's `Acceptance` implements and
+     its own `Verification` proves—or its `Acceptance`, for prose—and `Intent`
+     to a one-line distillation of the goal they serve.
    - Enabling task—tooling setup or a final verification gate:
      `Satisfies: none`, with an `Intent` naming its structural purpose toward
      the plan `## Goal`.
    - Write each task's `Guidance` per `references/outcome-guide.md`
      `## Guidance` from the `SPEC.md` `## Guidance` entries for its `Satisfies`
-     IDs and patterns surfaced while planning. Carry settled rejections bearing
-     on the task from `SPEC.md` `Out of scope` into its `Context`.
+     IDs and patterns surfaced while planning. Record each task-bound exclusion
+     in its `Context`.
    - Order tasks by dependency, risk, and vertical value.
    - Apply **Directives** and **Constraints**.
 5. **VERIFY**—Loop over **Verification** criteria for `PLAN.md`:
@@ -73,6 +73,10 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
      - Uncovered `R-NNN`: add a task.
      - Task serving no `R-NNN` and no enabling purpose: remove it.
      - Granularity: split a non-atomic task, and merge a merge candidate.
+     - Open line: close it per **Directives**.
+     - `Acceptance` implementing an unlisted `R-NNN`: list the ID, or move the
+       line to the owner task for that outcome.
+     - Restated outcome: keep it in its owner task alone.
    - Exit only when every criterion passes.
    - Never halt on the content of requirements.
 6. **PERSIST**—Write in order:
@@ -92,16 +96,28 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
   **Self-contained units**: fresh, isolated agents holding only the task's
   `PLAN.md` text and the repository can build, test, and verify it, each in a
   separate run. Write `Context` to supply every fact they need and can't derive,
-  including facts surfaced only while planning. Let a task's `Guidance` rely on
-  another task only through that task's `Acceptance`.
+  including facts surfaced only while planning and every task-bound exclusion.
+  Let a task's `Guidance` rely on another task only through that task's
+  `Acceptance`.
+- Apply these terms:
+  - **Outcome group**: `Acceptance` lines sharing one component or contract,
+    provable through one verification surface. An `R-NNN` spanning outcome
+    groups splits into one task per group.
+  - **Task-bound exclusion**: a settled rejection or residual risk from
+    `SPEC.md` `Out of scope`, or members a closed line leaves unnamed, bounding
+    a task's outcomes.
 - Slice vertically into atomic tasks with no merge candidate, per
   **Verification**.
 - Align with existing codebase patterns and avoid speculative design.
 - Write acceptance criteria as observable outcomes, contracts, and preserved
   behaviors at risk:
   - For a `Satisfies`-bearing task, name testable behaviors, including failure
-    modes and edge cases only when `SPEC.md` specifies them or task logic
-    requires them.
+    modes and edge cases only when `SPEC.md` names them or a branch, error path,
+    or boundary the task's own change introduces requires them—never contrived
+    input.
+  - Keep every `Acceptance` and `Verification` line closed per the
+    `references/outcome-guide.md` closure test, recording its unnamed members as
+    a task-bound exclusion and in `Risk notes`.
   - For prose, per `references/verification-guide.md`, name what the text must
     convey.
   - For a `Satisfies: none` enabling task, state structural assurances.
@@ -158,11 +174,15 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
   `T-NNN` reference—`Task graph` edges, the overview list, and `Dependencies`
   fields—resolves to a defined task.
 - Every `Satisfies`-bearing task's `Acceptance` names testable behaviors
-  (failure modes and edge cases only when `SPEC.md` specifies them or task logic
-  requires them), and for prose, what the text must convey. Every enabling
-  task's `Acceptance` states structural assurances.
-- Every `Satisfies` ID names an `R-NNN` the task implements and proves through
-  its own `Verification`—or its `Acceptance`, for prose.
+  (failure modes and edge cases only when `SPEC.md` names them or the task's own
+  change introduces them), and for prose, what the text must convey. Every
+  enabling task's `Acceptance` states structural assurances.
+- Every task traces both ways:
+  - Every `Satisfies` ID names an `R-NNN` the task implements and proves through
+    its own `Verification`—or its `Acceptance`, for prose.
+  - Every `R-NNN` its `Acceptance` implements appears in its `Satisfies`.
+  - Every `Acceptance` line traces to a listed `R-NNN`, a preserved behavior at
+    risk, or the enabling purpose.
 - Every task's `Verification` includes test execution—one smoke run for an
   enabling tooling task, project checks alone when `Acceptance` holds only
   prose—maps each step to the outcomes it proves, and follows
@@ -172,16 +192,22 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
 - Every task stays self-contained and isolated per `references/outcome-guide.md`
   **Self-contained units**: fresh agents holding only its text and the
   repository can build, test, and verify it, each in a separate run.
-- Every task stays atomic: a change one run can build, leaving the system
-  working.
+- Every task stays atomic: one outcome group, buildable in one run and judged
+  clear in one verification pass, leaving the system working. No task's
+  `Acceptance` spans outcome groups failing independently.
 - No merge candidate remains: bordering tasks—linked by a dependency edge or
   sharing `Scope` surface—form one unless any of these holds:
   - Each satisfies an `R-NNN` or serves as tooling setup or a final verification
     gate.
   - A third task must run between them.
   - Their merge would outgrow one run.
+  - Their merge would span outcome groups failing independently.
+- Every binding outcome belongs to one owner task, and a dependent relies on it
+  through the owner's `Acceptance`, never restating it.
 - Every binding task line passes the `references/outcome-guide.md` substitution
-  test, and `Context` holds no derivable fact beyond entry-point paths.
+  and closure tests, and `Context` holds no derivable fact beyond entry-point
+  paths and task-bound exclusions.
+- Every task-bound exclusion appears in its task's `Context`.
 - Every `Guidance` line follows the `references/outcome-guide.md` `## Guidance`
   rules.
 - Zero tasks mandate version control or release operations.

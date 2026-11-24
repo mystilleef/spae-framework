@@ -14,17 +14,17 @@
 - Scan the full proposal against all nine categories each phase before
   consulting the ledger:
 
-| Category        | Example                            | Disposition             |
-| --------------- | ---------------------------------- | ----------------------- |
-| Functional      | Explicit behavior or request       | `R-NNN`                 |
-| Constraint      | Non-functional (load, security)    | `R-NNN`                 |
-| Boundary        | Explicit exclusion in proposal     | `Out of scope`          |
-| Precondition    | Assumption or dependency           | `Assumptions`           |
-| Acceptance      | Named completion criterion         | `Goal` or `R-NNN`       |
-| Validation      | Verification expectation           | `Testing strategy`      |
-| Integration     | External code or `workstream`      | `R-NNN` / `Assumptions` |
-| Guidance        | Approach, exemplar, or method hint | `## Guidance`           |
-| `Uncategorized` | Ambiguous or unclassified claim    | Fit or `Out of scope`   |
+| Category        | Example                         | Disposition             |
+| --------------- | ------------------------------- | ----------------------- |
+| Functional      | Explicit behavior or request    | `R-NNN`                 |
+| Constraint      | Non-functional (load, security) | `R-NNN`                 |
+| Boundary        | Explicit exclusion in proposal  | `Out of scope`          |
+| Precondition    | Assumption or dependency        | `Assumptions`           |
+| Acceptance      | Named completion criterion      | `Goal` or `R-NNN`       |
+| Validation      | Verification expectation        | `Testing strategy`      |
+| Integration     | External code or `workstream`   | `R-NNN` / `Assumptions` |
+| Guidance        | Approach, exemplar, or hint     | `## Guidance`           |
+| `Uncategorized` | Ambiguous or unclassified claim | Fit or `Out of scope`   |
 
 - Phase `N` carries heightened focus on category `N` in table order. Scan all
   nine categories each phase.
@@ -62,8 +62,9 @@
   - **Premise**: a claim misstating current code—behavior, symbols, files,
     interfaces—against source.
   - **Gap**: work the goal entails that no claim covers—updates to direct
-    dependents a change breaks, companions `AGENTS.md` requires, goal or success
-    criteria left unreached.
+    dependents a change breaks, companions `AGENTS.md` requires, and goal or
+    success criteria left unreached. Count only gaps on realistic input, as
+    `SKILL.md` **Directives** defines it.
   - **Regression**: a claim altering behavior outside the goal.
   - **`AGENTS.md` violation**: a claim breaking an `AGENTS.md` constraint.
 - Record each defect: flag the affected entry with its class, and add each gap
@@ -73,7 +74,9 @@
     to `Out of scope` as superseded, with a one-line rationale.
   - Premise: rewrite the disposition to source reality, or file it under
     `Out of scope` when moot.
-  - Gap: a new `R-NNN`, or `Assumptions` for a precondition.
+  - Gap: a new closed `R-NNN`, or `Assumptions` for a precondition. **Proposal
+    fidelity** governs a gap only a rejected alternative, a reopened closed
+    list, or an open class closes.
   - Regression: narrow the claim's disposition to spare the behavior.
   - `AGENTS.md` violation: conform the claim's disposition to `AGENTS.md`.
 
@@ -94,7 +97,7 @@
   - File under `Out of scope` with a one-line rationale on `YAGNI` failure.
 - Treat orphaned ledger entries as unmet `VERIFY` criteria. Forbid silent drops.
 - Route `Validation` entries per `verification-guide.md`:
-  - Translate each into the outcome it protects.
+  - Translate each into the outcome it protects over the same input set.
   - Cheapest evidence the ladder admits → `Testing strategy`.
   - None → `Out of scope` residual risk.
   - Never carry recipes, rigs, coordinates, or case matrices.

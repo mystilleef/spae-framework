@@ -3,14 +3,14 @@
 
 > **For agent consumption**: settled evidence for an independent fix.
 >
-> - Re-run `Reproduction` before any change; on divergence from `Fails with`,
->   halt and report drift against `Baseline`.
+> - Re-run `Reproduction` before any change; on divergence from
+>   `Fails with`, halt and report drift against `Baseline`.
 > - Fix each finding at its root cause per `Fix direction`; avoid every
 >   `Rejected fixes` entry.
-> - Weigh each `Guidance` hint on its merits, never following it blindly:
->   accept, partially accept, or ignore it for a better fix.
-> - Treat `Ruled out` as settled; reopen a hypothesis only on new contrary
->   evidence.
+> - Weigh each `Guidance` hint on its merits, never following it
+>   blindly: accept, partially accept, or ignore it for a better fix.
+> - Treat `Ruled out` as settled; reopen a hypothesis only on new
+>   contrary evidence.
 > - `Inconclusive`: confirm each `Suspected` finding before fixing it.
 > - `Not Reproduced`: change no code until a run reproduces the symptom.
 > - Prove the fix through `Verification`.
@@ -19,12 +19,14 @@
 
 - **Result**: [Diagnosed | Inconclusive | Not Reproduced]
 - **Baseline**: [Commit SHA; dirty paths, or `clean`]
-- **Environment**: [Runtime, OS, and tool versions bearing on the failure]
+- **Environment**: [Runtime, OS, and tool versions bearing on the
+  failure]
 
 ## Symptom
 
 - **Observed**: [Actual behavior, error, or exit code]
-- **Expected**: [Correct behavior and its source—test, spec, docs, contract]
+- **Expected**: [Correct behavior and its source—test, spec, docs,
+  contract]
 
 ## Reproduction
 
@@ -36,8 +38,8 @@
 
 ## Root cause
 
-- **F1 [Title]**—`path:line` (`symbol`) · [critical | high | medium | low] ·
-  [Confirmed | Suspected]:
+- **F1 [Title]**—`path:line` (`symbol`) · [critical | high | medium |
+  low] · [Confirmed | Suspected]:
   - **Causal chain**: [Trigger to symptom, step by step]
   - **Proof**: [Check run and observed outcome]
   - **Missing evidence**: [Suspected only—confirming observation; why
@@ -49,8 +51,8 @@
 
 ## Fix direction
 
-- **F1**: [Corrected behavior at the root-cause site—never the edit; invariants
-  kept; coupling with other findings]
+- **F1**: [Corrected behavior at the root-cause site—never the edit;
+  invariants kept; coupling with other findings]
   - **Guidance** (advisory—omit when obvious; omit any absent kind):
     - **Pattern**: [`path:line` (`symbol`)—existing exemplar to mirror]
     - **Solution**: [Recommended fix sketch naming key sites and steps]
@@ -58,14 +60,14 @@
 
 ## Rejected fixes
 
-- **[Candidate fix]**: [Defect—masks the symptom, breaks a P item, weakens a
-  contract]
+- **[Candidate fix]**: [Defect—masks the symptom, breaks a P item,
+  weakens a contract]
 
 ## Scope
 
 - **Touch**: [Surface the fix may change—modules, behaviors, contracts]
-- **Exclude**: [Explicit boundaries; incidental defects outside the causal
-  chain, with `path:line`]
+- **Exclude**: [Explicit boundaries; incidental defects outside the
+  causal chain, with `path:line`]
 
 ## Preserved behavior
 

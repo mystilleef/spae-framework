@@ -110,13 +110,19 @@ Select path by target state:
 - Align with existing codebase patterns and avoid speculative design.
 - Filter all requirements and incoming findings against `YAGNI`, discarding
   `unrequested` scope, speculative design, or theoretical complexity. An
-  audit-proven gap never counts as `unrequested` scope. File `YAGNI`-discarded
-  ledger aspects under `Out of scope` with a one-line rationale, never a silent
-  drop.
+  audit-proven gap never counts as `unrequested` scope when it rests on
+  realistic input—input the proposal names or ordinary use produces, never a
+  theoretical risk, even one a contrived reproduction exhibits. File
+  `YAGNI`-discarded ledger aspects under `Out of scope` with a one-line
+  rationale, never a silent drop.
   - Filter verification breadth too: carry a proposal's verification request as
-    the outcomes it protects, never its recipe, rig, or case matrix.
-- Write observable, testable, and implementation-neutral requirements, tagging
-  each with a unique, stable `R-NNN` identifier:
+    the outcomes it protects over the same input set—never its recipe, rig, or
+    case matrix, and never a wider class.
+- Write observable, testable, closed, and implementation-neutral requirements,
+  tagging each with a unique, stable `R-NNN` identifier:
+  - Close each per the `references/outcome-guide.md` closure test: name every
+    member of each class it quantifies over, filing the unnamed members under
+    `Out of scope` as a residual risk.
   - Carry a proposal's design claim as the contract or outcome it delivers—a
     restatement, not a correction—and route its mechanism to `## Guidance`. A
     mechanism binds only through a settled decision or `AGENTS.md`.
@@ -128,7 +134,8 @@ Select path by target state:
   - Set `Assumptions` to `None` on single-behavior specs unless explicit
     constraints exist.
   - Never invent exclusions, assumptions, edge cases, or failure modes absent
-    evidence—an audit-proven gap supplies evidence. Keep section headers intact.
+    evidence—an audit-proven gap on realistic input supplies evidence. Keep
+    section headers intact.
 - Consult `references/verification-guide.md` and decide the cheapest evidence
   proving each spec item:
   - Translate manual checks and proposal verification recipes into the outcomes
@@ -193,27 +200,43 @@ Select path by target state:
     qualified goal, other claims, own judgment. Between peers, the claim serving
     the qualified goal wins. Otherwise, apply the **Ambiguity** fallback.
   - Apply the smallest correction and cite its evidence.
+  - Resolve a gap whose only closure revives a rejected alternative, reopens a
+    closed list, or demands an open class as an `Out of scope` residual risk, or
+    as the narrowest closed requirement meeting the qualified goal, citing the
+    settled item it preserves.
+  - Keep a settled enumeration—accepted limits, listed differences, fixed
+    texts—closed: extend it only by naming each new member with its evidence,
+    never by reference to another requirement.
   - On a premise-void proposal—source falsifies the goal's premise, or the
     codebase already meets the goal—specify the goal outcome against source
     reality, file falsified claims under `Out of scope`, and lead `Findings`
     with the void premise.
   - Never halt on a proposal defect.
 - **Contradictions**: audit `SPEC.md` as one self-contained unit per
-  `references/outcome-guide.md`. Conflicts include mutually exclusive
-  requirements, requirements an `Out of scope` item forbids, requirements
-  contradicting `AGENTS.md`, `Assumptions`, or `Testing strategy`, assumptions
-  contradicting source code, or evidence demanded from a repository state whose
-  runs breach `Testing strategy` or `references/verification-guide.md`.
-  Self-heal by precedence:
-  - `AGENTS.md` overrides requirements.
-  - Requirements override `Out of scope`, except version control, release,
-    human-presence, and settled-item exclusions.
-  - Requirements override assumptions and testing strategy.
-  - Source code overrides assumptions.
-  - `references/verification-guide.md` settles a state-bound evidence conflict.
-    Record an outcome it leaves unprovable as an `Out of scope` residual risk.
-  - Otherwise apply the **Ambiguity** fallback, never halting on a
-    contradiction.
+  `references/outcome-guide.md`.
+  - Conflicts:
+    - Mutually exclusive requirements, or requirements an `Out of scope` item
+      forbids.
+    - Requirements contradicting `AGENTS.md`, `Assumptions`, or
+      `Testing strategy`.
+    - An exception one requirement carves into another without naming the exact
+      fields, values, or slots it covers.
+    - Assumptions contradicting source code.
+    - Evidence demanded from a repository state whose runs breach
+      `Testing strategy` or `references/verification-guide.md`.
+  - Self-heal by precedence:
+    - `AGENTS.md` overrides requirements.
+    - Requirements override `Out of scope`, except version control, release,
+      human-presence, and settled-item exclusions.
+    - Requirements override assumptions and testing strategy.
+    - Source code overrides assumptions.
+    - An unbounded exception names its exact fields, values, or slots, else
+      drops.
+    - `references/verification-guide.md` settles a state-bound evidence
+      conflict. Record an outcome it leaves unprovable as an `Out of scope`
+      residual risk.
+    - Otherwise apply the **Ambiguity** fallback, never halting on a
+      contradiction.
 - **State schema**: never introduce `STATE.json` fields outside
   `references/STATE.md`.
 - **Halt conditions**: halt without writing and report `Failed` with a
@@ -231,7 +254,7 @@ Select path by target state:
 
 - Confirm each item carries a unique `R-NNN` identifier.
 - Confirm all requirements pass the `references/outcome-guide.md` substitution
-  test.
+  and closure tests.
 - Confirm `## Guidance` follows the `references/outcome-guide.md` `## Guidance`
   rules and keys only defined `R-NNN` IDs.
 - Confirm no **Contradictions** finding survives in `SPEC.md`.
@@ -258,7 +281,9 @@ Select path by target state:
 - Confirm every `Draft` ledger-audit defect resolves per
   `references/aspect-sweep.md` **Ledger audit** dispositions, each correction
   citing its evidence, with no settled item yielding without the source or
-  `AGENTS.md` evidence **Proposal fidelity** demands.
+  `AGENTS.md` evidence **Proposal fidelity** demands, no requirement reviving a
+  rejected alternative or reopening a closed list, and no gap resting on
+  unrealistic input.
 - Confirm `Revision` runs no aspect sweep or ledger audit and maps converted
   `VERIFY.md` items directly to spec items.
 - Ensure `.spae/[workstream]/STATE.json` specifies `phase: "plan"`,

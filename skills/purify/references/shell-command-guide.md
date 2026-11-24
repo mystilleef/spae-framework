@@ -3,29 +3,32 @@
 ## Directives
 
 - Redirect `stderr` with `2>&1` only, per the redirect syntax table.
-- Capture output to a file. **Never** pipe through `head`, `tail`, or `grep`—in
-  non-`TTY` mode, both sides block waiting for `EOF` that never arrives.
+- Capture output to a file. **Never** pipe through `head`, `tail`, or
+  `grep`—in non-`TTY` mode, both sides block waiting for `EOF` that
+  never arrives.
 - Wrap all commands that spawn processes or produce output with
   `timeout -k 5 N`, per the timeout defaults table.
-  - `timeout` moves the command into its own process group, so harnesses that
-    signal only their shell's group miss it until `N` expires.
-  - `-k 5`—escalates to `SIGKILL` when the command survives `SIGTERM` for 5
-    seconds.
-  - Never pass `--foreground`—on expiry it signals only the direct child,
-    orphaning grandchildren (for example, the real `bun` behind a Volta shim).
-- Redirect `stdin` from `/dev/null` (`< /dev/null`) on all non-interactive
-  commands.
-- Some tools open `/dev/tty` for credentials, bypassing `< /dev/null`— suppress
-  with the tool's non-interactive flag or credential environment variable.
-- Set `CI=true NO_COLOR=1 PAGER=cat TERM=dumb` before invoking test runners,
-  build tools, and installers.
-- Pass flags per tool docs to exit cleanly: end descendant processes, turn off
-  watch mode, set per-step timeouts.
+  - `timeout` moves the command into its own process group, so harnesses
+    that signal only their shell's group miss it until `N` expires.
+  - `-k 5`—escalates to `SIGKILL` when the command survives `SIGTERM`
+    for 5 seconds.
+  - Never pass `--foreground`—on expiry it signals only the direct
+    child, orphaning grandchildren (for example, the real `bun` behind a
+    Volta shim).
+- Redirect `stdin` from `/dev/null` (`< /dev/null`) on all
+  non-interactive commands.
+- Some tools open `/dev/tty` for credentials, bypassing `< /dev/null`—
+  suppress with the tool's non-interactive flag or credential
+  environment variable.
+- Set `CI=true NO_COLOR=1 PAGER=cat TERM=dumb` before invoking test
+  runners, build tools, and installers.
+- Pass flags per tool docs to exit cleanly: end descendant processes,
+  turn off watch mode, set per-step timeouts.
 - Never run watch modes (`--watch`) or dev servers in non-interactive
-  shells—they never exit, and `CI=true` doesn't turn them off (for example,
-  `bun --watch`, `bun test --watch`).
-- Write every command self-contained—no environment variables, shell options, or
-  state carry over from prior invocations.
+  shells—they never exit, and `CI=true` doesn't turn them off (for
+  example, `bun --watch`, `bun test --watch`).
+- Write every command self-contained—no environment variables, shell
+  options, or state carry over from prior invocations.
 
 ## Reference
 
@@ -45,8 +48,8 @@
 | Builds   | 120     |
 | Installs | 120     |
 
-`timeout` exits with code `124` on expiry, or `137` when `-k` escalates to
-`SIGKILL`—distinguishes a timeout from a real process failure.
+`timeout` exits with code `124` on expiry, or `137` when `-k` escalates
+to `SIGKILL`—distinguishes a timeout from a real process failure.
 
 ### Non-interactive environment variables
 
@@ -71,8 +74,8 @@ exit "${status}"
 ```
 
 - `< /dev/null`—prevents tools from blocking on `stdin`
-- `trap`—removes `${out}` once on any exit, turning `SIGINT` and `SIGTERM` into
-  exits
+- `trap`—removes `${out}` once on any exit, turning `SIGINT` and
+  `SIGTERM` into exits
 - `tail -n 40` reads from a file—safe, since pipes block and files don't
 
 ## Pipelines (unavoidable only)

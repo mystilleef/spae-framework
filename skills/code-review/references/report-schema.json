@@ -3,17 +3,21 @@
   "title": "CodeReviewReport",
   "description": "Output contract for the code-review skill. Emitted as YAML. Use | block scalars for multi-line values.",
   "type": "object",
-  "required": ["scope", "fingerprint", "result", "findings"],
+  "required": ["scope", "fingerprint", "model", "result", "findings"],
   "additionalProperties": false,
   "properties": {
     "scope": {
       "type": "string",
-      "description": "What was reviewed — file path, PR, commit, or diff description."
+      "description": "Reviewed target—file path, PR, commit, or diff description."
     },
     "fingerprint": {
       "type": "string",
       "pattern": "^[0-9a-f]{64}$",
       "description": "SHA-256 digest printed by scripts/fingerprint.sh; a repeat run seeds its ledger from this report only on a match."
+    },
+    "model": {
+      "type": "string",
+      "description": "Review model grounded in ORIENT: runtime execution model, threat model, and trusted inputs. Filters findings in every category; a repeat run inherits it on a fingerprint match."
     },
     "result": {
       "type": "string",
@@ -56,12 +60,12 @@
         "properties": {
           "signature": {
             "type": "string",
-            "description": "Defect signature category:path:line-or-range:short-defect-slug; keys ledger deduplication across runs."
+            "description": "Defect signature category:path:line-or-range:short-defect-slug, one per root cause, anchored at its primary site; keys ledger deduplication across runs."
           },
           "severity": {
             "type": "string",
             "enum": ["Critical", "High", "Medium", "Low", "Nit"],
-            "description": "Severity ranked by user impact or exploitability."
+            "description": "Severity ranked by likelihood × user impact, or exploitability for security; Low at most for self-recovering, fallback-only, or rerun-cleared defects."
           },
           "path": {
             "type": "string",
@@ -77,11 +81,11 @@
           },
           "finding": {
             "type": "string",
-            "description": "One sentence stating the defect."
+            "description": "One sentence stating the defect, naming sibling sites of a shared root cause."
           },
           "trigger": {
             "type": "string",
-            "description": "Concrete trigger scenario: input or state, reachable code path, and material impact."
+            "description": "Trigger passing the evidence threshold: concrete, plausible input or state, reachable code path, and material impact."
           },
           "guidance": {
             "type": "object",
@@ -112,7 +116,7 @@
     },
     "suppressed_findings": {
       "type": "array",
-      "description": "Findings carrying qualifying intent evidence or lacking a concrete trigger scenario, moved out of findings for audit; never shift result or verdict. Omit this key entirely when empty.",
+      "description": "Findings carrying qualifying intent evidence, failing the evidence threshold, or needing a fix disproportionate to a rare trigger, moved out of findings for audit; never shift result or verdict. Omit this key entirely when empty.",
       "items": {
         "type": "object",
         "required": [
@@ -127,12 +131,12 @@
         "properties": {
           "signature": {
             "type": "string",
-            "description": "Defect signature category:path:line-or-range:short-defect-slug; keys ledger deduplication across runs."
+            "description": "Defect signature category:path:line-or-range:short-defect-slug, one per root cause, anchored at its primary site; keys ledger deduplication across runs."
           },
           "severity": {
             "type": "string",
             "enum": ["Critical", "High", "Medium", "Low", "Nit"],
-            "description": "Severity ranked by user impact or exploitability."
+            "description": "Severity ranked by likelihood × user impact, or exploitability for security; Low at most for self-recovering, fallback-only, or rerun-cleared defects."
           },
           "path": {
             "type": "string",
@@ -148,11 +152,11 @@
           },
           "finding": {
             "type": "string",
-            "description": "One sentence stating the defect."
+            "description": "One sentence stating the defect, naming sibling sites of a shared root cause."
           },
           "trigger": {
             "type": "string",
-            "description": "Concrete trigger scenario, when one exists; omit for a finding suppressed for lacking one."
+            "description": "Trigger scenario, when one exists; omit for a finding suppressed for lacking one."
           },
           "guidance": {
             "type": "object",
@@ -180,7 +184,7 @@
           },
           "suppressionRationale": {
             "type": "string",
-            "description": "Quoted intent evidence and its source (commit, PR description, comment, or requester statement), or the missing trigger scenario, justifying suppression."
+            "description": "Quoted intent evidence and its source (commit, PR description, comment, or requester statement), the failed evidence-threshold test (missing, unreachable, implausible, or immaterial trigger), or the fix disproportion, justifying suppression."
           }
         }
       }

@@ -1,9 +1,10 @@
 ---
 name: spae-check
 description:
-  Task Verification Gate for the `SPAE` framework. Compares the active `PLAN.md`
-  task's `Intent`, `Acceptance`, and `Verification` against repository evidence,
-  then routes gaps to `/fix` or advances the task.
+  Task Verification Gate for the `SPAE` framework. Judges the active `PLAN.md`
+  task's `Intent`, `Acceptance`, and `Verification` against repository evidence
+  and reviews its changed code for implementation defects, then routes gaps to
+  `/fix` or advances the task.
 user-invocable: true
 argument-hint: ""
 ---
@@ -13,12 +14,13 @@ argument-hint: ""
 ## When to use
 
 - `STATE.json` reads `phase: check`: verify the active `PLAN.md` task against
-  repository evidence.
+  repository evidence and review its changed code.
 
 ## Goal
 
 - Judge the active task's implementation against its `Intent`, `Acceptance`, and
-  `Verification`, recording every gap in `FIX.md`.
+  `Verification`, and review its changed code as a full reviewer, recording
+  every gap in `FIX.md`.
 - Advance the `workstream` to `phase: fix` on a gap. Otherwise, mark the task
   `done` and advance to `phase: build` or `phase: verify`.
 
@@ -57,17 +59,30 @@ Read only what the check requires:
    - Read the task diff with the scoped audit command in
      `references/cleanup-guide.md`.
    - Judge each `Acceptance` outcome and the `Intent` against step output, the
-     diff, and source.
+     diff, and source, and review the changed code for implementation defects.
    - Label each finding with exactly one tag:
-     - **Gap**—blocks a clear verdict. Cite reproducible evidence, never a
-       hypothetical risk or stylistic preference:
-       - An unmet `Acceptance` outcome, a `Verification` step that fails or
-         can't run for a cause inside the task diff—such as missing isolation—or
-         behavior contradicting the `Intent`.
+     - **Gap**—blocks a clear verdict. Cite reproducible evidence—never a
+       theoretical risk, even one a contrived reproduction exhibits, or a
+       stylistic preference:
+       - An unmet `Acceptance` outcome on input or state the task names or
+         enumerates.
+       - An implementation defect: harm the task diff—fix-round edits
+         included—causes on realistic input within the task `Scope`, even input
+         `Acceptance` never names. Cite the contract, invariant, or regression
+         it breaks:
+         - A crash, or wrong or corrupted output.
+         - A regression of a preserved behavior.
+         - A broken contract: one the code, tests, docs, or task already
+           state—never one inferred anew.
+         - An `Intent` violation: the change defeats the task's goal for named
+           behavior. `Intent` never widens a closed bound.
+       - A `Verification` step that fails or can't run for a cause inside the
+         task diff—such as missing isolation.
        - A project-check failure the task diff causes.
        - Speculative abstraction, _unrequested_ complexity, or defensive bloat
          the diff adds beyond what the task `Intent` and `Acceptance` require,
-         or edits outside its `Scope` surface.
+         or edits outside its `Scope` surface. Code preventing a reproducible
+         defect counts as required, never bloat.
        - A task-written test breaking `references/verification-guide.md`.
        - **Gap** covers only task-introduced violations within the active task's
          declared scope: debug output, dead code, an orphan file, a
@@ -75,11 +90,15 @@ Read only what the check requires:
          stray build/cache output this task's own diff introduces and leaves
          behind. Never flag pre-existing uncommitted files outside task scope as
          gaps.
-     - **Observation**—never a verdict input: a concern outside task scope,
-       _unrequested_ edge-case coverage, a defensive-code suggestion, a
-       theoretical risk, or an approach diverging from the task `Guidance`, or
-       from one `Context` or `Scope` suggests, yet breaking no outcome,
-       boundary, or decision.
+     - **Observation**—never a verdict input, even when reproduced:
+       - A concern outside task scope.
+       - _Unrequested_ edge-case coverage.
+       - A coverage extension: handling missing for a member outside a line's
+         named members—whether the line closes its class or leaves it open—while
+         every named member works and the change causes no harm.
+       - A defensive-code suggestion or a theoretical risk.
+       - An approach diverging from the task `Guidance`, or from one `Context`
+         or `Scope` suggests, yet breaking no outcome, boundary, or decision.
 
    - On any `Gap`, draft `FIX.md` per `references/FIX.md`, heading each gap with
      the **Scope control** gap source it breaks.
@@ -122,8 +141,9 @@ Read only what the check requires:
 - Keep `FIX.md` self-contained and isolated per `references/outcome-guide.md`
   **Self-contained units**: a fresh, isolated agent holding only its text and
   the repository can close and prove every gap. Write `## Context` to supply
-  every task constraint, decision, and fact the agent needs and can't derive,
-  including facts surfaced only while checking.
+  every task constraint, exclusion the task `Context` names, decision, and fact
+  the agent needs and can't derive, including facts surfaced only while
+  checking.
 - Consult `references/prose-protocol.md` and `references/outcome-guide.md`
   before drafting `FIX.md`.
 - **IMPORTANT:** Return the result to the caller.
@@ -159,19 +179,23 @@ Read only what the check requires:
     diff—such as missing tooling, a broken external dependency, a step producing
     what it judges, or a need for human presence.
 - **Scope control**: judge only against the gap sources—the active task's
-  `Intent`, `Acceptance`, `Verification`, and `Scope`, project checks,
-  `references/verification-guide.md`, and the `references/cleanup-guide.md`
-  checklist—deriving no new outcome or verdict input, even from the `Intent`.
-  The task `Guidance` never acts as a gap source. Ignore pre-existing
-  uncommitted files and modifications outside the active task's declared
-  scope—they yield no finding.
+  `Intent`, `Acceptance`, `Verification`, and `Scope`, implementation defects in
+  the task diff, project checks, `references/verification-guide.md`, and the
+  `references/cleanup-guide.md` checklist. Derive no new required outcome, and
+  never widen a closed bound, even from the `Intent`. The task `Guidance` never
+  acts as a gap source. Ignore pre-existing uncommitted files and modifications
+  outside the active task's declared scope—they yield no finding.
 
 ## Verification
 
 - Every `Acceptance` outcome, `Verification` step, and the `Intent` judged
-  against cited evidence.
-- Every defect matching a `Gap` item—diff bloat and cleanup violations
-  included—carries `Gap`, and every other finding carries `Observation`.
+  against cited evidence, and the changed code reviewed for implementation
+  defects.
+- Every finding matching a `Gap` item—implementation defects, diff bloat, and
+  cleanup violations included—carries `Gap`, and every other finding—coverage
+  extensions included—carries `Observation`.
+- Every implementation-defect `Gap` cites the contract, invariant, or regression
+  it breaks.
 - Verdict reads clear only with zero `Gap` findings.
 
 - On a `Gap` verdict, the `FIX.md` draft matches `references/FIX.md`:

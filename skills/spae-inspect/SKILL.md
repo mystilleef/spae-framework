@@ -93,7 +93,17 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
      `Guidance`: correct it to conform, else remove it.
    - Ungrounded `Acceptance` line or clause, an unspecified failure mode or edge
      case included: narrow it to its grounded part, else remove it.
-   - Derivable `Context` fact beyond an entry-point path: trim it.
+   - Open `Acceptance` or `Verification` line—failing the
+     `references/outcome-guide.md` closure test, or carving an unnamed exception
+     into another line:
+     - Narrow it to the members `SPEC.md` names, else to the narrowest reading
+       its requirement grounds.
+     - Record the cut members as a task-bound exclusion and in `Risk notes`, and
+       log the bounded `SPEC.md` line under `Observations`.
+     - Bounding conforms to `SPEC.md`: an open line's checkable requirement
+       consists of its grounded part alone. Never halt on it.
+   - Derivable `Context` fact beyond an entry-point path or a task-bound
+     exclusion: trim it.
    - Disproportionate or infeasible `Verification` step—re-proving covered
      logic, scripting assertions over prose wording, needing calibration or
      inadmissible tooling, or isolating beyond what suffices: trim it to the
@@ -103,7 +113,12 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
      command.
    - Overstated `Satisfies` ID: drop it, then add or extend a task when coverage
      drops.
+   - Understated `Satisfies`—`Acceptance` implementing an unlisted `R-NNN`: list
+     the ID, or move the line to the owner task for that outcome.
    - Granularity: split a non-atomic task, and merge a merge candidate.
+   - Restated outcome: keep it in its owner task, rebinding each dependent to
+     the owner's `Acceptance`.
+   - Missing task-bound exclusion: record it in the task's `Context`.
    - Version control or release step: strip it, removing any task left empty.
    - Ordering: reorder so every dependency precedes its dependent, and break a
      cycle by dropping an ungrounded edge, else merging its tasks.
@@ -136,6 +151,13 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
   fact a fresh agent needs and can't derive, including facts surfaced only
   during inspection. Record hints surfaced during inspection in the `Guidance`
   of each task a repair rewrites.
+- Apply these terms:
+  - **Outcome group**: `Acceptance` lines sharing one component or contract,
+    provable through one verification surface. An `R-NNN` spanning outcome
+    groups splits into one task per group.
+  - **Task-bound exclusion**: a settled rejection or residual risk from
+    `SPEC.md` `Out of scope`, or members a closed line leaves unnamed, bounding
+    a task's outcomes.
 - Make each task's `Verification` concrete, deterministic, and proportional per
   `references/verification-guide.md`. Challenge each step's feasibility,
   isolation, observation, and proportionality, then rewrite a failing step, trim
@@ -182,8 +204,15 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
 - **`Must fix`** criteria—failure breaks requirements, contracts, safety, or
   verification:
   - Every `SPEC.md` `R-NNN` maps to at least one task's `Satisfies`.
-  - Every `Satisfies` ID names an `R-NNN` the task implements and proves through
-    its own `Verification`—or its `Acceptance`, for prose.
+  - Every task traces both ways:
+    - Every `Satisfies` ID names an `R-NNN` the task implements and proves
+      through its own `Verification`—or its `Acceptance`, for prose.
+    - Every `R-NNN` its `Acceptance` implements appears in its `Satisfies`.
+    - Every `Acceptance` line traces to a listed `R-NNN`, a preserved behavior
+      at risk, or the enabling purpose.
+  - Every `Acceptance` and `Verification` line passes the
+    `references/outcome-guide.md` closure test, and no line carves an exception
+    into another without naming the exact fields, values, or slots it covers.
   - Every task carries an `Intent` line.
   - Task IDs run contiguously from `T-001`, and every `T-NNN`
     reference—`Task graph` edges, the overview list, and `Dependencies`
@@ -213,20 +242,27 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
     or human presence.
 - **`Should fix`** criteria—failure adds risk or complicates execution:
   - Every `Intent` names an actionable goal.
-  - Every task stays atomic: a change one run can build, leaving the system
-    working.
+  - Every task stays atomic: one outcome group, buildable in one run and judged
+    clear in one verification pass, leaving the system working. No task's
+    `Acceptance` spans outcome groups failing independently.
   - No merge candidate remains: bordering tasks form one unless any of these
     holds:
     - Each satisfies an `R-NNN` or serves as tooling setup or a final
       verification gate.
     - A third task must run between them.
     - Their merge would outgrow one run.
+    - Their merge would span outcome groups failing independently.
+  - Every binding outcome belongs to one owner task, and a dependent relies on
+    it through the owner's `Acceptance`, never restating it.
+  - Every task-bound exclusion appears in its task's `Context`.
   - Every `Satisfies`-bearing task's `Acceptance` names testable behaviors,
-    including failure modes and edge cases only when `SPEC.md` specifies them or
-    task logic requires them, and for prose, what the text must convey.
+    including failure modes and edge cases only when `SPEC.md` names them or a
+    branch, error path, or boundary the task's own change introduces requires
+    them—never contrived input—and for prose, what the text must convey.
   - Every `Acceptance` line stays grounded: a `SPEC.md` constraint, a preserved
-    behavior at risk, task logic, or its task's `Satisfies` requirements or
-    enabling rationale demands it.
+    behavior at risk, a branch, error path, or boundary the task's own change
+    introduces, or its task's `Satisfies` requirements or enabling rationale
+    demands it.
   - Every task's `Verification` includes test execution commands—one smoke run
     for an enabling tooling task, project checks alone when `Acceptance` holds
     only prose—each mapped to the outcomes it proves.
@@ -235,8 +271,8 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
     calibration, inadmissible tooling, isolation beyond what suffices, or
     invocation mechanics.
   - Every binding task line passes the `references/outcome-guide.md`
-    substitution test, and `Context` holds no derivable fact beyond entry-point
-    paths.
+    substitution and closure tests, and `Context` holds no derivable fact beyond
+    entry-point paths and task-bound exclusions.
   - Every `Guidance` line follows the `references/outcome-guide.md`
     `## Guidance` rules.
   - `Task graph` edges mirror per-task `Dependencies` fields.

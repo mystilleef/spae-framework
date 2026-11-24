@@ -22,9 +22,11 @@ probing live systems, or bypassing safeguards.
 - Missing tests or test coverage
 - Style, formatting, naming conventions
 - `DRY` / abstraction suggestions
-- Hypothetical callers or inputs (unless new public API)
 
 ## Severity
+
+Rate likelihood × impact. Every severity this guide assigns sets a default,
+never a floor:
 
 - **Critical**: crash in likely path · auth bypass · data loss · secret exposed
 - **High**: logic error producing wrong output · resource leak · injection risk
@@ -33,6 +35,9 @@ probing live systems, or bypassing safeguards.
   validation · unsafe type coercion
 - **Low**: suboptimal but non-broken pattern · recoverable edge case unhandled
 - **Nit**: emit only if trivially co-located with a higher-severity finding
+
+Cap at **Low** any finding that self-recovers, touches only fallback or degraded
+paths, or clears on rerun or restart.
 
 ## Categories and checks
 
@@ -111,11 +116,7 @@ probing live systems, or bypassing safeguards.
 Omit items out of scope, plus:
 
 - Missing comments or documentation
-- Hypothetical inputs (unless diff introduces new public API with realistic
-  callers)
 - Performance micro-optimizations lacking evidence of hot execution paths
-- Theoretical vulnerabilities, race conditions, or edge cases outside app threat
-  model (for example, local multi-tenant race attacks on single-user CLI tools)
 - Defensive bloat, _unrequested_ guardrails, or over-engineered abstractions
   violating `KISS` or `YAGNI`
 
@@ -123,9 +124,9 @@ Omit items out of scope, plus:
 
 - **Resource leak**: trace acquisitions (open, lock, connect, `alloc`) across
   return/panic paths. Flag **High** if any path exits without release.
-- **Injection**: trace _untrusted_ inputs (HTTP `params`/headers/body, CLI
-  `args`, file content). Flag **Critical** only when input reaches execution
-  boundaries without _sanitization_.
+- **Injection**: trace inputs the `model` leaves _untrusted_ (HTTP
+  `params`/headers/body, CLI `args`, file content). Flag **Critical** only when
+  input reaches execution boundaries without _sanitization_.
 - **Null safety**: verify guards precede _dereference_ of _nullable_ sources
   (optional return, map lookup, `config`, JSON). Flag **High** if unguarded.
 - **Concurrency**: trace shared mutable state across runtime execution paths.
@@ -136,14 +137,32 @@ Omit items out of scope, plus:
   silently discarded.
 - **Intent check**: search commits, PR descriptions, adjacent comments, or user
   intent for change rationales. Move findings with qualifying rationales to
-  `suppressed_findings`. Route theoretical security, concurrency, or null safety
-  findings lacking concrete trigger scenarios to `suppressed_findings`, citing
-  the missing scenario—never emit in active `findings`.
-- **Evidence threshold**: establish a concrete trigger scenario, reachable code
-  path, and material impact. Source evidence suffices without exploit
-  construction or live-system reproduction. Assess _exploitability_ only for
-  security findings, within the app threat model, and judge other defects by
-  observable failure and impact.
+  `suppressed_findings`.
+- **Evidence threshold**: establish each test below for every finding, inherited
+  entries included, in every category:
+  - **Concrete trigger**: named input or state.
+  - **Reachable path**: code path from trigger to defect.
+  - **Plausible trigger**: a realistic user action, configuration, or
+    environment for the project's audience, within the review `model`. Contrived
+    inputs—crafted path names, layouts absent from the project, hypothetical
+    callers outside new public API—or stacked rare preconditions fail it, as do
+    threats outside the `model` (for example, local multi-tenant race attacks on
+    single-user CLI tools).
+  - **Material impact**: user-observable wrong behavior, data loss, security
+    exposure, or crash. Replacements yielding identical output, or ordering
+    differences within fallback or degraded paths, fail it.
+  - Source evidence and isolated local checks prove mechanism, never
+    plausibility: a synthetic reproduction—fixture process, crafted path—leaves
+    **Plausible trigger** unmet. Skip exploit construction and live-system
+    reproduction.
+  - Assess _exploitability_ only for security findings, within the `model`, and
+    judge other defects by observable failure and impact.
+  - Route failures to `suppressed_findings`, citing the failed test—never emit
+    in active `findings`.
+- **Fix proportionality**: weigh each `guidance.solution` against `KISS` and
+  `YAGNI`. When the minimal fix adds state, timers, protocols, or infrastructure
+  for a rare trigger, route the finding to `suppressed_findings`, citing the
+  disproportion.
 
 ## Calibration
 

@@ -57,9 +57,17 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
    - Judge each `R-NNN` against command output, `workstream` changes, and
      source.
    - Label each finding with exactly one tag:
-     - **Hard block**—drives `Revision required`. Cite reproducible evidence:
-       - Missing or incorrect required behavior, a contract break, or a
-         regression.
+     - **Hard block**—drives `Revision required`. Cite reproducible
+       evidence—never a theoretical risk, even one a contrived reproduction
+       exhibits:
+       - Missing or incorrect required behavior on input or state `SPEC.md`
+         names or enumerates.
+       - Harm the `workstream` changes cause on realistic input, citing the
+         contract, invariant, or regression it breaks:
+         - A crash, or wrong or corrupted output.
+         - A regression.
+         - A broken contract: one the code, tests, docs, or `SPEC.md` already
+           state—never one inferred anew.
        - A project-check failure the `workstream` causes.
        - A spec defect: an `R-NNN` no available automated evidence proves, such
          as one needing human presence or tooling the repository never declares.
@@ -67,13 +75,20 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
        - Absent test coverage of explicit required behavior.
        - An unsafe optimization.
        - Speculative abstraction, defensive bloat, or complexity no `R-NNN`
-         grounds, cited from `workstream` changes—never a hypothetical risk or
-         stylistic preference.
-     - **Observation**—never a verdict input: thin edge-case coverage, an
-       `R-NNN` failing only on input `SPEC.md` neither names nor plainly covers,
-       an ambiguous `R-NNN`, a minor deviation outside `SPEC.md` scope, an
-       _unrequested_ guardrail, a theoretical risk, an `Out of scope` residual
-       risk, or a check failure the `workstream` doesn't cause.
+         grounds, cited from `workstream` changes—never a theoretical risk or
+         stylistic preference. Code preventing a reproducible defect counts as
+         grounded.
+     - **Observation**—never a verdict input, even when reproduced:
+       - Thin edge-case coverage.
+       - A coverage extension: handling missing for a member outside an
+         `R-NNN`'s named members while every named member works and the changes
+         cause no harm.
+       - A regression surfacing only under contrived input or state, for example
+         crafted paths or layouts absent from the project.
+       - An ambiguous `R-NNN`, or a minor deviation outside `SPEC.md` scope.
+       - An _unrequested_ guardrail, a theoretical risk, or an `Out of scope`
+         residual risk.
+       - A check failure the `workstream` doesn't cause.
    - Head each finding with the `R-NNN` it concerns, else `none`.
    - On any `Hard block`, draft `VERIFY.md` per `references/VERIFY.md`.
    - Apply **Directives** and **Constraints**.
@@ -105,7 +120,7 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
   varied purposes, with no memory of this run. Keep it self-contained, explicit,
   and token-dense, and make each `Hard block` actionable without repeating the
   investigation: the unmet `R-NNN` outcome with evidence. No `Expected` or
-  `Concern` prescribes a remedy; place an advisory remedy hint under a hard
+  `Concern` prescribes a remedy. Place an advisory remedy hint under a hard
   block's `Guidance` only when its evidence points at one, per
   `references/outcome-guide.md` `## Guidance`.
 - Consult `references/prose-protocol.md` and `references/outcome-guide.md`
@@ -142,15 +157,19 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
   - Evidence can't run for a cause outside the repository: a broken external
     dependency or an environment failure.
 - **Scope control**: judge only `SPEC.md` requirements and `workstream`-caused
-  regressions, adding no requirements or verdict inputs beyond them. `SPEC.md`
-  `## Guidance` never acts as a verdict input.
+  regressions and harm, adding no requirements or verdict inputs beyond them,
+  and never widening a closed bound. `SPEC.md` `## Guidance` never acts as a
+  verdict input.
 
 ## Verification
 
 - Every `R-NNN` judged against cited automated evidence.
 - Every finding matching a `Hard block` or `Soft finding`
   item—`workstream`-added bloat included—carries that tag, and every other
-  finding carries `Observation`.
+  finding—coverage extensions and failures only on contrived input or state
+  included—carries `Observation`.
+- Every harm `Hard block` cites the contract, invariant, or regression it
+  breaks.
 - Verdict reads `Pass` only with zero `Hard block` findings—any `Hard block`
   yields `Revision required`.
 - On `Revision required`, the `VERIFY.md` draft matches `references/VERIFY.md`:

@@ -1,8 +1,9 @@
 ---
 name: purify
 description:
-  "Eliminate KISS, YAGNI, Idiomatic, and Hygiene violations, including bloated,
-  obsolete, and flaky tests, while preserving intended behavior."
+  "Eliminate KISS, YAGNI, Idiomatic, and Hygiene violations, including
+  bloated, obsolete, and flaky tests, while preserving intended
+  behavior."
 user-invocable: true
 argument-hint: "[optional: file path, module, or focus area]"
 ---
@@ -13,20 +14,22 @@ argument-hint: "[optional: file path, module, or focus area]"
 
 - Code contains visible waste, ceremony, duplication, or dead paths.
 - Existing implementation looks correct but heavier than necessary.
-- Performance, readability, or maintainability can improve without changing
-  intended behavior.
+- Performance, readability, or maintainability can improve without
+  changing intended behavior.
 - Test suites carry redundant, obsolete, slow, or flaky tests.
 
 ## Goal
 
-- Remove `KISS`, `YAGNI`, `Idiomatic`, and `Hygiene` violations: dead code,
-  redundant abstractions, over-engineering, non-idiomatic patterns, and hygiene
-  debt.
+- Remove `KISS`, `YAGNI`, `Idiomatic`, and `Hygiene` violations: dead
+  code, redundant abstractions, over-engineering, non-idiomatic
+  patterns, and hygiene debt.
 - Reduce code to the smallest clear, idiomatic, maintainable form.
 - Improve efficiency only through safe, verified changes.
-- Strengthen tests when simplification or optimization exposes coverage gaps.
-- Keep test suites small, fast, and deterministic: prune redundant and obsolete
-  tests, speed slow ones, stabilize flaky ones, preserve protection.
+- Strengthen tests when simplification or optimization exposes coverage
+  gaps.
+- Keep test suites small, fast, and deterministic: prune redundant and
+  obsolete tests, speed slow ones, stabilize flaky ones, preserve
+  protection.
 
 ## Input
 
@@ -37,159 +40,174 @@ Determine scope by the first available source:
 
 Halt if no scope exists.
 
-_Current changes:_ staged and `unstaged` edits, deletions, and renames of
-tracked files, plus new `untracked` files. Requires a versioned project.
+_Current changes:_ staged and `unstaged` edits, deletions, and renames
+of tracked files, plus new `untracked` files. Requires a versioned
+project.
 
 ## Testing
 
-See `references/testing-guide.md` for test structure, isolation, mocking,
-assertion, and performance standards, and for selecting project testing guides
-(`TESTING*.md` at the project root). Project guides override it on conflict.
+See `references/testing-guide.md` for test structure, isolation,
+mocking, assertion, and performance standards, and for selecting
+project testing guides (`TESTING*.md` at the project root). Project
+guides override it on conflict.
 
-When scope includes test files, see `references/test-pruning-guide.md` for the
-test smell catalog, edit order, deletion evidence, and speed and stability
-fixes.
+When scope includes test files, see `references/test-pruning-guide.md`
+for the test smell catalog, edit order, deletion evidence, and speed and
+stability fixes.
 
 ## Shell commands
 
-See `references/shell-command-guide.md` for command safety, timeouts, redirects,
-and non-interactive environment directives.
+See `references/shell-command-guide.md` for command safety, timeouts,
+redirects, and non-interactive environment directives.
 
 ## Cleanup
 
-See `references/cleanup-guide.md` for the Self-cleanup checklist and diff-only
-audit scope.
+See `references/cleanup-guide.md` for the Self-cleanup checklist and
+diff-only audit scope.
 
 ## Workflow
 
-1. **GATE**—Survey scope and establish baseline. Inspect target code, tests,
-   build commands, and recent changes. Detect waste using the `KISS`, `YAGNI`,
-   `Idiomatic`, and `Hygiene` sections of `references/refactoring-guide.md`.
-   Read `references/shell-command-guide.md`. Run relevant tests and, if they
+1. **GATE**—Survey scope and establish baseline. Inspect target code,
+   tests, build commands, and recent changes. Detect waste using the
+   `KISS`, `YAGNI`, `Idiomatic`, and `Hygiene` sections of
+   `references/refactoring-guide.md`. Read
+   `references/shell-command-guide.md`. Run relevant tests and, if they
    fail, identify why verification can't run.
-   - If scope resolves to current changes, the project contains TypeScript or
-     JavaScript sources, and `fallow` resolves (`fallow --version`): run
+   - If scope resolves to current changes, the project contains
+     TypeScript or JavaScript sources, and `fallow` resolves
+     (`fallow --version`): run
      `git --no-pager diff --no-ext-diff HEAD | fallow audit -f json -q --diff-stdin`
-     and treat confirmed findings as extra dead-code signal. Treat all findings
-     as unverified candidates, applying judgment during PLAN. Skip silently if
-     `fallow` doesn't resolve or the project lacks TS/JS sources.
-   - When scope includes test files, read `references/test-pruning-guide.md` and
-     detect test smells using its catalog. Failing obsolete tests count as test
-     smells, not baseline failures.
-   - Record one detection line per category: `KISS`, `YAGNI`, `Idiomatic`,
-     `Hygiene`, and test smells when scope includes test files. Each line names
-     code examined (or why none applies) and violations found.
-   - Once every category carries a line, exit if the survey finds none of: dead
-     code, redundant abstractions, unused helpers, over-engineered constructs,
-     non-idiomatic patterns, hygiene debt, or test smells. Emit
-     `Result: No Changes` via the template below and halt.
+     and treat confirmed findings as extra dead-code signal. Treat all
+     findings as unverified candidates, applying judgment during PLAN.
+     Skip silently if `fallow` doesn't resolve or the project lacks
+     TS/JS sources.
+   - When scope includes test files, read
+     `references/test-pruning-guide.md` and detect test smells using its
+     catalog. Failing obsolete tests count as test smells, not baseline
+     failures.
+   - Record one detection line per category: `KISS`, `YAGNI`,
+     `Idiomatic`, `Hygiene`, and test smells when scope includes test
+     files. Each line names code examined (or why none applies) and
+     violations found.
+   - Once every category carries a line, exit if the survey finds none
+     of: dead code, redundant abstractions, unused helpers,
+     over-engineered constructs, non-idiomatic patterns, hygiene debt,
+     or test smells. Emit `Result: No Changes` via the template below
+     and halt.
    - When detected waste carries high regression risk resisting safe
-     verification under existing tests: record in `Findings`, omit edits, and
-     emit `Result: No Changes`.
-2. **ORIENT**—State goal and scope in one sentence. Name what won't change:
-   behavior, public interfaces, and feature scope. Capture pre-task baseline
-   snapshot per `references/cleanup-guide.md`.
-3. **PLAN**—Read `references/testing-guide.md` and each project testing guide
-   covering the files under test. Declare minimal changes: which violations to
-   remove, which files to edit, and in what order. Test edits follow the
-   `references/test-pruning-guide.md` order. Check ambiguous or risky slices
-   before acting.
+     verification under existing tests: record in `Findings`, omit
+     edits, and emit `Result: No Changes`.
+2. **ORIENT**—State goal and scope in one sentence. Name what won't
+   change: behavior, public interfaces, and feature scope. Capture
+   pre-task baseline snapshot per `references/cleanup-guide.md`.
+3. **PLAN**—Read `references/testing-guide.md` and each project testing
+   guide covering the files under test. Declare minimal changes: which
+   violations to remove, which files to edit, and in what order. Test
+   edits follow the `references/test-pruning-guide.md` order. Check
+   ambiguous or risky slices before acting.
 4. **ACT**—Execute only what PLAN declared. Nothing more.
-   - Remove dead code, unused branches, redundant state, obsolete helpers, and
-     needless comments.
-   - Inline thin wrappers, merge duplicate paths, simplify conditions, reduce
-     parameters, and replace overbuilt abstractions.
-   - Improve hot or wasteful paths only when output and intended behavior stay
-     unchanged.
-   - Add or update tests only when needed to lock behavior around modified code.
+   - Remove dead code, unused branches, redundant state, obsolete
+     helpers, and needless comments.
+   - Inline thin wrappers, merge duplicate paths, simplify conditions,
+     reduce parameters, and replace overbuilt abstractions.
+   - Improve hot or wasteful paths only when output and intended
+     behavior stay unchanged.
+   - Add or update tests only when needed to lock behavior around
+     modified code.
    - Prune and stabilize tests per `references/test-pruning-guide.md`.
 5. **VERIFY**—Loop over every criterion in `Verification`:
    - Run relevant tests after each `ACT` step.
-   - Audit task edits against the pre-task baseline using the Self-cleanup
-     checklist in `references/cleanup-guide.md`, removing every self-introduced
-     artifact before proceeding.
-   - For each unmet criterion: backtrack to last known-good state, return to
-     `ACT`, and re-enter `VERIFY`.
+   - Audit task edits against the pre-task baseline using the
+     Self-cleanup checklist in `references/cleanup-guide.md`, removing
+     every self-introduced artifact before proceeding.
+   - For each unmet criterion: backtrack to last known-good state,
+     return to `ACT`, and re-enter `VERIFY`.
    - Exit only when all criteria pass.
-   - Halt only for out-of-scope blockers (failing baseline tests, compilation
-     errors, or missing runtime environments), never for complex code cleanups.
-6. **PERSIST**—Confirm all edits written. Run final compilation or type-check
-   where applicable.
-7. **REPORT**—Emit the result following the result directives and using the
-   result template. Confirm what changed matches ORIENT.
+   - Halt only for out-of-scope blockers (failing baseline tests,
+     compilation errors, or missing runtime environments), never for
+     complex code cleanups.
+6. **PERSIST**—Confirm all edits written. Run final compilation or
+   type-check where applicable.
+7. **REPORT**—Emit the result following the result directives and using
+   the result template. Confirm what changed matches ORIENT.
 
 ## Directives
 
 - Prefer deletion over abstraction.
 - Prefer direct, idiomatic language features over custom machinery.
-- Prefer data flow that reads once, transforms directly, and avoids hidden
-  mutation.
+- Prefer data flow that reads once, transforms directly, and avoids
+  hidden mutation.
 - Replace cleverness with direct code.
-- Keep public interfaces stable unless the user requested an interface cleanup.
-- Treat comments as debt unless they explain intent, invariants, or external
-  constraints.
-- Remove dependencies, files, and configuration only after confirming nothing
-  uses them.
+- Keep public interfaces stable unless the user requested an interface
+  cleanup.
+- Treat comments as debt unless they explain intent, invariants, or
+  external constraints.
+- Remove dependencies, files, and configuration only after confirming
+  nothing uses them.
 - Optimize measurable or visible waste, avoiding speculative tuning.
 - Surface detection as one `Actions` line (for example,
-  `detection: 4/4 categories; 1 found`), keeping per-category detail out of the
-  result.
+  `detection: 4/4 categories; 1 found`), keeping per-category detail out
+  of the result.
 - **IMPORTANT:** Return the result to the caller.
 
 ## Constraints
 
-- **No Confirmation Halts**: never halt to request user scope confirmation or
-  interactive direction— execute the smallest safe cleanup within detected scope
-  or emit `Result: No Changes`.
-- Never introduce `SOLID` or coupling violations, checking against the `SOLID`
-  sections of `references/refactoring-guide.md`.
-- Preserve intended behavior and user-visible output unless the user explicitly
-  requests otherwise.
+- **No Confirmation Halts**: never halt to request user scope
+  confirmation or interactive direction— execute the smallest safe
+  cleanup within detected scope or emit `Result: No Changes`.
+- Never introduce `SOLID` or coupling violations, checking against the
+  `SOLID` sections of `references/refactoring-guide.md`.
+- Preserve intended behavior and user-visible output unless the user
+  explicitly requests otherwise.
 - Don't expand feature scope.
 - Don't mask failing tests—fix root causes or report blockers.
-- Delete a test only with the evidence `references/test-pruning-guide.md`
-  requires. Otherwise, record it in `Findings` and keep it.
-- Edit only test files in scope, though survivors may live outside scope. Place
-  new helpers and fixtures in an in-scope file.
-- **Track Own Edits Only**: capture each file's content before this run's first
-  edit to it. Revert means rewriting captured content back, or deleting files
-  this run created—never a git-level reset, stash, checkout, or restore, which
-  erases uncommitted work from earlier phases in the same tree.
-- **Never Leave It Broken**: end every purify pass with tests passing again or
-  the offending edits reverted, regardless of why VERIFY halts.
-- **Self-Inflicted Failures Stay In-Scope**: a failure this pass's own edits
-  cause never qualifies as an out-of-scope blocker—loop `VERIFY`'s backtrack
-  step instead of halting.
-- **Bug Found Mid-Purify**: a pre-existing bug this pass exposes counts as
-  out-of-scope. Revert the edits that surfaced it, then report the bug as a
-  separate finding—fixing it here would expand feature scope and change
-  preserved behavior.
-- Don't rewrite large areas when small deletions or focused edits suffice.
-- Halt and report if verification needs unavailable services, secrets, or
-  destructive setup.
+- Delete a test only with the evidence
+  `references/test-pruning-guide.md` requires. Otherwise, record it in
+  `Findings` and keep it.
+- Edit only test files in scope, though survivors may live outside
+  scope. Place new helpers and fixtures in an in-scope file.
+- **Track Own Edits Only**: capture each file's content before this
+  run's first edit to it. Revert means rewriting captured content back,
+  or deleting files this run created—never a git-level reset, stash,
+  checkout, or restore, which erases uncommitted work from earlier
+  phases in the same tree.
+- **Never Leave It Broken**: end every purify pass with tests passing
+  again or the offending edits reverted, regardless of why VERIFY halts.
+- **Self-Inflicted Failures Stay In-Scope**: a failure this pass's own
+  edits cause never qualifies as an out-of-scope blocker—loop `VERIFY`'s
+  backtrack step instead of halting.
+- **Bug Found Mid-Purify**: a pre-existing bug this pass exposes counts
+  as out-of-scope. Revert the edits that surfaced it, then report the
+  bug as a separate finding—fixing it here would expand feature scope
+  and change preserved behavior.
+- Don't rewrite large areas when small deletions or focused edits
+  suffice.
+- Halt and report if verification needs unavailable services, secrets,
+  or destructive setup.
 - No hacks, workarounds, or shortcuts.
 - Forbid laziness: fix issues properly, correctly, and idiomatically.
 - Never edit build or tool configuration files, such as `tsconfig.json`,
   `.eslintrc.*`, `webpack.config.*`, `vite.config.*`, `jest.config.*`,
   `Makefile`, `pyproject.toml`, or `Cargo.toml`.
 - Never suppress or turn off compiler or linter diagnostics, such as
-  `@ts-ignore`, `eslint-disable`, `@SuppressWarnings`, or `# type: ignore`.
-- Never weaken type contracts—`as any`, `!` non-null assertions, or broadened
-  union types—to silence errors.
+  `@ts-ignore`, `eslint-disable`, `@SuppressWarnings`, or
+  `# type: ignore`.
+- Never weaken type contracts—`as any`, `!` non-null assertions, or
+  broadened union types—to silence errors.
 
 ## Verification
 
-- Every detection line names code examined or why none applies—restating the
-  category never counts.
+- Every detection line names code examined or why none applies—restating
+  the category never counts.
 - Relevant tests pass with no new failures.
 - Code compiles or type-checks where applicable.
 - Coverage protects modified behavior or documented gaps remain.
-- Test pruning leaves coverage at the pre-pruning baseline and lowers test count
-  or suite runtime.
+- Test pruning leaves coverage at the pre-pruning baseline and lowers
+  test count or suite runtime.
 - Each stabilized test passes every repeated run
   `references/test-pruning-guide.md` requires.
-- Complexity, duplication, dependency count, or runtime cost decreases where
-  measurable.
+- Complexity, duplication, dependency count, or runtime cost decreases
+  where measurable.
 - No self-introduced cleanup violation remains per
   `references/cleanup-guide.md`.
 - `Result: Failed` only follows a working tree the agent restores to the
@@ -201,12 +219,13 @@ audit scope.
 - Keep prose terse while ensuring clarity.
 - Optimize prose for agent, token, and context efficiency.
 - Use lists and sub-lists for long sentences and dense paragraphs.
-- **Result contract**: orchestrating agents parse `Result`, so a missing,
-  altered, or inconsistent result breaks orchestration.
-- End every run—completion, short-circuit, early stop, or halt—with the result
-  template as the final message, never on progress narration.
-- Set `Result` to exactly one template literal, verbatim. Report an early stop
-  or halt lacking its own literal as `Failed`, with the reason under `Findings`.
+- **Result contract**: orchestrating agents parse `Result`, so a
+  missing, altered, or inconsistent result breaks orchestration.
+- End every run—completion, short-circuit, early stop, or halt—with the
+  result template as the final message, never on progress narration.
+- Set `Result` to exactly one template literal, verbatim. Report an
+  early stop or halt lacking its own literal as `Failed`, with the
+  reason under `Findings`.
 - Emit the result template as live markdown—never in a code fence.
 - Output nothing outside the template.
 
