@@ -33,8 +33,9 @@ flowchart TD
 - **Intent**: [One line: the goal this task serves and why it matters]
 - **Context**: [Entry-point paths, plus facts a fresh agent can't derive,
   including facts surfaced only while planning this task]
-  - [Task-bound exclusion: settled rejection, residual risk, or members a closed
-    line leaves unnamed, bounding this task's outcomes—if applicable]
+  - [Task-bound exclusion: settled rejection, residual risk, members a closed
+    line leaves unnamed, or a claim or distinction the premise or observability
+    test cuts, bounding this task's outcomes—if applicable]
 - **Scope**:
   - [Change surface—module, behavior, or contract—including direct dependents
     the change breaks; never an edit list]
@@ -56,5 +57,6 @@ flowchart TD
 ## Risk notes
 
 - [Risk or data loss potential]
-- [Residual risk carried from `SPEC.md`]
+- [Residual risk carried from `SPEC.md`, or cut by closure, premise, or
+  observability bounds]
 ````

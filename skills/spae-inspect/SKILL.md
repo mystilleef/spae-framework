@@ -87,12 +87,21 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
    - Prescriptive line failing the `references/outcome-guide.md` substitution
      test: restate it as the outcome or constraint it protects and move its
      method to the task `Guidance`, else remove it.
+   - Binding claim or distinction the `references/outcome-guide.md` premise or
+     observability test leaves unconfirmed: narrow it to the closest confirmed
+     observable boundary or cut it, recording the cut member in `Risk notes`
+     and, when it bounds a task, as a task-bound exclusion. Log any
+     `SPEC.md`-originating narrowing under `Observations`, and never halt on it.
    - `Guidance` line breaking a `references/outcome-guide.md` `## Guidance`
      rule—contradicting the task's binding lines, `SPEC.md`, or source code,
      ungrounded, stating a binding claim, or relying on another task's
      `Guidance`: correct it to conform, else remove it.
-   - Ungrounded `Acceptance` line or clause, an unspecified failure mode or edge
-     case included: narrow it to its grounded part, else remove it.
+   - `Acceptance` line or clause failing the **Verification** grounding
+     criterion—including widening an ambiguous `SPEC.md` term into a stricter
+     runtime distinction beyond what `SPEC.md` and source ground: narrow it to
+     the closest `SPEC.md`-grounded observable contract, else remove it,
+     recording cut members as a task-bound exclusion and in `Risk notes` and
+     logging the `SPEC.md` ambiguity under `Observations`.
    - Open `Acceptance` or `Verification` line—failing the
      `references/outcome-guide.md` closure test, or carving an unnamed exception
      into another line:
@@ -156,8 +165,16 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
     provable through one verification surface. An `R-NNN` spanning outcome
     groups splits into one task per group.
   - **Task-bound exclusion**: a settled rejection or residual risk from
-    `SPEC.md` `Out of scope`, or members a closed line leaves unnamed, bounding
-    a task's outcomes.
+    `SPEC.md` `Out of scope`, members a closed line leaves unnamed, or a claim
+    or distinction the premise or observability test cuts, bounding a task's
+    outcomes.
+  - **Realistic input**: input or state `SPEC.md` names or ordinary use
+    produces, never a theoretical risk, contrived harness, or adversarial host
+    bypass.
+  - **Preserved behavior at risk**: existing runtime behavior of a changed
+    surface's direct dependents—callers, importers, and configs—relying on a
+    contract, data shape, or side effect the task's change alters on realistic
+    input.
 - Make each task's `Verification` concrete, deterministic, and proportional per
   `references/verification-guide.md`. Challenge each step's feasibility,
   isolation, observation, and proportionality, then rewrite a failing step, trim
@@ -211,8 +228,9 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
     - Every `Acceptance` line traces to a listed `R-NNN`, a preserved behavior
       at risk, or the enabling purpose.
   - Every `Acceptance` and `Verification` line passes the
-    `references/outcome-guide.md` closure test, and no line carves an exception
-    into another without naming the exact fields, values, or slots it covers.
+    `references/outcome-guide.md` closure and observability tests, and no line
+    carves an exception into another without naming the exact fields, values, or
+    slots it covers.
   - Every task carries an `Intent` line.
   - Task IDs run contiguously from `T-001`, and every `T-NNN`
     reference—`Task graph` edges, the overview list, and `Dependencies`
@@ -255,14 +273,15 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
   - Every binding outcome belongs to one owner task, and a dependent relies on
     it through the owner's `Acceptance`, never restating it.
   - Every task-bound exclusion appears in its task's `Context`.
-  - Every `Satisfies`-bearing task's `Acceptance` names testable behaviors,
-    including failure modes and edge cases only when `SPEC.md` names them or a
-    branch, error path, or boundary the task's own change introduces requires
-    them—never contrived input—and for prose, what the text must convey.
-  - Every `Acceptance` line stays grounded: a `SPEC.md` constraint, a preserved
-    behavior at risk, a branch, error path, or boundary the task's own change
-    introduces, or its task's `Satisfies` requirements or enabling rationale
-    demands it.
+  - Every `Satisfies`-bearing task's `Acceptance` names testable behaviors, and
+    for prose, what the text must convey.
+  - Every `Acceptance` line stays grounded:
+    - A failure mode or edge case: `SPEC.md` names it, or a branch, error path,
+      or boundary the task's own change introduces requires it on realistic
+      input.
+    - Any other line: a `SPEC.md` constraint, a preserved behavior at risk, or
+      its task's `Satisfies` requirements or enabling rationale demands it, with
+      no ungrounded widening of an ambiguous `SPEC.md` term.
   - Every task's `Verification` includes test execution commands—one smoke run
     for an enabling tooling task, project checks alone when `Acceptance` holds
     only prose—each mapped to the outcomes it proves.
@@ -271,8 +290,9 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
     calibration, inadmissible tooling, isolation beyond what suffices, or
     invocation mechanics.
   - Every binding task line passes the `references/outcome-guide.md`
-    substitution and closure tests, and `Context` holds no derivable fact beyond
-    entry-point paths and task-bound exclusions.
+    substitution and premise tests—and outside `Acceptance` and `Verification`,
+    its closure and observability tests—and `Context` holds no derivable fact
+    beyond entry-point paths and task-bound exclusions.
   - Every `Guidance` line follows the `references/outcome-guide.md`
     `## Guidance` rules.
   - `Task graph` edges mirror per-task `Dependencies` fields.

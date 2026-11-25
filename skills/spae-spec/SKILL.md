@@ -39,7 +39,12 @@ Sources:
 
 - `Draft`: proposal or task argument.
 - `Revision`: `.spae/[workstream]/VERIFY.md`.
-- Both: `AGENTS.md` at project root, plus the codebase.
+- Both:
+  - `AGENTS.md` at project root, plus the codebase.
+  - Project-root testing guides (`TESTING*.md`) covering the files under test,
+    when present, for test commands and prerequisites: `TESTING.md` covers the
+    main language, `TESTING-<LANG>.md` the named one (`TESTING-LUA.md` for
+    `*.lua`).
 - `.spae/[workstream]/STATE.json` when present, with field reference,
   directives, and snapshots in `references/STATE.md`.
 
@@ -66,6 +71,11 @@ Select path by target state:
      importers, configs, tests, and docs—of each interface or behavior it
      changes.
    - `Revision`: source files each `VERIFY.md` finding names.
+   - Both:
+     - Host or runtime API surfaces backing any runtime-state partition or
+       event-reactive behavior, to confirm observable discriminators.
+     - The tooling evidence—declared dependencies, configs, scripts, installed
+       binaries—behind each candidate `Testing strategy` rung.
 4. **ACT**—Draft `SPEC.md` content:
    - Read codebase sections narrowly, widening only on uncertainty.
    - `Draft`:
@@ -111,31 +121,35 @@ Select path by target state:
 - Filter all requirements and incoming findings against `YAGNI`, discarding
   `unrequested` scope, speculative design, or theoretical complexity. An
   audit-proven gap never counts as `unrequested` scope when it rests on
-  realistic input—input the proposal names or ordinary use produces, never a
-  theoretical risk, even one a contrived reproduction exhibits. File
-  `YAGNI`-discarded ledger aspects under `Out of scope` with a one-line
-  rationale, never a silent drop.
+  realistic input—input or state the proposal, task, or `VERIFY.md` names, or
+  ordinary use produces, never a theoretical risk, contrived harness, or
+  adversarial host bypass. File `YAGNI`-discarded ledger aspects under
+  `Out of scope` with a one-line rationale, never a silent drop.
   - Filter verification breadth too: carry a proposal's verification request as
     the outcomes it protects over the same input set—never its recipe, rig, or
     case matrix, and never a wider class.
 - Write observable, testable, closed, and implementation-neutral requirements,
   tagging each with a unique, stable `R-NNN` identifier:
-  - Close each per the `references/outcome-guide.md` closure test: name every
-    member of each class it quantifies over, filing the unnamed members under
-    `Out of scope` as a residual risk.
+  - Apply the `references/outcome-guide.md` closure and observability tests:
+    resolve unmapped proposal enums, unbounded trigger quantifiers, and
+    unconfirmed host discriminators from codebase, host API, and settled
+    decision evidence during `/spec`—never deferring them to `/plan`. Narrow
+    unobservable distinctions to the confirmed observable boundary, and file
+    unnamed, unmapped, or ambiguous cases, host bypasses, and cut distinctions
+    under `Out of scope` as residual risks.
   - Carry a proposal's design claim as the contract or outcome it delivers—a
     restatement, not a correction—and route its mechanism to `## Guidance`. A
     mechanism binds only through a settled decision or `AGENTS.md`.
 - Write `## Guidance` keyed by `R-NNN`, per `references/outcome-guide.md`
   `## Guidance`.
 - Match level of detail to task size, avoiding process bloat:
-  - Require failure modes and edge cases only when the proposal introduces
-    complex branching or error paths.
+  - Require failure modes and edge cases only when the proposal, task, or
+    `VERIFY.md` names them, or a branch, error path, or boundary the specified
+    change introduces requires them on realistic input.
   - Set `Assumptions` to `None` on single-behavior specs unless explicit
     constraints exist.
-  - Never invent exclusions, assumptions, edge cases, or failure modes absent
-    evidence—an audit-proven gap on realistic input supplies evidence. Keep
-    section headers intact.
+  - Never invent exclusions or assumptions absent evidence—an audit-proven gap
+    on realistic input supplies evidence. Keep section headers intact.
 - Consult `references/verification-guide.md` and decide the cheapest evidence
   proving each spec item:
   - Translate manual checks and proposal verification recipes into the outcomes
@@ -151,11 +165,9 @@ Select path by target state:
 - Refine and optimize `SPEC.md` for agent consumption: agents read it for varied
   purposes, with no memory of this run. Keep it self-contained, explicit, and
   token-dense.
-
 - Run the aspect sweep and ledger audit on `Draft` only, per
   `references/aspect-sweep.md`. `Revision` consumes `VERIFY.md` findings
   directly. Reference `PHASE_COUNT` by name only.
-
 - Surface aspect-sweep phases run and ledger-audit counts by defect class in the
   result `Actions` list (for example,
   `aspect sweep: 9/9 phases, 12/12 sections mapped` and
@@ -186,14 +198,17 @@ Select path by target state:
   assumption presuming human execution, an attended or interactive terminal, or
   human presence. Treat such a need as a scope defect and resolve before
   `PERSIST`.
-- **Ambiguity**: resolve from codebase evidence first. Fall back to a documented
-  conservative assumption only when evidence proves insufficient, and record it
-  under **Assumptions** in `SPEC.md`.
+- **Ambiguity**: resolve an ambiguous demand from codebase evidence first. Fall
+  back to a documented conservative assumption only when evidence proves
+  insufficient, and record it under **Assumptions** in `SPEC.md`. A claim of
+  current fact or a host/runtime discriminator never takes this fallback: the
+  `references/outcome-guide.md` premise and observability tests settle it.
 - **Proposal fidelity** (`Draft`): the qualified goal—the proposal goal as its
   settled items narrow it—binds, and every other claim serves it.
   - Settled items: decisions, rejected alternatives, accepted limits, and
-    explicit exclusions, under any heading. Each binds unless source code or
-    `AGENTS.md` falsifies its premise or proves it leaves the goal unreachable.
+    explicit exclusions, under any heading. Each binds unless source code, host
+    APIs, or `AGENTS.md` falsifies its premise or observability, or proves it
+    leaves the goal unreachable.
   - Correct a claim only on a defect the ledger audit proves. Leave merely
     suboptimal design as written, never redesigning it.
   - Resolve by precedence, highest first: `AGENTS.md`, source code, the
@@ -201,9 +216,10 @@ Select path by target state:
     the qualified goal wins. Otherwise, apply the **Ambiguity** fallback.
   - Apply the smallest correction and cite its evidence.
   - Resolve a gap whose only closure revives a rejected alternative, reopens a
-    closed list, or demands an open class as an `Out of scope` residual risk, or
-    as the narrowest closed requirement meeting the qualified goal, citing the
-    settled item it preserves.
+    closed list, demands an open class, or fails the observability test as an
+    `Out of scope` residual risk, or as the narrowest closed, observable
+    requirement meeting the qualified goal, citing the settled item it
+    preserves.
   - Keep a settled enumeration—accepted limits, listed differences, fixed
     texts—closed: extend it only by naming each new member with its evidence,
     never by reference to another requirement.
@@ -221,7 +237,6 @@ Select path by target state:
       `Testing strategy`.
     - An exception one requirement carves into another without naming the exact
       fields, values, or slots it covers.
-    - Assumptions contradicting source code.
     - Evidence demanded from a repository state whose runs breach
       `Testing strategy` or `references/verification-guide.md`.
   - Self-heal by precedence:
@@ -229,7 +244,6 @@ Select path by target state:
     - Requirements override `Out of scope`, except version control, release,
       human-presence, and settled-item exclusions.
     - Requirements override assumptions and testing strategy.
-    - Source code overrides assumptions.
     - An unbounded exception names its exact fields, values, or slots, else
       drops.
     - `references/verification-guide.md` settles a state-bound evidence
@@ -251,10 +265,10 @@ Select path by target state:
 
 - Ensure `.spae/[workstream]/SPEC.md` contains distilled requirements and
   structure matching `references/SPEC.md` exactly.
-
 - Confirm each item carries a unique `R-NNN` identifier.
-- Confirm all requirements pass the `references/outcome-guide.md` substitution
-  and closure tests.
+- Confirm all requirements pass the `references/outcome-guide.md` substitution,
+  closure, and observability tests, and every binding line passes its premise
+  test.
 - Confirm `## Guidance` follows the `references/outcome-guide.md` `## Guidance`
   rules and keys only defined `R-NNN` IDs.
 - Confirm no **Contradictions** finding survives in `SPEC.md`.
@@ -262,17 +276,18 @@ Select path by target state:
   release deployments.
 - Confirm no spec item, testing strategy, or assumption in `SPEC.md` presumes
   human execution, an attended or interactive terminal, or human presence.
-- Confirm testing strategy covers expected behavior, requires failure modes and
-  edge cases only for complex proposals, and allows single-target verification
-  on single-behavior specs.
-- Confirm `Testing strategy` pairs each `R-NNN` with its cheapest proving
-  evidence per `references/verification-guide.md`. No rig, recipe, coordinate,
-  calibration step, inadmissible tooling, scripted assertion over prose wording,
-  re-proof of logic cheaper evidence covers, or evidence producing what it
-  judges or relying on another run's report or on state that run left outside
-  the project survives.
-- Confirm section depth matches task size, with no invented edge case, failure
-  mode, or exclusion on a single-behavior spec.
+- Confirm `Testing strategy`:
+  - Covers expected behavior.
+  - Names failure modes and edge cases only where **Directives** admit them.
+  - Allows single-target verification on single-behavior specs.
+  - Pairs each `R-NNN` with its cheapest proving evidence per
+    `references/verification-guide.md`. No rig, recipe, coordinate, calibration
+    step, inadmissible tooling, scripted assertion over prose wording, re-proof
+    of logic cheaper evidence covers, or evidence producing what it judges or
+    relying on another run's report or on state that run left outside the
+    project survives.
+- Confirm section depth matches task size, with no exclusion or assumption
+  invented absent evidence.
 - Confirm every `Draft` aspect-ledger entry resolves to an `R-NNN`,
   `Out of scope`, `Assumption`, `Testing strategy` element, `Guidance` entry, or
   `Goal` success criterion—no orphaned aspect.
@@ -280,10 +295,10 @@ Select path by target state:
   `no claim`, per `references/aspect-sweep.md`.
 - Confirm every `Draft` ledger-audit defect resolves per
   `references/aspect-sweep.md` **Ledger audit** dispositions, each correction
-  citing its evidence, with no settled item yielding without the source or
-  `AGENTS.md` evidence **Proposal fidelity** demands, no requirement reviving a
-  rejected alternative or reopening a closed list, and no gap resting on
-  unrealistic input.
+  citing its evidence, with no settled item yielding without the source, host
+  API, or `AGENTS.md` evidence **Proposal fidelity** demands, no requirement
+  reviving a rejected alternative, reopening a closed list, or demanding an
+  unobservable host distinction, and no gap resting on unrealistic input.
 - Confirm `Revision` runs no aspect sweep or ledger audit and maps converted
   `VERIFY.md` items directly to spec items.
 - Ensure `.spae/[workstream]/STATE.json` specifies `phase: "plan"`,
@@ -293,9 +308,6 @@ Select path by target state:
   **Input** rules.
 - Confirm revision processes resolve every `VERIFY.md` hard block and soft
   finding, and each converted observation, without editing forbidden files.
-- Confirm unparseable `STATE.json` or orphaned artifacts halt with diagnostics,
-  leaving all artifacts unmodified.
-- Verify all other halt conditions leave artifacts intact.
 
 ## Result directives
 

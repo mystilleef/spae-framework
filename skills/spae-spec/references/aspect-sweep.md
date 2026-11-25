@@ -59,8 +59,12 @@
   - **Contradiction**: claims demanding incompatible outcomes—a change against a
     preserved behavior, a design against a decision, an edit outside declared
     scope, a verification outcome an accepted limit waives.
-  - **Premise**: a claim misstating current code—behavior, symbols, files,
-    interfaces—against source.
+  - **Premise**: a claim of current fact the `outcome-guide.md` premise test
+    fails—contradicted or unconfirmed.
+  - **Observability**: an outcome partitioning runtime states or reacting to
+    host or external events that fails the `outcome-guide.md` observability
+    test—lacking a confirmed in-scope discriminator or explicitly specified
+    mechanism.
   - **Gap**: work the goal entails that no claim covers—updates to direct
     dependents a change breaks, companions `AGENTS.md` requires, and goal or
     success criteria left unreached. Count only gaps on realistic input, as
@@ -72,11 +76,15 @@
 - Dispose per `SKILL.md` **Proposal fidelity**:
   - Contradiction: the winning claim keeps its disposition, and the other moves
     to `Out of scope` as superseded, with a one-line rationale.
-  - Premise: rewrite the disposition to source reality, or file it under
-    `Out of scope` when moot.
+  - Premise: rewrite a contradicted claim's disposition to source reality, or
+    file it under `Out of scope` when moot. File an unconfirmed claim under
+    `Out of scope` as a residual risk.
+  - Observability: narrow the disposition to the closest confirmed observable
+    boundary and file the unobservable distinction under `Out of scope` as a
+    residual risk.
   - Gap: a new closed `R-NNN`, or `Assumptions` for a precondition. **Proposal
     fidelity** governs a gap only a rejected alternative, a reopened closed
-    list, or an open class closes.
+    list, an open class, or an unobservable distinction closes.
   - Regression: narrow the claim's disposition to spare the behavior.
   - `AGENTS.md` violation: conform the claim's disposition to `AGENTS.md`.
 

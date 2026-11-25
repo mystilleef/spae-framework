@@ -57,34 +57,35 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
    - Judge each `R-NNN` against command output, `workstream` changes, and
      source.
    - Label each finding with exactly one tag:
-     - **Hard block**—drives `Revision required`. Cite reproducible
-       evidence—never a theoretical risk, even one a contrived reproduction
-       exhibits:
-       - Missing or incorrect required behavior on input or state `SPEC.md`
-         names or enumerates.
-       - Harm the `workstream` changes cause on realistic input, citing the
+     - **Hard block**—drives `Revision required`. Cite reproducible evidence on
+       realistic input—input or state `SPEC.md` explicitly names or ordinary use
+       produces, never a theoretical risk, contrived harness, or adversarial
+       host bypass:
+       - Missing or incorrect required behavior on realistic input.
+       - Harm the `workstream` changes cause on realistic input. Cite the
          contract, invariant, or regression it breaks:
          - A crash, or wrong or corrupted output.
          - A regression.
          - A broken contract: one the code, tests, docs, or `SPEC.md` already
            state—never one inferred anew.
        - A project-check failure the `workstream` causes.
-       - A spec defect: an `R-NNN` no available automated evidence proves, such
-         as one needing human presence or tooling the repository never declares.
+       - A spec defect: an `R-NNN` no available automated evidence proves—such
+         as one needing human presence or tooling the repository never
+         declares—or one lacking a confirmed observable host discriminator.
      - **Soft finding**—never a verdict input:
        - Absent test coverage of explicit required behavior.
        - An unsafe optimization.
        - Speculative abstraction, defensive bloat, or complexity no `R-NNN`
          grounds, cited from `workstream` changes—never a theoretical risk or
-         stylistic preference. Code preventing a reproducible defect counts as
-         grounded.
+         stylistic preference. Code preventing a defect reproducible on
+         realistic input counts as grounded.
      - **Observation**—never a verdict input, even when reproduced:
        - Thin edge-case coverage.
        - A coverage extension: handling missing for a member outside an
          `R-NNN`'s named members while every named member works and the changes
          cause no harm.
-       - A regression surfacing only under contrived input or state, for example
-         crafted paths or layouts absent from the project.
+       - Harm or an `R-NNN` miss surfacing only under contrived input, crafted
+         paths or layouts absent from the project, or adversarial host bypasses.
        - An ambiguous `R-NNN`, or a minor deviation outside `SPEC.md` scope.
        - An _unrequested_ guardrail, a theoretical risk, or an `Out of scope`
          residual risk.
@@ -166,8 +167,8 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
 - Every `R-NNN` judged against cited automated evidence.
 - Every finding matching a `Hard block` or `Soft finding`
   item—`workstream`-added bloat included—carries that tag, and every other
-  finding—coverage extensions and failures only on contrived input or state
-  included—carries `Observation`.
+  finding—coverage extensions and harm or `R-NNN` misses surfacing only under
+  contrived input or adversarial host bypasses included—carries `Observation`.
 - Every harm `Hard block` cites the contract, invariant, or regression it
   breaks.
 - Verdict reads `Pass` only with zero `Hard block` findings—any `Hard block`

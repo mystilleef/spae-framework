@@ -35,10 +35,11 @@ and proving outcomes before advancing.
   group—`Acceptance` lines sharing one component or contract, provable through
   one verification surface—and stands alone, as each skill does: fresh, isolated
   agents build, test, and verify it in separate runs, needing only its text and
-  the repository. Its lines stay closed and jointly satisfiable, and its
-  `Context` names every exclusion bounding it. `/spec` audits the requirement
-  set and `/inspect` audits tasks against the `outcome-guide.md` **Closure
-  test** and **Self-contained units**.
+  the repository. Its lines stay closed, observable, and jointly satisfiable,
+  and its `Context` names every exclusion bounding it. `/spec` audits the
+  requirement set and `/inspect` audits tasks against the `outcome-guide.md`
+  **Closure test**, **Premise test**, **Observability test**, and
+  **Self-contained units**.
 - **Full autonomy**: no phase, task, or verification step may require human
   execution, an attended or interactive terminal, or a human physically present
   to observe or respond. Deterministic, unattended automated waits—polling,
@@ -186,8 +187,12 @@ The framework distinguishes **Critical Execution State** (`phase`,
   - Completed-task re-entry (`"done"` task at entry to build/check/fix), or a
     task not `"done"` at entry to `/verify`.
   - Unmet task dependencies.
-  - A defect no source edit closes: an infeasible criterion, a planned step that
-    can't run, or a need for human presence.
+  - A defect no in-scope source edit closes:
+    - An infeasible or host-unobservable criterion (at `/check`, `/build`, or
+      `/fix`) requiring ungrounded host assumptions, private-API access, or
+      out-of-scope or excluded edits for lack of an observable discriminator.
+    - A root cause outside the task `Scope`.
+    - A planned step that can't run, or a need for human presence.
   - Unresolvable environment blockers.
   - A `SPEC.md`-internal conflict no `PLAN.md` edit can resolve (at `/inspect`).
 
@@ -197,8 +202,8 @@ Contains distilled requirements and boundaries. Agents must read the codebase
 first to ensure the spec fits existing patterns.
 
 - **What**: core goal.
-- **Requirements**: specific, testable, closed outcomes, contracts, constraints,
-  or sourced decisions—never mechanism lacking a source.
+- **Requirements**: specific, observable, testable, closed outcomes, contracts,
+  constraints, or sourced decisions—never mechanism lacking a source.
 - **Testing strategy**: global validation plan.
 - **Out of scope**: explicit boundaries and residual risks.
 - **Assumptions**: explicitly stated assumptions.
@@ -240,11 +245,12 @@ Created only when `/check` detects gaps between the active task's implementation
 and its `PLAN.md` entry, or implementation defects its changed code introduces.
 Contains:
 
-- The task `Intent`.
+- The task `Intent` and `Scope`.
 - Any task constraints, task-bound exclusions, decisions, and non-derivable
   facts the closures depend on.
-- Each gap as the unmet outcome with evidence—never the edit closing it—with
-  pointers to the affected files.
+- Each gap as the unmet outcome on realistic input, passing the observability
+  test, with evidence—never the edit closing it—and pointers to the affected
+  files.
 - Advisory `Guidance`: the task's own, plus a closure hint per gap its evidence
   grounds.
 
@@ -270,8 +276,9 @@ task or to `/verify` once the plan concludes.
   (`phase: spec`, `status: active`), or, on `status: revision_required` with
   `VERIFY.md` present, write a new `SPEC.md` from scratch using `VERIFY.md`
   findings and source inspection, halting otherwise. Audits the draft so its
-  requirements hold jointly and stay closed, and self-heals conflicts by
-  precedence, never halting on them.
+  requirements hold jointly, close input partitions and event quantifiers,
+  confirm observable host discriminators, and self-heal conflicts by precedence,
+  never halting on them.
 - **Output**: writes `SPEC.md`. Resets `STATE.json` (`phase: plan`,
   `status: active`, `cursor: {}`, `tasks: {}`). Updates `.spae/current`.
 - **Write scope**: `SPEC.md`, `STATE.json`, `.spae/current`, and the
@@ -284,8 +291,9 @@ task or to `/verify` once the plan concludes.
 - **Input**: `SPEC.md`.
 - **Action**: decomposes the specification into a Directed Acyclic Graph (`DAG`)
   of atomic tasks. Orders tasks by dependency and risk. Ensures each task
-  carries one outcome group, stands alone, and leaves the system in a working
-  state. Treats repository code as read-only.
+  carries one outcome group, stands alone, passes the premise and observability
+  tests without widening ambiguous `SPEC.md` terms, and leaves the system in a
+  working state. Treats repository code as read-only.
 - **Output**: overwrites `PLAN.md`. Initializes `tasks` to `todo`, resets
   `cursor: {}`, and updates `STATE.json` phase to `inspect`.
 - **Write scope**: `PLAN.md` and `STATE.json`.
@@ -300,9 +308,11 @@ task or to `/verify` once the plan concludes.
   heavyweight governance stage. Reports findings as `Must fix`, `Should fix`, or
   `Observations`. Rewrites plan lines and tasks that contradict `SPEC.md`,
   source code, each other, or themselves—`SPEC.md` arbitrates requirements,
-  source code facts. Bounds each open plan line to the members `SPEC.md` names.
-  Halts without writing on a `SPEC.md`-internal conflict no `PLAN.md` edit can
-  resolve. Reads source code for analysis only.
+  source code facts. Bounds each open, widened, or host-unobservable plan line
+  to the closest `SPEC.md`-grounded observable contract, recording cut
+  distinctions as task-bound exclusions and in `Risk notes`. Halts without
+  writing on a `SPEC.md`-internal conflict no `PLAN.md` edit can resolve. Reads
+  source code for analysis only.
 - **Output**: overwrites `PLAN.md` with the optimized version. When refinement
   resizes the task set, renumbers to contiguous `T-NNN` IDs, updates every
   in-plan reference, and re-derives the `STATE.json` `tasks` registry to match.
@@ -327,12 +337,14 @@ task or to `/verify` once the plan concludes.
   and docs criteria through planned verification steps, or by reading for prose.
   Runs project checks. Reads forward tasks to avoid foreclosing them but never
   implements beyond the active task. Drives task verification to green, treating
-  a failing check as ordinary work rather than a stop signal. Fails the task
-  only when it can't pass within its scope—an infeasible acceptance criterion, a
-  plan or spec defect, or a broken external dependency—never by gaming a test or
-  editing the plan. When a task legitimately changes a contract, updates the
-  tests it invalidates to match, never weakening, skipping, or deleting a test
-  to force a pass.
+  a failing check as ordinary work—corrected at its cause—rather than a stop
+  signal. Fails the task only when it can't pass within its scope—an infeasible
+  or host-unobservable acceptance criterion requiring ungrounded host
+  assumptions, private-API access, or out-of-scope or excluded edits, a plan or
+  spec defect, or a broken external dependency—never by gaming a test or editing
+  the plan. When a task legitimately changes a contract, updates the tests it
+  invalidates to match, never weakening, skipping, or deleting a test to force a
+  pass.
 - **Output**: mutates source code. Leaves the active task `in_progress` in the
   `tasks` registry—`/check` owns the `done` transition and cursor advance.
   Updates `STATE.json` phase to `check`. The agent never edits `PLAN.md` during
@@ -346,13 +358,16 @@ task or to `/verify` once the plan concludes.
   `status`) and state drift at entry (`tasks[active_task_id]` reading `todo` or
   missing, corrected to `in_progress`), and halts if it reads `done`. Verifies
   the active task's implementation against its `PLAN.md` entry. Runs project
-  checks and the task's own tests. Confirms every `Acceptance` outcome and
-  `Verification` step passes, with no gap against the task `Intent`. Reviews the
-  changed code as a full reviewer:
+  checks and the task's own tests. Confirms every `Acceptance` outcome passes on
+  realistic input—never on contrived harnesses or adversarial host bypasses—and
+  every `Verification` step passes, with no gap against the task `Intent`. Halts
+  without writing `FIX.md` when an `Acceptance` line fails the observability
+  test. Reviews the changed code as a full reviewer:
   - Harm it causes on realistic input—a crash, wrong output, a regression, a
     broken stated contract—counts as a gap.
-  - Handling missing for a member outside a line's named members counts as an
-    observation.
+  - Handling missing for a member outside a line's named members, and misses or
+    harm surfacing only under contrived harnesses or adversarial host bypasses,
+    count as observations.
   - Reads source code for analysis only.
   - Evaluates gaps strictly within the active task's declared scope and ignores
     pre-existing uncommitted files outside task scope.
@@ -368,18 +383,21 @@ task or to `/verify` once the plan concludes.
 
 ### Step 6: `/fix` (Gap remediation)
 
-- **Input**: `STATE.json` (cursor), `FIX.md` (task, `Intent`, `Context`, gaps,
-  and `Guidance`), and source code. `FIX.md` carries all task context.
-- **Action**: addresses exactly the gaps `FIX.md` lists—nothing beyond their
-  scope. Holds the same source-editing authority as `/build`, and weighs
-  `FIX.md` `Guidance` the same way. Self-heals metadata (injects missing
-  `version`, `workstream`, `status`) and state drift at entry (`todo` →
-  `in_progress`), and halts if the active task reads `done`. Proves each
-  behavior gap closed with a test failing on the pre-task state and passing
+- **Input**: `STATE.json` (cursor), `FIX.md` (task, `Intent`, `Scope`,
+  `Context`, gaps, and `Guidance`), and source code. `FIX.md` carries all task
+  context.
+- **Action**: addresses exactly the gaps `FIX.md` lists, correcting each at its
+  root cause within the task `Scope`. Holds the same source-editing authority as
+  `/build`, and weighs `FIX.md` `Guidance` the same way. Self-heals metadata
+  (injects missing `version`, `workstream`, `status`) and state drift at entry
+  (`todo` → `in_progress`), and halts if the active task reads `done`. Proves
+  each behavior gap closed with a test failing on the pre-task state and passing
   after. Iterates until the task's tests pass, treating a failing check as
-  ordinary work rather than a stop signal. Fails the task only when a gap can't
-  close within scope—an infeasible finding, a plan or spec defect, or a broken
-  external dependency.
+  ordinary work—corrected at its cause—rather than a stop signal. Fails the task
+  only when a gap can't close within scope—an infeasible or host-unobservable
+  finding requiring ungrounded host assumptions, private-API access, or
+  out-of-scope or excluded edits, a root cause outside the task `Scope`, a plan
+  or spec defect, or a broken external dependency.
 - **Output**: mutates source code. Updates `STATE.json` phase to `check`, then
   deletes `FIX.md`. The active task stays `in_progress`, and the agent never
   marks it `done` or edits `PLAN.md`.
@@ -390,9 +408,10 @@ task or to `/verify` once the plan concludes.
   source code.
 - **Action**: compares implementation strictly against explicit `SPEC.md`
   requirements. Restricts `Revision required` verdicts to hard
-  blocks—requirement failures, harm or regressions the changes cause, or check
-  breaks—and relegates theoretical edge cases and handling missing for unnamed
-  members to observations. Acts as the final arbiter of `workstream` completion.
+  blocks—requirement failures or harm on realistic input, check breaks, or spec
+  defects—and relegates contrived harnesses, adversarial host bypasses,
+  theoretical edge cases, and handling missing for unnamed members to
+  observations. Acts as the final arbiter of `workstream` completion.
 - **Output (Revision required)**: creates `VERIFY.md` with detailed findings.
   Updates `STATE.json` with `status: revision_required`, `phase: spec`,
   `cursor: {}`, and `tasks: {}`.

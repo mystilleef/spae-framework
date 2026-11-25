@@ -68,14 +68,40 @@ Write it by these rules:
   quantifies over names its members, an input set, or a cited decision bounding
   it—so a consumer decides it met with finite evidence.
   - An open qualifier admits unnamed members: `routine`, `such as`, an
-    unterminated `including`, `any form`, `applicable`, `safe`, `where known`.
-  - Restate an open line as its named members, and file the unnamed members as a
-    residual risk among the unit's exclusions.
+    unterminated `including`, `any form`, `applicable`, `safe`, `where known`,
+    or an unbounded universal trigger quantifier (`any <event>`,
+    `every <trigger>`, `all <mechanism>`) lacking enumerated triggers or a cited
+    decision.
+  - Every classifying, branching, or enum-valued outcome closes both its output
+    set and its **input partition**—the observable condition mapping inputs or
+    runtime states to each named output value.
+  - Restate an open line as its named members, input partition, or triggers, and
+    file unnamed, unmapped, or ambiguous cases and host bypasses as residual
+    risks among the unit's exclusions.
   - A closed member list counts as contract content—named values, encodings,
     cases—never a case matrix, and test wiring around it stays `Guidance`.
 - **Derivation test**: keep a binding context fact only when the consumer can't
   recover it from the repository or its own instructions. Entry-point paths pass
   as pointers. `Guidance` may point at derivable facts.
+- **Premise test**: keep a binding claim of current fact—behavior, symbols,
+  paths, interfaces, tooling, external systems—only when repository files or
+  command output read while authoring confirm it. The test spares the target
+  state a demand—outcome, constraint, decision—prescribes, never a current fact
+  it cites.
+  - Restate a claim the evidence contradicts to match it.
+  - Never rest a binding line on a claim no evidence settles: cut the claim, and
+    file it as a residual risk among the unit's exclusions.
+- **Observability test**: keep a binding outcome that partitions runtime states
+  or reacts to host or external events only when repository files, host APIs,
+  runtime APIs, or command output confirm an in-scope **observable
+  discriminator**—a public field, event, signal, or return contract—or an
+  explicitly specified mechanism separating those states or observing that
+  trigger without ungrounded host assumptions or private internals.
+  - Narrow a line lacking one to the closest confirmed observable boundary, and
+    file the unobservable distinction as a residual risk among the unit's
+    exclusions.
+  - The test spares pure internal logic whose discriminator the unit creates and
+    controls.
 - **Examples**: admit a concrete input→output example only to pin a behavior
   prose leaves ambiguous—never a case matrix.
 - **Accountability**: state every outcome as observable, falsifiable, and
@@ -89,6 +115,7 @@ Write it by these rules:
   - Repair a failing unit before writing it. Failure shapes:
     - Two outcomes demanding incompatible states.
     - An outcome requiring a state a constraint forbids.
+    - An outcome demanding an unobservable host distinction.
     - Evidence demanded from a state its run constraints forbid.
     - An exception one line carves into another without naming the exact fields,
       values, or slots it covers.

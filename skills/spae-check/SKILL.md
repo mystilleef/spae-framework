@@ -61,15 +61,15 @@ Read only what the check requires:
    - Judge each `Acceptance` outcome and the `Intent` against step output, the
      diff, and source, and review the changed code for implementation defects.
    - Label each finding with exactly one tag:
-     - **Gap**—blocks a clear verdict. Cite reproducible evidence—never a
-       theoretical risk, even one a contrived reproduction exhibits, or a
-       stylistic preference:
-       - An unmet `Acceptance` outcome on input or state the task names or
-         enumerates.
+     - **Gap**—blocks a clear verdict. Cite reproducible evidence on realistic
+       input—input or state the task explicitly names or ordinary use produces,
+       never a theoretical risk, contrived harness, or adversarial host bypass
+       (for example forging internal state to spoof provenance or suppressing
+       host events outside named cases), and never a stylistic preference:
+       - An unmet `Acceptance` outcome on realistic input.
        - An implementation defect: harm the task diff—fix-round edits
-         included—causes on realistic input within the task `Scope`, even input
-         `Acceptance` never names. Cite the contract, invariant, or regression
-         it breaks:
+         included—causes within the task `Scope` on realistic input. Cite the
+         contract, invariant, or regression it breaks:
          - A crash, or wrong or corrupted output.
          - A regression of a preserved behavior.
          - A broken contract: one the code, tests, docs, or task already
@@ -81,8 +81,8 @@ Read only what the check requires:
        - A project-check failure the task diff causes.
        - Speculative abstraction, _unrequested_ complexity, or defensive bloat
          the diff adds beyond what the task `Intent` and `Acceptance` require,
-         or edits outside its `Scope` surface. Code preventing a reproducible
-         defect counts as required, never bloat.
+         or edits outside its `Scope` surface. Code preventing a defect
+         reproducible on realistic input counts as required, never bloat.
        - A task-written test breaking `references/verification-guide.md`.
        - **Gap** covers only task-introduced violations within the active task's
          declared scope: debug output, dead code, an orphan file, a
@@ -96,6 +96,9 @@ Read only what the check requires:
        - A coverage extension: handling missing for a member outside a line's
          named members—whether the line closes its class or leaves it open—while
          every named member works and the change causes no harm.
+       - Harm or an `Acceptance` miss surfacing only under contrived input,
+         crafted paths or layouts absent from the project, or adversarial host
+         bypasses.
        - A defensive-code suggestion or a theoretical risk.
        - An approach diverging from the task `Guidance`, or from one `Context`
          or `Scope` suggests, yet breaking no outcome, boundary, or decision.
@@ -135,7 +138,8 @@ Read only what the check requires:
   demands, with evidence—never widened, never the edit closing it.
 - Write `FIX.md` `Guidance` per `references/outcome-guide.md` `## Guidance`:
   - Copy the task's `PLAN.md` `Guidance` bearing on the gaps into `## Guidance`
-    verbatim, dropping any hint the gap `Evidence` contradicts.
+    verbatim, dropping any hint the gap `Evidence` or current source
+    contradicts.
   - Add a closure hint to a gap's `Guidance` only when its `Evidence` grounds
     the hint.
 - Keep `FIX.md` self-contained and isolated per `references/outcome-guide.md`
@@ -178,6 +182,9 @@ Read only what the check requires:
   - A planned `Verification` step can't run for a cause outside the task
     diff—such as missing tooling, a broken external dependency, a step producing
     what it judges, or a need for human presence.
+  - An `Acceptance` line fails the `references/outcome-guide.md` observability
+    test—closing it requires ungrounded host assumptions, private-API access, or
+    out-of-scope or excluded edits for lack of an observable discriminator.
 - **Scope control**: judge only against the gap sources—the active task's
   `Intent`, `Acceptance`, `Verification`, and `Scope`, implementation defects in
   the task diff, project checks, `references/verification-guide.md`, and the
@@ -193,26 +200,28 @@ Read only what the check requires:
   defects.
 - Every finding matching a `Gap` item—implementation defects, diff bloat, and
   cleanup violations included—carries `Gap`, and every other finding—coverage
-  extensions included—carries `Observation`.
+  extensions and harm or `Acceptance` misses surfacing only under contrived
+  input or adversarial host bypasses included—carries `Observation`.
 - Every implementation-defect `Gap` cites the contract, invariant, or regression
   it breaks.
 - Verdict reads clear only with zero `Gap` findings.
 
 - On a `Gap` verdict, the `FIX.md` draft matches `references/FIX.md`:
-  - `## Intent` verbatim from `PLAN.md`.
+  - `## Intent` and `## Scope` verbatim from `PLAN.md`.
   - Every `Gap` headed by its source, with `File`, `Expected`, `Actual`, and
     reproducible `Evidence`.
-  - Every `Expected` restates what its source demands—never widened, never an
-    edit.
+  - Every `Expected` restates what its source demands on realistic input,
+    passing the observability test—never widened, never an edit.
   - `## Guidance` copies only task `PLAN.md` `Guidance` bearing on the gaps,
-    none the gap `Evidence` contradicts, and every gap `Guidance` rests on that
-    gap's `Evidence`.
+    none the gap `Evidence` or current source contradicts, and every gap
+    `Guidance` rests on that gap's `Evidence`.
   - No `Observation`.
 
 - On a `Gap` verdict, the `FIX.md` draft follows `references/outcome-guide.md`:
   - **Self-contained units**: a fresh agent holding only its text and the
     repository can close and prove every gap.
-  - **Substitution test**: every binding line passes.
+  - **Substitution test**, **Premise test**, and **Observability test**: every
+    binding line passes all three.
   - **`## Guidance`**: every `Guidance` line follows its rules.
   - **Derivation test**: `## Context` holds no derivable fact.
 - `STATE.json` matches the `references/STATE.md` exit snapshot for the verdict.

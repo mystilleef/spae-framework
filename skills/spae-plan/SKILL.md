@@ -27,7 +27,7 @@ Use only relevant context from:
 - `.spae/current/SPEC.md`.
 - `.spae/current/STATE.json`, with field reference, directives, and snapshots in
   `references/STATE.md`.
-- Repository source, for codebase fit.
+- Repository source, for codebase fit and preserved behaviors at risk.
 - Project-root testing guides (`TESTING*.md`) covering the files under test,
   when present, for test commands and prerequisites: `TESTING.md` covers the
   main language, `TESTING-<LANG>.md` the named one (`TESTING-LUA.md` for
@@ -51,8 +51,14 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
    - Read `SPEC.md` and extract goal, requirements, testing strategy,
      out-of-scope items, and assumptions. Capture every `R-NNN` into a coverage
      checklist.
-3. **PLAN**—Declare the codebase-fit scope:
+3. **PLAN**—Declare the source-reading scope:
    - Identify the source patterns `ACT` reads for codebase fit.
+   - Identify the direct dependents of each surface the plan changes, for
+     preserved behaviors at risk.
+   - Identify host or runtime API surfaces backing any runtime-state partition
+     or event-reactive behavior, to confirm observable discriminators.
+   - Identify the tooling evidence—declared dependencies, configs, scripts,
+     installed binaries—each `Verification` step binds to.
 4. **ACT**—Draft `PLAN.md`:
    - Read source narrowly, widening only on uncertainty.
    - Follow `references/PLAN.md`, numbering tasks from `T-001`.
@@ -74,6 +80,10 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
      - Task serving no `R-NNN` and no enabling purpose: remove it.
      - Granularity: split a non-atomic task, and merge a merge candidate.
      - Open line: close it per **Directives**.
+     - Failed premise: restate or cut the claim per **Directives**.
+     - Unobservable distinction or widened term: narrow to the confirmed
+       `SPEC.md`-grounded observable boundary and record the cut distinction per
+       **Directives**.
      - `Acceptance` implementing an unlisted `R-NNN`: list the ID, or move the
        line to the owner task for that outcome.
      - Restated outcome: keep it in its owner task alone.
@@ -97,15 +107,26 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
   `PLAN.md` text and the repository can build, test, and verify it, each in a
   separate run. Write `Context` to supply every fact they need and can't derive,
   including facts surfaced only while planning and every task-bound exclusion.
-  Let a task's `Guidance` rely on another task only through that task's
-  `Acceptance`.
+  Rest every binding task line on facts and discriminators the
+  `references/outcome-guide.md` premise and observability tests confirm,
+  recording each claim or distinction they cut as a task-bound exclusion and in
+  `Risk notes`. Let a task's `Guidance` rely on another task only through that
+  task's `Acceptance`.
 - Apply these terms:
   - **Outcome group**: `Acceptance` lines sharing one component or contract,
     provable through one verification surface. An `R-NNN` spanning outcome
     groups splits into one task per group.
   - **Task-bound exclusion**: a settled rejection or residual risk from
-    `SPEC.md` `Out of scope`, or members a closed line leaves unnamed, bounding
-    a task's outcomes.
+    `SPEC.md` `Out of scope`, members a closed line leaves unnamed, or a claim
+    or distinction the premise or observability test cuts, bounding a task's
+    outcomes.
+  - **Realistic input**: input or state `SPEC.md` names or ordinary use
+    produces, never a theoretical risk, contrived harness, or adversarial host
+    bypass.
+  - **Preserved behavior at risk**: existing runtime behavior of a changed
+    surface's direct dependents—callers, importers, and configs—relying on a
+    contract, data shape, or side effect the task's change alters on realistic
+    input.
 - Slice vertically into atomic tasks with no merge candidate, per
   **Verification**.
 - Align with existing codebase patterns and avoid speculative design.
@@ -113,11 +134,17 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
   behaviors at risk:
   - For a `Satisfies`-bearing task, name testable behaviors, including failure
     modes and edge cases only when `SPEC.md` names them or a branch, error path,
-    or boundary the task's own change introduces requires them—never contrived
+    or boundary the task's own change introduces requires them on realistic
     input.
+  - State each preserved behavior at risk in the `Acceptance` of the task whose
+    change risks it.
   - Keep every `Acceptance` and `Verification` line closed per the
-    `references/outcome-guide.md` closure test, recording its unnamed members as
-    a task-bound exclusion and in `Risk notes`.
+    `references/outcome-guide.md` closure test, recording its unnamed members or
+    host bypasses as a task-bound exclusion and in `Risk notes`.
+  - Never widen an ambiguous `SPEC.md` term into a stricter unverified runtime
+    distinction beyond what `SPEC.md` and source ground. Resolve ambiguity to
+    the narrowest observable contract grounded in `SPEC.md` and source,
+    recording cut cases as a task-bound exclusion and in `Risk notes`.
   - For prose, per `references/verification-guide.md`, name what the text must
     convey.
   - For a `Satisfies: none` enabling task, state structural assurances.
@@ -126,7 +153,8 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
   mapped to the outcomes it proves. Keep each step concrete, deterministic, and
   proportional per `references/verification-guide.md`, and never name invocation
   mechanics, test design, or review procedures:
-  - Bind each step to tooling available now or installed by a dependency task.
+  - Bind each step to tooling confirmed available now or installed by a
+    dependency task.
   - Schedule a tooling task only for tooling the `SPEC.md` `Testing strategy`
     admits, verifying it with one smoke run, never its own test suite.
   - Never re-prove in a later task logic an earlier task's tests cover.
@@ -143,7 +171,8 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
   directory outside the project, removed when the run ends. Scratch writes and
   byproducts of a command run for evidence, such as formatter rewrites, never
   count as this phase's writes. Never run a command for its write effect outside
-  this scope. Read source code only for codebase fit.
+  this scope. Read source code only for codebase fit and preserved behaviors at
+  risk.
 - **Phase boundary**: hand off work to `/inspect` without executing tasks.
 - **Version control and release**: never create tasks for version control (git
   staging, commits, branches, tags) or release operations (package publishing,
@@ -173,10 +202,11 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
 - Every `Dependencies` ID numerically precedes its declaring task, and every
   `T-NNN` reference—`Task graph` edges, the overview list, and `Dependencies`
   fields—resolves to a defined task.
-- Every `Satisfies`-bearing task's `Acceptance` names testable behaviors
-  (failure modes and edge cases only when `SPEC.md` names them or the task's own
-  change introduces them), and for prose, what the text must convey. Every
-  enabling task's `Acceptance` states structural assurances.
+- Every `Satisfies`-bearing task's `Acceptance` names testable behaviors,
+  including failure modes and edge cases only when `SPEC.md` names them or a
+  branch, error path, or boundary the task's own change introduces requires them
+  on realistic input, and for prose, what the text must convey. Every enabling
+  task's `Acceptance` states structural assurances.
 - Every task traces both ways:
   - Every `Satisfies` ID names an `R-NNN` the task implements and proves through
     its own `Verification`—or its `Acceptance`, for prose.
@@ -204,9 +234,10 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
   - Their merge would span outcome groups failing independently.
 - Every binding outcome belongs to one owner task, and a dependent relies on it
   through the owner's `Acceptance`, never restating it.
-- Every binding task line passes the `references/outcome-guide.md` substitution
-  and closure tests, and `Context` holds no derivable fact beyond entry-point
-  paths and task-bound exclusions.
+- Every binding task line passes the `references/outcome-guide.md` substitution,
+  closure, premise, and observability tests, introduces no ungrounded widening
+  of an ambiguous `SPEC.md` term, and `Context` holds no derivable fact beyond
+  entry-point paths and task-bound exclusions.
 - Every task-bound exclusion appears in its task's `Context`.
 - Every `Guidance` line follows the `references/outcome-guide.md` `## Guidance`
   rules.
