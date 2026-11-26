@@ -85,29 +85,29 @@
           },
           "trigger": {
             "type": "string",
-            "description": "Trigger passing the evidence threshold: concrete, plausible input or state, reachable code path, and material impact."
+            "description": "Trigger passing the evidence threshold, premise test, and observability test: concrete, plausible input or state, reachable code path, and material impact."
           },
           "guidance": {
             "type": "object",
-            "description": "Advisory fix hints per references/outcome-guide.md ## Guidance; consumers weigh them on their merits, then accept, partially accept, or ignore them.",
+            "description": "Advisory, statically grounded fix hints per references/outcome-guide.md ## Guidance and premise test; consumers weigh them on their merits, then accept, partially accept, or ignore them.",
             "required": ["solution"],
             "additionalProperties": false,
             "properties": {
               "pattern": {
                 "type": "string",
-                "description": "Existing exemplar to mirror—path:line and symbol."
+                "description": "Confirmed existing exemplar to mirror—verified path:line and symbol upholding the needed contract."
               },
               "solution": {
                 "type": "string",
-                "description": "Concrete, targeted fix sketch naming key sites and steps—never vague advice, a diff, or a full patch."
+                "description": "Concrete, targeted, feasible fix sketch naming confirmed sites, APIs, and steps—never unverified claims, vague advice, a diff, or a full patch."
               },
               "avoid": {
                 "type": "string",
-                "description": "Tempting wrong fix the finding invites—such as a suppression, a masking guard, or a weakened type—with why it fails."
+                "description": "Confirmed tempting wrong fix the finding invites—such as a suppression, a masking guard, or a weakened type—with its verified failure mode."
               },
               "tests": {
                 "type": "string",
-                "description": "Regression test hint: test file to extend, fixtures to reuse, triggering case."
+                "description": "Regression test hint grounded in declared repo tooling: existing test file to extend, fixtures to reuse, triggering case."
               }
             }
           }
@@ -116,7 +116,7 @@
     },
     "suppressed_findings": {
       "type": "array",
-      "description": "Findings carrying qualifying intent evidence, failing the evidence threshold, or needing a fix disproportionate to a rare trigger, moved out of findings for audit; never shift result or verdict. Omit this key entirely when empty.",
+      "description": "Findings carrying qualifying intent evidence, failing the evidence-threshold/premise/observability tests, needing an infeasible or disproportionate fix, or inherited entries falsified or out of scope, moved out of findings for audit; never shift result or verdict. Omit this key entirely when empty.",
       "items": {
         "type": "object",
         "required": [
@@ -124,7 +124,6 @@
           "severity",
           "path",
           "finding",
-          "guidance",
           "suppressionRationale"
         ],
         "additionalProperties": false,
@@ -160,31 +159,31 @@
           },
           "guidance": {
             "type": "object",
-            "description": "Advisory fix hints per references/outcome-guide.md ## Guidance; consumers weigh them on their merits, then accept, partially accept, or ignore them.",
+            "description": "Optional advisory fix hints per references/outcome-guide.md ## Guidance and premise test; omit when unneeded per outcome-guide.md Proportional.",
             "required": ["solution"],
             "additionalProperties": false,
             "properties": {
               "pattern": {
                 "type": "string",
-                "description": "Existing exemplar to mirror—path:line and symbol."
+                "description": "Confirmed existing exemplar to mirror—verified path:line and symbol upholding the needed contract."
               },
               "solution": {
                 "type": "string",
-                "description": "Concrete, targeted fix sketch naming key sites and steps—never vague advice, a diff, or a full patch."
+                "description": "Concrete, targeted, feasible fix sketch naming confirmed sites, APIs, and steps—never unverified claims, vague advice, a diff, or a full patch."
               },
               "avoid": {
                 "type": "string",
-                "description": "Tempting wrong fix the finding invites—such as a suppression, a masking guard, or a weakened type—with why it fails."
+                "description": "Confirmed tempting wrong fix the finding invites—such as a suppression, a masking guard, or a weakened type—with its verified failure mode."
               },
               "tests": {
                 "type": "string",
-                "description": "Regression test hint: test file to extend, fixtures to reuse, triggering case."
+                "description": "Regression test hint grounded in declared repo tooling: existing test file to extend, fixtures to reuse, triggering case."
               }
             }
           },
           "suppressionRationale": {
             "type": "string",
-            "description": "Quoted intent evidence and its source (commit, PR description, comment, or requester statement), the failed evidence-threshold test (missing, unreachable, implausible, or immaterial trigger), or the fix disproportion, justifying suppression."
+            "description": "Quoted intent evidence and its source (commit, PR description, comment, or requester statement), the failed evidence-threshold/premise/observability test (missing, unreachable, implausible, or immaterial trigger; unconfirmed premise; no in-scope observable discriminator), fix infeasibility or disproportion, or falsified/out-of-scope inherited rationale."
           }
         }
       }

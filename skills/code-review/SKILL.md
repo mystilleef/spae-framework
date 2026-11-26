@@ -51,23 +51,28 @@ Gather intent grounding matching the resolved scope:
 2. **ORIENT**—Read `references/code-review-guide.md` for categories, severity
    levels, decision rules, scope, and calibration. Read
    `references/report-schema.json` as the output contract, and
-   `references/outcome-guide.md` `## Guidance` for each finding's `guidance`.
-   Anchor to review goal and name what the review won't change.
+   `references/outcome-guide.md` (`## Guidance`, premise test, and observability
+   test) for static grounding of findings and advisory `guidance`. Anchor to
+   review goal and name what the review won't change.
    - Ground the review `model`, refining any inherited one:
      - Runtime execution model (single-threaded CLI, async loop, multi-threaded
        server, isolated worker) and threat model.
      - Trusted inputs—sources the user, project, or plugin controls, such as its
        source tree, install paths, and configuration—carry realistic values,
        never adversarial or contrived ones, in every category.
-   - Limit validation to source inspection and isolated local checks, excluding
-     live-system probing and exploit development.
+   - Limit validation to source inspection and isolated local read-only checks
+     (repository files, manifests, type definitions, or installed
+     runtime/tooling contracts), excluding applying patches, live-system
+     probing, and exploit development.
    - Gather intent grounding (see Input) for the `hunks` under review before the
      phase sweep.
 3. **ACT**—Execute:
    - Read relevant project documentation (`AGENTS.md`, `ORIENT.md`,
      `DESIGN.md`), nearby code, and tests for grounding.
    - Detect and run configured linters, type checkers, and static analysis,
-     treating tool errors as confirmed findings.
+     adding in-scope errors on changed code to the ledger for `VERIFY`—never
+     bypassing scope, `Don't flag` exclusions (such as style or formatting), or
+     the evidence threshold.
    - Sweep all `PHASE_COUNT` (8) phases against a running ledger, seeded per
      _GATE_—a phase with zero new candidates never ends the sweep:
      - Each phase scans every category below in full before consulting the
@@ -99,24 +104,29 @@ Gather intent grounding matching the resolved scope:
        without guaranteed release.
      - **Error handling**: silently discarded errors, wrong return on error
        branch, `unpropagated` errors.
-     - **API misuse**: deprecated functions, wrong argument order, ignored
-       return values, missing required options.
-     - **Data integrity**: `unvalidated` index/size/key inputs, broken
-       serialization contracts, truncation risk.
+     - **API misuse**: broken or removed deprecated functions, wrong argument
+       order, ignored return values, missing required options.
+     - **Data integrity**: `unvalidated` _untrusted_ index/size/key inputs,
+       broken serialization contracts, realistic truncation risk.
 4. **VERIFY**—Run once, after the phase sweep completes—never per phase. Prove
-   each ledger finding, inherited entries included, against code, project
-   mandates, and the `model`, applying the guide's severity rules and decision
-   rules:
+   each ledger finding and statically ground any emitted `guidance`, inherited
+   entries included, against code, project mandates, and the `model`, applying
+   the guide's severity and decision rules:
    - Pass each finding through the evidence threshold—concrete, reachable,
-     plausible trigger plus material impact—recorded as its `trigger`.
-   - Rate severity by likelihood × impact, and weigh each `guidance.solution`
-     for fix proportionality.
-   - Drop out-of-scope new candidates. Never drop an inherited entry, so later
-     runs keep its signature.
-   - Route findings failing the evidence threshold or fix proportionality, or
-     carrying qualifying intent evidence, to `suppressed_findings`, citing the
-     failed test, the fix disproportion, or the intent evidence—never emit them
-     in `findings`.
+     plausible trigger plus material impact, recorded as its `trigger`—and the
+     guide's premise and observability confirmation rules.
+   - Confirm every emitted `guidance` entry's static premises (`solution`,
+     `pattern`, `tests`, `avoid`) per the guide's premise confirmation
+     rule—strip or replace any unconfirmed hint.
+   - Rate severity by likelihood × impact, and weigh each finding's minimal
+     `guidance.solution` under the guide's fix feasibility and proportionality
+     rule.
+   - Drop out-of-scope or falsified new candidates. Never drop an inherited
+     entry, so later runs keep its signature.
+   - Route findings failing these tests—plus entries carrying qualifying intent
+     evidence and falsified or out-of-scope inherited entries—to
+     `suppressed_findings`, citing the exact basis—never emit them in
+     `findings`.
 5. **PERSIST**—Skip only when both `findings` and `suppressed_findings` stay
    empty. Otherwise:
    - Re-run `scripts/fingerprint.sh` as in _GATE_. On output differing from the
@@ -131,9 +141,11 @@ Gather intent grounding matching the resolved scope:
 
 ## Directives
 
+- Optimize all operations for agent, token, and context efficiency.
 - Cite each finding with a quoted excerpt and `path:line`.
 - Rank findings: `Critical`, `High`, `Medium`, `Low`, `Nit`.
-  - Emit `Nit` only when trivially co-located with a higher-severity finding.
+  - Emit `Nit` only when trivially co-located with a non-inherited
+    higher-severity finding.
 - `Result`, reported in the status block and the report `result`: `Issues Found`
   (any non-inherited `findings` entry) · `No New Issues` (inherited `findings`
   entries only) · `No Issues` (no findings).
@@ -142,15 +154,22 @@ Gather intent grounding matching the resolved scope:
   only) · `Approve` (no findings). Derive `Result` and verdict from `findings`
   only—`suppressed_findings` never shift either.
 - Hold candidate findings and every `guidance.solution` to the `model`, `KISS`,
-  and `YAGNI`: never demand defensive bloat or ungrounded guardrails, and keep
-  theoretical defects outside realistic execution paths out of `findings`.
-- Mark uncertainty explicitly: _"Context may change this finding, but…"_
-- Give every `findings` and `suppressed_findings` entry advisory `guidance` per
-  `references/outcome-guide.md` `## Guidance`: the minimal, targeted `solution`,
-  plus `pattern`, `avoid`, and `tests` when they help—never a rewrite of the
-  patch.
+  `YAGNI`, and feasibility: never demand defensive bloat, ungrounded guardrails,
+  or unobservable distinctions, and keep theoretical defects outside realistic
+  execution paths out of `findings`.
+- Keep unconfirmed hypotheses out of active `findings`: emit a finding only
+  after confirmed evidence satisfies the evidence threshold and premise test.
+  Route unconfirmed items to `suppressed_findings`, citing the missing
+  confirmation, and note narrow contextual nuance inline only on confirmed
+  defects.
+- Give every active `findings` entry grounded advisory `guidance` per
+  `references/outcome-guide.md` `## Guidance` and premise test: the minimal,
+  targeted `solution`, plus `pattern`, `avoid`, and `tests` when confirmed and
+  helpful—never a diff, patch, or rewrite. Omit `guidance` from
+  `suppressed_findings` entries needing none, per `outcome-guide.md`
+  **Proportional**.
 - Omit empty categories and "none found" sections.
-- Verify findings against `AGENTS.md` before reporting.
+- Verify findings and advisory `guidance` against `AGENTS.md` before reporting.
 - Keep `PHASE_COUNT` (8) equal to the category count as a single named
   constant—never scatter phase-count literals across the workflow.
 - Open the result `Actions` list with the seed line (for example,
@@ -167,32 +186,39 @@ Gather intent grounding matching the resolved scope:
   bypass safeguards to verify findings.
 - No praise, broad commentary, or unrelated cleanup requests.
 - No large raw tool output—summarize diagnostics.
-- Don't change project source files during review.
+- Don't change project source files or test-apply fixes during review—downstream
+  fixers own implementation and runtime verification.
 - Run `VERIFY`, `PERSIST`, and `REPORT` once, after the phase sweep—never per
   phase.
 
 ## Verification
 
-- Static analysis output checked when available and practical.
+- Static analysis output checked when available and practical, with tool errors
+  filtered through scope, `Don't flag`, and `VERIFY`.
 - Findings map to diff or file excerpts and line references, and every active
-  finding carries a trigger passing the evidence threshold.
+  finding carries a `trigger` passing the evidence threshold, premise test,
+  observability test, and fix feasibility/proportionality.
 - Severity reflects likelihood × user impact, with security _exploitability_
   assessed within the `model`, without requiring exploit development.
-- No self-recovering, fallback-only, or rerun-cleared finding outranks `Low`.
-- Every `guidance.solution` describes a concrete change, and every `guidance`
-  follows the `references/outcome-guide.md` `## Guidance` rules.
-- Report matches workspace mandates.
-- Every `suppressed_findings` entry cites qualifying intent evidence, the failed
-  evidence-threshold test, or the fix disproportion—never a general or vague
-  rationale.
+- No self-recovering, fallback-only, or rerun-cleared finding outranks `Low`,
+  and no `Nit` emits without a co-located non-inherited higher-severity finding.
+- Every active `guidance` follows `references/outcome-guide.md` `## Guidance`
+  and the guide's read-only premise confirmation rule, staying advisory without
+  applying or running fixes.
+- Findings, advisory `guidance`, and report match workspace mandates.
+- `suppressed_findings` omits `guidance` when unneeded, and every entry cites
+  qualifying intent evidence, the failed
+  evidence-threshold/premise/observability test, fix
+  infeasibility/disproportion, or a falsified/out-of-scope inherited entry—never
+  a general or vague rationale.
 - If findings or suppressed findings exist: `code-review-report.yaml` written,
   conforming to `references/report-schema.json`, with the grounded `model` and a
   `fingerprint` matching the PERSIST re-run of `scripts/fingerprint.sh`.
 - Ledger seeded only from a report whose `fingerprint` matches the _GATE_ run of
   `scripts/fingerprint.sh`—any other report deleted.
-- Every inherited entry re-proven under the same evidence, severity, and
-  proportionality tests, then persisted in `findings` or
-  `suppressed_findings`—none dropped.
+- Every inherited entry re-proven under the same evidence, premise,
+  observability, severity, and feasibility/proportionality tests, then persisted
+  in `findings` or `suppressed_findings`—none dropped.
 - `Result` counts only non-inherited `findings` entries as new.
 - Ledger deduplication keys off the defect signature
   (`category:path:line-or-range:slug`), one entry per root cause—no phase counts
@@ -232,7 +258,7 @@ Gather intent grounding matching the resolved scope:
 - **Findings**:
   - [Terse list of notable findings]
 - **Resolutions**:
-  - [Terse list of recommended fixes to findings]
+  - [Terse list of advisory fixes from active findings' `guidance.solution`]
 - **Summary**:
   - [Terse list summarizing outcome]
 
