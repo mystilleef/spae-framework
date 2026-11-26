@@ -22,11 +22,12 @@ closures depend on—omit the section when none apply]
     observability test—never widened, never the edit]
   - **Actual**: [actual result]
   - **Evidence**: [reproducible evidence]
-  - **Guidance**: [Advisory closure hint the evidence grounds—omit when none]
+  - **Guidance**: [Advisory closure hint grounded in evidence and the premise
+    test—omit when none]
 
 ## Guidance
 
 [Advisory: the task's PLAN.md `Guidance` bearing on the gaps, verbatim, minus
-hints the gap evidence or current source contradicts—omit the section when none
-applies]
+hints the gap evidence, current source, or premise test contradicts—omit the
+section when none applies]
 ```

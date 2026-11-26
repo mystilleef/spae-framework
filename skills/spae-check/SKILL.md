@@ -68,8 +68,11 @@ Read only what the check requires:
        host events outside named cases), and never a stylistic preference:
        - An unmet `Acceptance` outcome on realistic input.
        - An implementation defect: harm the task diff—fix-round edits
-         included—causes within the task `Scope` on realistic input. Cite the
-         contract, invariant, or regression it breaks:
+         included—causes within the task `Scope` on realistic input, closable
+         within task `Scope` and exclusions through confirmed observable
+         boundaries without disproportionate complexity for a rare or
+         fallback-only path. Cite the contract, invariant, or regression it
+         breaks:
          - A crash, or wrong or corrupted output.
          - A regression of a preserved behavior.
          - A broken contract: one the code, tests, docs, or task already
@@ -100,6 +103,10 @@ Read only what the check requires:
          crafted paths or layouts absent from the project, or adversarial host
          bypasses.
        - A defensive-code suggestion or a theoretical risk.
+       - A non-`Acceptance` defect whose closure requires edits outside task
+         `Scope` or in an excluded area, an unobservable host discriminator,
+         private internals, or disproportionate `KISS`/`YAGNI` complexity for a
+         rare or fallback-only path.
        - An approach diverging from the task `Guidance`, or from one `Context`
          or `Scope` suggests, yet breaking no outcome, boundary, or decision.
 
@@ -131,17 +138,19 @@ Read only what the check requires:
 
 ## Directives
 
-- Optimize for agent, token, and context efficiency.
+- Optimize all operations for agent, token, and context efficiency.
 - Refine and optimize `FIX.md` for agent consumption: agents read it for varied
   purposes, with no memory of this run. Keep it self-contained, explicit, and
   token-dense, and make each gap closable without `PLAN.md`: what its source
   demands, with evidence—never widened, never the edit closing it.
-- Write `FIX.md` `Guidance` per `references/outcome-guide.md` `## Guidance`:
+- Write `FIX.md` `Guidance` per `references/outcome-guide.md` `## Guidance` and
+  premise test:
   - Copy the task's `PLAN.md` `Guidance` bearing on the gaps into `## Guidance`
-    verbatim, dropping any hint the gap `Evidence` or current source
-    contradicts.
-  - Add a closure hint to a gap's `Guidance` only when its `Evidence` grounds
-    the hint.
+    verbatim, dropping any hint the gap `Evidence`, current source, or premise
+    test contradicts.
+  - Add a closure hint to a gap's `Guidance` only when its `Evidence` and
+    read-only static premise confirmation (confirmed symbols, APIs, flags,
+    contracts, and declared tooling) ground it—never applying or running fixes.
 - Keep `FIX.md` self-contained and isolated per `references/outcome-guide.md`
   **Self-contained units**: a fresh, isolated agent holding only its text and
   the repository can close and prove every gap. Write `## Context` to supply
@@ -200,8 +209,9 @@ Read only what the check requires:
   defects.
 - Every finding matching a `Gap` item—implementation defects, diff bloat, and
   cleanup violations included—carries `Gap`, and every other finding—coverage
-  extensions and harm or `Acceptance` misses surfacing only under contrived
-  input or adversarial host bypasses included—carries `Observation`.
+  extensions, infeasible/out-of-scope/disproportionate non-`Acceptance`
+  findings, and harm or `Acceptance` misses surfacing only under contrived input
+  or adversarial host bypasses included—carries `Observation`.
 - Every implementation-defect `Gap` cites the contract, invariant, or regression
   it breaks.
 - Verdict reads clear only with zero `Gap` findings.
@@ -213,8 +223,8 @@ Read only what the check requires:
   - Every `Expected` restates what its source demands on realistic input,
     passing the observability test—never widened, never an edit.
   - `## Guidance` copies only task `PLAN.md` `Guidance` bearing on the gaps,
-    none the gap `Evidence` or current source contradicts, and every gap
-    `Guidance` rests on that gap's `Evidence`.
+    none the gap `Evidence`, current source, or premise test contradicts, and
+    every gap `Guidance` rests on that gap's `Evidence`.
   - No `Observation`.
 
 - On a `Gap` verdict, the `FIX.md` draft follows `references/outcome-guide.md`:
@@ -222,7 +232,8 @@ Read only what the check requires:
     repository can close and prove every gap.
   - **Substitution test**, **Premise test**, and **Observability test**: every
     binding line passes all three.
-  - **`## Guidance`**: every `Guidance` line follows its rules.
+  - **`## Guidance`**: every `Guidance` line follows its rules and passes the
+    premise test read-only, without applying or running fixes.
   - **Derivation test**: `## Context` holds no derivable fact.
 - `STATE.json` matches the `references/STATE.md` exit snapshot for the verdict.
 - This phase wrote no file outside **Write scope**.

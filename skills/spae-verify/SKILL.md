@@ -62,7 +62,9 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
        produces, never a theoretical risk, contrived harness, or adversarial
        host bypass:
        - Missing or incorrect required behavior on realistic input.
-       - Harm the `workstream` changes cause on realistic input. Cite the
+       - Harm the `workstream` changes cause on realistic input, closable within
+         stated scope and confirmed observable boundaries without
+         disproportionate complexity for a rare or fallback-only path. Cite the
          contract, invariant, or regression it breaks:
          - A crash, or wrong or corrupted output.
          - A regression.
@@ -89,6 +91,10 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
        - An ambiguous `R-NNN`, or a minor deviation outside `SPEC.md` scope.
        - An _unrequested_ guardrail, a theoretical risk, or an `Out of scope`
          residual risk.
+       - Non-`R-NNN` harm whose closure requires an unobservable host
+         discriminator, private internals, an out-of-scope redesign, or
+         disproportionate `KISS`/`YAGNI` complexity for a rare or fallback-only
+         path.
        - A check failure the `workstream` doesn't cause.
    - Head each finding with the `R-NNN` it concerns, else `none`.
    - On any `Hard block`, draft `VERIFY.md` per `references/VERIFY.md`.
@@ -118,12 +124,18 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
 
 - Optimize all operations for agent, token, and context efficiency.
 - Refine and optimize `VERIFY.md` for agent consumption: agents read it for
-  varied purposes, with no memory of this run. Keep it self-contained, explicit,
-  and token-dense, and make each `Hard block` actionable without repeating the
-  investigation: the unmet `R-NNN` outcome with evidence. No `Expected` or
-  `Concern` prescribes a remedy. Place an advisory remedy hint under a hard
-  block's `Guidance` only when its evidence points at one, per
-  `references/outcome-guide.md` `## Guidance`.
+  varied purposes, with no memory of this run:
+  - Keep it self-contained, explicit, and token-dense per
+    `references/outcome-guide.md` **Self-contained units**.
+  - State each `Hard block` as the unmet `R-NNN` outcome or broken contract on
+    realistic input—never widened, never prescribing a remedy—passing the
+    premise and observability tests (except when flagging a spec defect for
+    lacking one).
+  - Place an advisory remedy hint under a hard block's `Guidance` only when its
+    `Evidence` and read-only static premise confirmation (confirmed symbols,
+    APIs, flags, contracts, and declared tooling) ground it, per
+    `references/outcome-guide.md` `## Guidance` and premise test—never applying
+    or running fixes.
 - Consult `references/prose-protocol.md` and `references/outcome-guide.md`
   before drafting `VERIFY.md`.
 - **IMPORTANT:** Return the result to the caller.
@@ -167,8 +179,9 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
 - Every `R-NNN` judged against cited automated evidence.
 - Every finding matching a `Hard block` or `Soft finding`
   item—`workstream`-added bloat included—carries that tag, and every other
-  finding—coverage extensions and harm or `R-NNN` misses surfacing only under
-  contrived input or adversarial host bypasses included—carries `Observation`.
+  finding—coverage extensions, infeasible/disproportionate non-`R-NNN` harm, and
+  harm or `R-NNN` misses surfacing only under contrived input or adversarial
+  host bypasses included—carries `Observation`.
 - Every harm `Hard block` cites the contract, invariant, or regression it
   breaks.
 - Verdict reads `Pass` only with zero `Hard block` findings—any `Hard block`
@@ -177,10 +190,19 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
   - Every finding headed by its `R-NNN`, else `none`.
   - Every `Hard block` with `File`, `Expected`, `Actual`, and reproducible
     `Evidence`.
-  - Every `Expected` names the unmet `R-NNN` outcome.
+  - Every `Expected` restates the unmet `R-NNN` outcome or broken contract on
+    realistic input—never widened, never a remedy.
   - No `Expected` or `Concern` prescribes a remedy, and every `Guidance` rests
-    on its hard block's `Evidence` and follows the `references/outcome-guide.md`
-    `## Guidance` rules.
+    on its hard block's `Evidence`.
+- On `Revision required`, the `VERIFY.md` draft follows
+  `references/outcome-guide.md`:
+  - **Self-contained units**: a fresh agent holding only `VERIFY.md` and the
+    repository can act on every hard block without repeating the investigation.
+  - **Substitution test**, **Premise test**, and **Observability test**: every
+    binding line passes all three (spec-defect findings naming an unobservable
+    `R-NNN` excepted from observability).
+  - **`## Guidance`**: every `Guidance` line follows its rules and passes the
+    premise test read-only, without applying or running fixes.
 - No `VERIFY.md` finding requests human execution, an attended or interactive
   terminal, or human presence.
 - `STATE.json` matches the `references/STATE.md` exit snapshot for the verdict.

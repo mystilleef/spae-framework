@@ -5,10 +5,12 @@
 
 - **[R-NNN | none]**
   - **File**: `path:line`
-  - **Expected**: [expected outcome—never the remedy]
+  - **Expected**: [unmet outcome on realistic input, passing the observability
+    test unless flagging a spec defect—never widened, never the remedy]
   - **Actual**: [actual result]
   - **Evidence**: [reproducible evidence]
-  - **Guidance**: [Advisory remedy hint the evidence points at—omit when none]
+  - **Guidance**: [Advisory remedy hint grounded in evidence and the premise
+    test—omit when none]
 
 ## Soft findings
 

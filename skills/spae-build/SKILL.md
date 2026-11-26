@@ -61,8 +61,11 @@ audit scope.
 3. **PLAN**—Declare the implementation path:
    - Read `references/testing-guide.md`, each project testing guide covering the
      files under test, and `references/shell-command-guide.md`.
-   - Map the test surface per behavior criterion—expected behavior, failure
-     modes, and edge cases—and the covering test per preserved behavior at risk.
+   - Map the test surface per behavior criterion on realistic input—input or
+     state the task names or ordinary use produces, never contrived inputs,
+     contrived harnesses, or adversarial host bypasses: expected behavior,
+     failure modes, and edge cases, plus the covering test per preserved
+     behavior at risk.
    - `PLAN.md` fixes outcomes, `Scope`, and `Context` decisions, never method.
      Choose among valid implementations by fit to the task `Intent`, the plan
      `## Goal`, and forward seams, not local convenience. Weigh the task's
@@ -103,8 +106,8 @@ audit scope.
 - Optimize all operations for agent, token, and context efficiency.
 - Align with existing codebase patterns and avoid speculative design.
 - Write every test category the task demands—unit, integration,
-  end-to-end—deriving each test from its `Acceptance` criterion, never from the
-  implementation's output.
+  end-to-end—deriving each test from its `Acceptance` criterion on realistic
+  input, never from the implementation's output.
 - Treat a failing test or check as ordinary build work and drive it green by
   correcting its cause.
 - When the task legitimately changes a contract, update the tests it invalidates
@@ -176,9 +179,9 @@ audit scope.
 - Every `Acceptance` criterion passes.
 - Every task `Verification` step passes.
 - Relevant project tests pass with no new failures.
-- Every behavior criterion carries passing tests covering its test surface
-  exhaustively, and every preserved behavior at risk a test passing on the
-  pre-task and post-task state.
+- Every behavior criterion carries passing tests covering its realistic-input
+  test surface—no contrived-input or adversarial-bypass bloat—and every
+  preserved behavior at risk a test passing on the pre-task and post-task state.
 - Every added or updated test fails when the behavior it covers breaks and
   passes the CI parity rules in `references/testing-guide.md`.
 - No self-introduced artifact remains per `references/cleanup-guide.md`.
