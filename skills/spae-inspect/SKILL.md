@@ -92,10 +92,12 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
      observable boundary or cut it, recording the cut member in `Risk notes`
      and, when it bounds a task, as a task-bound exclusion. Log any
      `SPEC.md`-originating narrowing under `Observations`, and never halt on it.
-   - `Guidance` line breaking a `references/outcome-guide.md` `## Guidance`
-     rule—contradicting the task's binding lines, `SPEC.md`, or source code,
-     ungrounded, stating a binding claim, or relying on another task's
-     `Guidance`: correct it to conform, else remove it.
+   - `Guidance` line breaking `references/outcome-guide.md` `## Guidance` or its
+     premise test—contradicting the task's binding lines, `SPEC.md`, or source
+     code, naming unconfirmed symbols, APIs, flags, contracts, exemplars, or
+     declared test files/tooling, stating a binding claim, or relying on another
+     task's `Guidance`: correct it from read-only source/manifest evidence, else
+     remove it.
    - `Acceptance` line or clause failing the **Verification** grounding
      criterion—including widening an ambiguous `SPEC.md` term into a stricter
      runtime distinction beyond what `SPEC.md` and source ground: narrow it to
@@ -152,14 +154,15 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
 
 ## Directives
 
-- Optimize for agent, token, and context efficiency.
+- Optimize all operations for agent, token, and context efficiency.
 - Align with existing codebase patterns and avoid speculative design.
 - Refine and optimize `PLAN.md` for agent consumption: agents read it for varied
   purposes, with no memory of this run. Keep rewritten tasks self-contained,
   explicit, and token-dense, and write each task's `Context` to supply every
   fact a fresh agent needs and can't derive, including facts surfaced only
-  during inspection. Record hints surfaced during inspection in the `Guidance`
-  of each task a repair rewrites.
+  during inspection. Record inspection hints in the `Guidance` of each rewritten
+  task only after they pass the `references/outcome-guide.md` premise test
+  read-only.
 - Apply these terms:
   - **Outcome group**: `Acceptance` lines sharing one component or contract,
     provable through one verification surface. An `R-NNN` spanning outcome
@@ -293,8 +296,8 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
     substitution and premise tests—and outside `Acceptance` and `Verification`,
     its closure and observability tests—and `Context` holds no derivable fact
     beyond entry-point paths and task-bound exclusions.
-  - Every `Guidance` line follows the `references/outcome-guide.md`
-    `## Guidance` rules.
+  - Every `Guidance` line follows `references/outcome-guide.md` `## Guidance`
+    and its premise test.
   - `Task graph` edges mirror per-task `Dependencies` fields.
   - Every `Satisfies: none` task's `Context` states a credible enabling
     rationale.

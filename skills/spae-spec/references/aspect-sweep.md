@@ -83,8 +83,9 @@
     boundary and file the unobservable distinction under `Out of scope` as a
     residual risk.
   - Gap: a new closed `R-NNN`, or `Assumptions` for a precondition. **Proposal
-    fidelity** governs a gap only a rejected alternative, a reopened closed
-    list, an open class, or an unobservable distinction closes.
+    fidelity** governs a gap whose closure requires a rejected alternative, a
+    reopened closed list, an open class, an unobservable distinction, or
+    disproportionate `KISS`/`YAGNI` machinery for a rare or fallback-only path.
   - Regression: narrow the claim's disposition to spare the behavior.
   - `AGENTS.md` violation: conform the claim's disposition to `AGENTS.md`.
 
@@ -110,8 +111,9 @@
   - None → `Out of scope` residual risk.
   - Never carry recipes, rigs, coordinates, or case matrices.
 - Route mechanism claims per `outcome-guide.md`: carry each as the `R-NNN`
-  stating its contract or outcome, and its mechanism into `## Guidance` under
-  that `R-NNN`. A mechanism a settled decision or `AGENTS.md` fixes stays a
-  constraint `R-NNN`.
+  stating its contract or outcome, and carry its mechanism into `## Guidance`
+  under that `R-NNN` only after it passes the `outcome-guide.md` premise test
+  (stripping unconfirmed hints). A mechanism a settled decision or `AGENTS.md`
+  fixes stays a constraint `R-NNN`.
 - Keep settled items—`Rejected` entries included—in their binding disposition,
   never duplicated into `## Guidance`.

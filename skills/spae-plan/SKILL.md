@@ -69,9 +69,11 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
      `Satisfies: none`, with an `Intent` naming its structural purpose toward
      the plan `## Goal`.
    - Write each task's `Guidance` per `references/outcome-guide.md`
-     `## Guidance` from the `SPEC.md` `## Guidance` entries for its `Satisfies`
-     IDs and patterns surfaced while planning. Record each task-bound exclusion
-     in its `Context`.
+     `## Guidance` and premise test from the `SPEC.md` `## Guidance` entries for
+     its `Satisfies` IDs and patterns surfaced while planning, confirming every
+     cited symbol, API, flag, contract, exemplar `path:line`, and declared test
+     file/fixture/tooling read-only and dropping any unconfirmed hint. Record
+     each task-bound exclusion in its `Context`.
    - Order tasks by dependency, risk, and vertical value.
    - Apply **Directives** and **Constraints**.
 5. **VERIFY**—Loop over **Verification** criteria for `PLAN.md`:
@@ -80,7 +82,8 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
      - Task serving no `R-NNN` and no enabling purpose: remove it.
      - Granularity: split a non-atomic task, and merge a merge candidate.
      - Open line: close it per **Directives**.
-     - Failed premise: restate or cut the claim per **Directives**.
+     - Failed premise: restate or cut the binding claim or `Guidance` hint per
+       **Directives**.
      - Unobservable distinction or widened term: narrow to the confirmed
        `SPEC.md`-grounded observable boundary and record the cut distinction per
        **Directives**.
@@ -239,8 +242,8 @@ Never read `.spae/current/VERIFY.md`, since `SPEC.md` holds all requirements.
   of an ambiguous `SPEC.md` term, and `Context` holds no derivable fact beyond
   entry-point paths and task-bound exclusions.
 - Every task-bound exclusion appears in its task's `Context`.
-- Every `Guidance` line follows the `references/outcome-guide.md` `## Guidance`
-  rules.
+- Every `Guidance` line follows `references/outcome-guide.md` `## Guidance` and
+  its premise test.
 - Zero tasks mandate version control or release operations.
 - `STATE.json` specifies `phase: "inspect"`, `status: "active"`, `cursor: {}`,
   and `tasks` mapping every `PLAN.md` task ID to `"todo"`.

@@ -85,8 +85,15 @@ Select path by target state:
      - Derive goal, requirements, testing strategy, out-of-scope boundaries,
        assumptions, and guidance from the ledger.
    - `Revision`:
-     - Convert each hard block into a spec item, carrying its `Guidance` into
-       `## Guidance` under that item.
+     - Convert each non-spec-defect hard block into a spec item, carrying its
+       `Guidance` into `## Guidance` under that item only after it passes the
+       `references/outcome-guide.md` premise test (stripping or replacing
+       unconfirmed hints).
+     - For a spec-defect hard block (an `R-NNN` lacking practical automated
+       evidence or a confirmed observable host discriminator), narrow it to the
+       closest confirmed observable, provable boundary or retire it to
+       `Out of scope` as a residual risk—never carry an infeasible `R-NNN`
+       forward.
      - Assess soft findings against `YAGNI`, discarding those adding
        `unrequested` scope or theoretical complexity.
      - Treat observations as context, not spec items:
@@ -119,12 +126,14 @@ Select path by target state:
 - Optimize all operations for agent, token, and context efficiency.
 - Align with existing codebase patterns and avoid speculative design.
 - Filter all requirements and incoming findings against `YAGNI`, discarding
-  `unrequested` scope, speculative design, or theoretical complexity. An
-  audit-proven gap never counts as `unrequested` scope when it rests on
-  realistic input—input or state the proposal, task, or `VERIFY.md` names, or
-  ordinary use produces, never a theoretical risk, contrived harness, or
-  adversarial host bypass. File `YAGNI`-discarded ledger aspects under
-  `Out of scope` with a one-line rationale, never a silent drop.
+  `unrequested` scope, speculative design, or theoretical complexity:
+  - An audit-proven gap counts as grounded only when it rests on realistic
+    input—input or state the proposal, task, or `VERIFY.md` names, or ordinary
+    use produces, never a theoretical risk, contrived harness, or adversarial
+    host bypass—and its closure avoids disproportionate `KISS`/`YAGNI` machinery
+    for a rare or fallback-only path.
+  - File `YAGNI`-discarded or disproportionate ledger aspects under
+    `Out of scope` with a one-line rationale, never a silent drop.
   - Filter verification breadth too: carry a proposal's verification request as
     the outcomes it protects over the same input set—never its recipe, rig, or
     case matrix, and never a wider class.
@@ -141,7 +150,10 @@ Select path by target state:
     restatement, not a correction—and route its mechanism to `## Guidance`. A
     mechanism binds only through a settled decision or `AGENTS.md`.
 - Write `## Guidance` keyed by `R-NNN`, per `references/outcome-guide.md`
-  `## Guidance`.
+  `## Guidance` and premise test: confirm every cited symbol, API, flag,
+  contract, exemplar `path:line`, and declared test file/fixture/tooling from
+  repository files, manifests, type definitions, or isolated read-only
+  checks—dropping or replacing any unconfirmed proposal or `VERIFY.md` hint.
 - Match level of detail to task size, avoiding process bloat:
   - Require failure modes and edge cases only when the proposal, task, or
     `VERIFY.md` names them, or a branch, error path, or boundary the specified
@@ -216,8 +228,9 @@ Select path by target state:
     the qualified goal wins. Otherwise, apply the **Ambiguity** fallback.
   - Apply the smallest correction and cite its evidence.
   - Resolve a gap whose only closure revives a rejected alternative, reopens a
-    closed list, demands an open class, or fails the observability test as an
-    `Out of scope` residual risk, or as the narrowest closed, observable
+    closed list, demands an open class, fails the observability test, or adds
+    disproportionate `KISS`/`YAGNI` machinery for a rare or fallback-only path
+    as an `Out of scope` residual risk, or as the narrowest closed, observable
     requirement meeting the qualified goal, citing the settled item it
     preserves.
   - Keep a settled enumeration—accepted limits, listed differences, fixed
@@ -269,8 +282,8 @@ Select path by target state:
 - Confirm all requirements pass the `references/outcome-guide.md` substitution,
   closure, and observability tests, and every binding line passes its premise
   test.
-- Confirm `## Guidance` follows the `references/outcome-guide.md` `## Guidance`
-  rules and keys only defined `R-NNN` IDs.
+- Confirm `## Guidance` follows `references/outcome-guide.md` `## Guidance` and
+  its premise test, and keys only defined `R-NNN` IDs.
 - Confirm no **Contradictions** finding survives in `SPEC.md`.
 - Confirm zero requirements mandate git operations, package publishing, or
   release deployments.
@@ -294,20 +307,23 @@ Select path by target state:
 - Confirm every proposal `section-ref` maps to a ledger signature or carries
   `no claim`, per `references/aspect-sweep.md`.
 - Confirm every `Draft` ledger-audit defect resolves per
-  `references/aspect-sweep.md` **Ledger audit** dispositions, each correction
-  citing its evidence, with no settled item yielding without the source, host
-  API, or `AGENTS.md` evidence **Proposal fidelity** demands, no requirement
-  reviving a rejected alternative, reopening a closed list, or demanding an
-  unobservable host distinction, and no gap resting on unrealistic input.
-- Confirm `Revision` runs no aspect sweep or ledger audit and maps converted
-  `VERIFY.md` items directly to spec items.
+  `references/aspect-sweep.md` **Ledger audit** dispositions, citing evidence:
+  - No settled item yields without the source, host API, or `AGENTS.md` evidence
+    **Proposal fidelity** demands.
+  - No requirement revives a rejected alternative, reopens a closed list,
+    demands an unobservable host distinction, or imposes disproportionate
+    machinery on a rare or fallback-only path, and no gap rests on unrealistic
+    input.
+- Confirm `Revision` runs no aspect sweep or ledger audit, resolves every
+  `VERIFY.md` hard block, soft finding, and converted observation—narrowing or
+  retiring spec-defect hard blocks instead of emitting infeasible `R-NNN`s—and
+  maps each remaining converted item directly to a spec item.
 - Ensure `.spae/[workstream]/STATE.json` specifies `phase: "plan"`,
   `status: "active"`, `cursor: {}`, and `tasks: {}`.
 - Confirm `.spae/current` links to `.spae/[workstream]`.
 - Verify invocations without a `workstream` name, with a proposal, resolve per
   **Input** rules.
-- Confirm revision processes resolve every `VERIFY.md` hard block and soft
-  finding, and each converted observation, without editing forbidden files.
+- This phase wrote no file outside **Write scope**.
 
 ## Result directives
 
